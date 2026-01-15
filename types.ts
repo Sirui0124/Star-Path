@@ -13,6 +13,8 @@ export enum Company {
   AGRAY = 'AGRAY'         // 艾灰音乐
 }
 
+export type Gender = 'male' | 'female';
+
 export interface Stats {
   vocal: number;
   dance: number;
@@ -52,6 +54,10 @@ export interface VoteBreakdown {
 }
 
 export interface GameState {
+  name: string; // Player name
+  gender: Gender;
+  dreamLabel: string; // User selected dream text
+
   stats: Stats;
   hiddenStats: HiddenStats;
   time: GameTime;
@@ -101,14 +107,28 @@ export interface Action {
   condition?: (state: GameState) => boolean;
 }
 
+export type EventType = 'SOCIAL' | 'RANDOM' | 'SHOW';
+
 export interface GameEvent {
   id: string;
+  type: EventType;
   title: string;
   description: string;
+  stage: GameStage | 'ALL'; // Restrict event to specific stage
+  isMandatory: boolean; // If true, it MUST happen if triggered. If false, it competes in the random pool.
   trigger: (state: GameState) => boolean;
   options: {
     text: string;
-    effect: (state: GameState) => Partial<Stats>;
-    log: string;
+    effect: (state: GameState) => Partial<Stats>; // Fallback effect
+    log: string; // Fallback log
   }[];
+}
+
+// New Interface for AI Event Results
+export interface EventOutcome {
+  narrative: string;
+  changes: Partial<Stats & HiddenStats>;
+  socialType: 'WECHAT' | 'WEIBO' | 'SYSTEM';
+  socialSender: string; // e.g., "经纪人", "吃瓜路人", "系统"
+  socialContent: string;
 }

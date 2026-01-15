@@ -1,10 +1,19 @@
+
 // 图片资源库
 // 为了区分不同阶段，使用了不同的背景色和文字描述
 // 后续请将这些 URL 替换为您准备好的二次元插画链接
 
 export const STORY_IMAGES: Record<string, string> = {
+  // --- 系统背景 ---
+  setup_bg: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png", // 角色创建页背景
+
+  // --- 事件背景 (新增) ---
+  event_social: "https://s3.bmp.ovh/imgs/2026/01/14/b181aebe7ab7fa01.png", // 社媒营业
+  event_random: "https://s3.bmp.ovh/imgs/2026/01/14/c234302c56b34c0a.png", // 突发事件
+  event_show: "https://s3.bmp.ovh/imgs/2026/01/14/d4275123ddcdeddb.png",    // 选秀事件
+
   // --- 练习生阶段 (16-18岁) ---
-  default: "https://placehold.co/600x400/ffe4e6/881337?text=Star+Path",
+  default: "https://s3.bmp.ovh/imgs/2026/01/14/76df613fa07ca668.png",
   16: "https://s3.bmp.ovh/imgs/2026/01/14/76df613fa07ca668.png", // 粉色系，懵懂
   17: "https://placehold.co/600x400/fecdd3/9f1239?text=Age+17+Hard+Training", // 深粉，汗水
   18: "https://placehold.co/600x400/fbcfe8/831843?text=Age+18+Coming+of+Age", // 紫粉，成长
@@ -24,11 +33,11 @@ export const STORY_IMAGES: Record<string, string> = {
   26: "https://placehold.co/600x400/fde047/713f12?text=Age+26+Final+Chapter", // 金色，终章
 
   // --- 结局插画 ---
-  ending_center: "https://placehold.co/600x400/fff7ed/7c2d12?text=Ending:+Center+Debut", // C位-橙金辉煌
-  ending_group: "https://placehold.co/600x400/fce7f3/831843?text=Ending:+Group+Debut",   // 成团-花路粉红
-  ending_solo_good: "https://placehold.co/600x400/ecfeff/164e63?text=Ending:+Top+Solo",   // Solo好-青色实力
-  ending_solo_bad: "https://placehold.co/600x400/eef2ff/312e81?text=Ending:+Solo+Debut",  // Solo普-深沉蓝紫
-  ending_eliminated: "https://placehold.co/600x400/f3f4f6/1f2937?text=Ending:+Game+Over", // 淘汰-灰色落寞
+  ending_center: "https://s3.bmp.ovh/imgs/2026/01/14/00917a62999f88b8.png", // C位-橙金辉煌
+  ending_group: "https://s3.bmp.ovh/imgs/2026/01/14/1bfa0f89a987ead3.png",   // 成团-花路粉红
+  ending_solo_good: "https://s3.bmp.ovh/imgs/2026/01/14/e346da09ae4386da.png",   // Solo好-青色实力
+  ending_solo_bad: "https://s3.bmp.ovh/imgs/2026/01/14/e346da09ae4386da.png",  // Solo普-未来无限可能
+  ending_eliminated: "https://s3.bmp.ovh/imgs/2026/01/14/0e7af0bf4b3d5fc1.png", // 淘汰-灰色落寞
 };
 
 // 根据结局文本获取对应的图片 Key

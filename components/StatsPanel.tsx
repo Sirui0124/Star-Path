@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Stats, GameTime, GameStage, HiddenStats } from '../types';
 import { Heart, Smile, Mic, Music, Video, User, TrendingUp, Star, Trophy, Flame, Zap } from 'lucide-react';
@@ -30,12 +31,12 @@ export const StatsPanel: React.FC<Props> = ({ stats, hiddenStats, time, stage, r
   const getQuarterName = (q: number) => ['春', '夏', '秋', '冬'][q - 1];
 
   return (
-    <div className="bg-white p-3 rounded-xl shadow-md mb-4 border border-pink-100">
+    <div className="bg-white p-3 rounded-xl shadow-md mb-4 border border-blue-100">
       <div className="flex justify-between items-center mb-3 border-b pb-2">
-        <div className="text-lg font-bold text-pink-600">
+        <div className="text-lg font-bold text-blue-600">
           {time.age}岁 · {time.year}年{getQuarterName(time.quarter)}
         </div>
-        <div className="text-xs bg-pink-100 text-pink-800 px-2 py-1 rounded-full whitespace-nowrap">
+        <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full whitespace-nowrap">
             {stage === GameStage.AMATEUR ? '练习生' : stage === GameStage.SHOW ? '青春404' : '结局'}
         </div>
       </div>
@@ -54,7 +55,7 @@ export const StatsPanel: React.FC<Props> = ({ stats, hiddenStats, time, stage, r
       </div>
 
       <div className="mt-2 flex justify-between items-center pt-2 border-t text-sm font-medium">
-         <div className="flex items-center gap-1 text-pink-700 text-xs sm:text-sm">
+         <div className="flex items-center gap-1 text-blue-700 text-xs sm:text-sm">
             <Star size={14} /> 粉丝: {stats.fans}万
          </div>
          {stage === GameStage.SHOW && (

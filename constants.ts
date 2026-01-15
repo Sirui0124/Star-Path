@@ -1,4 +1,27 @@
-import { Action, Company, GameEvent, GameState, GameStage } from './types';
+
+import { Action, Company } from './types';
+
+// --- Loading Messages ---
+export const LOADING_MESSAGES = [
+  "经纪人正在疯狂打电话...",
+  "正在联系百万修音师...",
+  "粉丝后援会正在集资冲榜...",
+  "正在挑选红毯战袍...",
+  "正在应对营销号的突发爆料...",
+  "正在等待热搜降临...",
+  "正在练习室挥洒汗水...",
+  "正在与导演组激烈沟通...",
+  "正在精修路透生图...",
+  "正在确认通告行程...",
+  "站姐正在上传高清直拍..."
+];
+
+// --- Random Player Names ---
+export const RANDOM_PLAYER_NAMES = [
+  "星河", "沐沐", "小七", "阿光", "Yuna", "Kiki", "Alex", "Max",
+  "子墨", "云帆", "知夏", "乐天", "Coco", "Vivi", "Rain", 
+  "予安", "清欢", "北辰", "南笙", "Zero"
+];
 
 // --- Companies ---
 export const COMPANIES = {
@@ -64,20 +87,20 @@ export const AMATEUR_ACTIONS: Action[] = [
   {
     id: 'street_perform',
     name: '街头演出',
-    description: '健康-8, Vocal+5, 情商+3, 粉丝UP',
+    description: '健康-8, Vocal+5, 情商+3, 粉丝+',
     apCost: 1,
-    effect: () => ({
+    effect: (state) => ({
       health: -8,
       vocal: 5,
       eq: 3,
-      fans: chance(30) ? 10 : rand(3, 5),
+      fans: state.stats.fans >= 100 ? rand(8, 12) : rand(3, 5),
       dream: 3
     })
   },
   {
     id: 'social_media',
     name: '社媒运营',
-    description: '健康-2, 情商+5, 粉丝UP',
+    description: '健康-2, 情商+5, 粉丝+',
     apCost: 1,
     effect: (state) => ({
       health: -2,
@@ -90,8 +113,8 @@ export const AMATEUR_ACTIONS: Action[] = [
 export const SHOW_ACTIONS: Action[] = [
   {
     id: 'show_practice',
-    name: '练习室(高强度)',
-    description: 'Vocal/Dance+10, 粉丝/票数下降, 概率出圈',
+    name: '独自苦练（无镜头）',
+    description: 'Vocal+5,Dance+5,票数--, 概率出圈',
     apCost: 1,
     effect: () => ({
       vocal: 10,
@@ -105,18 +128,18 @@ export const SHOW_ACTIONS: Action[] = [
   {
     id: 'show_rest',
     name: '补觉休息',
-    description: '健康+15, 粉丝/票数下降',
+    description: '健康+10, 粉丝/票数下降',
     apCost: 1,
     effect: () => ({
       health: 15,
-      fans: -rand(2, 4),
+      fans: -rand(1, 3),
       votes: -3
     })
   },
   {
     id: 'show_makeup',
     name: '化妆造型',
-    description: '健康-2, 颜值+8, 票数+2, 概率涨粉',
+    description: '健康-2, 颜值+8, 票数+2, 粉丝+',
     apCost: 1,
     effect: () => ({
       health: -2,
@@ -127,11 +150,12 @@ export const SHOW_ACTIONS: Action[] = [
   },
   {
     id: 'show_help',
-    name: '帮助朋友',
-    description: '道德+10, 随机能力-5',
+    name: '帮助他人',
+    description: '道德+10, 情商+3, 随机能力-5',
     apCost: 1,
     effect: () => ({
       morale: 10,
+      eq: 3,
       vocal: Math.random() > 0.5 ? -5 : 0,
       dance: Math.random() <= 0.5 ? -5 : 0,
     })
@@ -139,131 +163,40 @@ export const SHOW_ACTIONS: Action[] = [
   {
     id: 'show_vlog',
     name: '录制Vlog',
-    description: '健康-5, 情商+6, 粉丝+5, 票数+8, 概率出圈',
+    description: '健康-5, 粉丝+5, 票数+8, 概率出圈',
     apCost: 1,
     effect: () => ({
       health: -5,
-      eq: 6,
       fans: 5,
       votes: 8,
-      viralMoments: chance(10) ? 1 : 0
+      viralMoments: chance(10) ? 1 : 0,
+      sincerity: 2
     })
   },
   {
     id: 'show_camera',
     name: '抢镜头',
-    description: '健康-5, 道德-5, 情商+8, 粉丝+5',
+    description: '健康-5, 道德-5, 票数++',
     apCost: 1,
     effect: () => ({
       health: -5,
       morale: -5,
-      eq: 8,
-      fans: 5,
+      votes: chance(25) ? rand(20,30) : rand(5,10),
       sincerity: -5
     })
   },
   {
     id: 'show_cp',
     name: '炒CP',
-    description: '健康-5, 道德-8, 颜值+2, 情商+8, 票数大涨',
-    apCost: 1,
+    description: '健康-5, 道德-10, 粉丝++, 票数++',
+    apCost: 2,
     effect: () => ({
       health: -5,
-      morale: -8,
-      looks: 2,
-      eq: 8,
+      morale: -10,
       fans: chance(25) ? rand(10, 20) : rand(3, 8),
-      votes: chance(25) ? 30 : 10,
+      votes: chance(25) ? rand(20,30) : rand(5,10),
       sincerity: -10,
       hotCp: chance(15) ? 1 : 0
     })
-  }
-];
-
-// --- Events ---
-export const EVENTS: GameEvent[] = [
-  {
-    id: 'scandal_rumor',
-    title: '网络谣言',
-    description: '有人在论坛爆料你初中时的黑历史（真假难辨）。',
-    trigger: (s) => s.stats.fans > 50 && chance(30),
-    options: [
-      { text: '发律师函', effect: () => ({ morale: 5, fans: -5 }), log: '你选择了强硬回击，虽然流失了部分粉丝，但维护了尊严。' },
-      { text: '冷处理', effect: () => ({ eq: 5, fans: 0 }), log: '你选择冷处理，谣言随着时间慢慢平息。' },
-      { text: '卖惨澄清', effect: () => ({ sincerity: -5, fans: 10 }), log: '你哭着开了直播，粉丝心疼不已，但也失去了部分路人缘。' }
-    ]
-  },
-  {
-    id: 'street_scout',
-    title: '星探搭讪',
-    description: '在便利店买关东煮时，一个戴墨镜的大叔递给你名片。',
-    trigger: (s) => s.stage === GameStage.AMATEUR && s.stats.looks > 50 && chance(20),
-    options: [
-      { text: '礼貌收下', effect: () => ({ eq: 5 }), log: '你礼貌收下名片，增加了社会经验。' },
-      { text: '当场拒绝', effect: () => ({ morale: 5 }), log: '你警惕地拒绝了，安全第一。' },
-      { text: '热情攀谈', effect: () => ({ eq: -5, dream: 5 }), log: '你太热情了，对方反而有点被吓到。' }
-    ]
-  },
-  {
-    id: 'school_festival',
-    title: '校园艺术节',
-    description: '学校举办艺术节，班长希望你报名一个节目。',
-    trigger: (s) => s.stage === GameStage.AMATEUR && s.time.quarter === 3 && chance(50),
-    options: [
-      { text: '独唱歌曲', effect: () => ({ vocal: 10, fans: 2 }), log: '你的歌声惊艳了全校，收获了第一批迷妹。' },
-      { text: '热舞开场', effect: () => ({ dance: 10, fans: 2 }), log: '你的舞蹈点燃了全场气氛！' },
-      { text: '婉拒', effect: () => ({ health: 5 }), log: '你选择在台下为同学鼓掌，度过了轻松的一天。' }
-    ]
-  },
-  {
-    id: 'viral_video',
-    title: '意外走红',
-    description: '路人随手拍的你练习室的视频在短视频平台火了。',
-    trigger: (s) => s.stats.dance > 80 && chance(10),
-    options: [
-      { text: '趁热打铁开直播', effect: () => ({ fans: 20, health: -5 }), log: '你抓住机会吸了一大波粉。' },
-      { text: '保持神秘', effect: () => ({ looks: 5, dream: 5 }), log: '你的神秘感让大家对你更好奇了。' }
-    ]
-  },
-  {
-    id: 'late_night_practice',
-    title: '深夜练习',
-    description: '练习室的灯只剩下你这一盏。',
-    trigger: (s) => s.stage === GameStage.SHOW && s.stats.health > 60 && chance(40),
-    options: [
-      { text: '坚持到底', effect: () => ({ vocal: 5, dance: 5, health: -10, dream: 5 }), log: '你练到了凌晨，看着镜子里的自己，眼神更加坚定了。' },
-      { text: '回去休息', effect: () => ({ health: 5 }), log: '懂得休息也是一种能力。' }
-    ]
-  },
-  {
-    id: 'evil_editing',
-    title: '恶魔剪辑',
-    description: '节目组把你发呆的镜头剪辑成了对导师翻白眼。',
-    trigger: (s) => s.stage === GameStage.SHOW && chance(25),
-    options: [
-      { text: '找选管理论', effect: () => ({ eq: -5, morale: 5 }), log: '你据理力争，但得罪了节目组。' },
-      { text: '忍气吞声', effect: () => ({ eq: 5, health: -5, dream: -5 }), log: '你默默忍受了委屈，压力很大。' },
-      { text: '自黑解围', effect: () => ({ fans: 5, eq: 10 }), log: '你在Vlog里模仿自己的表情包，高情商化解了危机。' }
-    ]
-  },
-  {
-    id: 'fan_gift',
-    title: '粉丝的礼物',
-    description: '收到了一封手写的长信和一盒润喉糖。',
-    trigger: (s) => s.stats.fans > 10 && chance(30),
-    options: [
-      { text: '认真回信', effect: () => ({ fans: 5, sincerity: 10 }), log: '你真诚地回复了粉丝。' },
-      { text: '分享给室友', effect: () => ({ eq: 5, health: 5 }), log: '你和室友分享了这份温暖。' }
-    ]
-  },
-  {
-    id: 'reality_check',
-    title: '现实的打击',
-    description: '同期的练习生因为家里有钱，直接空降了出道位。',
-    trigger: (s) => s.stage === GameStage.AMATEUR && s.stats.eq < 30 && chance(20),
-    options: [
-      { text: '愤愤不平', effect: () => ({ morale: 5, eq: -5 }), log: '你发了朋友圈吐槽，被经纪人批评了。' },
-      { text: '更加努力', effect: () => ({ vocal: 5, dance: 5, dream: 10 }), log: '你把不甘心化为了动力。' }
-    ]
   }
 ];
