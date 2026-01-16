@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Gender } from '../types';
 import { RANDOM_PLAYER_NAMES } from '../constants';
@@ -13,22 +12,22 @@ const DREAMS = [
   {
     id: 'idol',
     title: '舞台王者',
-    desc: '从练习室走到大舞台，唱跳全能的舞台主宰。I am the C',
-    icon: <Star size={24} />,
+    desc: '唱跳全能的舞台主宰。I am the C',
+    icon: <Star size={18} />,
     defaultStats: { vocal: 25, dance: 25, looks: 10 }
   },
   {
     id: 'singer',
     title: '灵魂歌手',
-    desc: '我想一辈子唱歌给我爱的人们听，歌声永远屹立不倒。',
-    icon: <Mic size={24} />,
+    desc: '唱到体育场，声音永远屹立不倒',
+    icon: <Mic size={18} />,
     defaultStats: { vocal: 40, dance: 5, looks: 15 }
   },
   {
     id: 'artist',
     title: '实力明星',
-    desc: '以多元身份解锁无限可能，穿梭在镜头和舞台之间，用作品见证成长。',
-    icon: <Music size={24} />,
+    desc: '多元身份，无限可能，穿梭在镜头和舞台之间，用作品见证成长',
+    icon: <Music size={18} />,
     defaultStats: { vocal: 15, dance: 10, looks: 35 }
   }
 ];
@@ -142,13 +141,13 @@ export const CharacterSetup: React.FC<Props> = ({ onComplete }) => {
                 <button
                   key={d.id}
                   onClick={() => setSelectedDreamId(d.id)}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-start gap-4 group ${
+                  className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center gap-4 group min-h-24 h-auto ${
                     selectedDreamId === d.id 
-                    ? 'border-blue-500 bg-white/80 shadow-md transform scale-[1.02]' 
-                    : 'border-transparent bg-white/40 hover:bg-white/60 hover:border-blue-200'
+                    ? 'border-blue-500 bg-white/90 shadow-md transform scale-[1.02]' 
+                    : 'border-transparent bg-white/60 hover:bg-white/80 hover:border-blue-200'
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-1 transition-colors ${
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors ${
                      selectedDreamId === d.id ? 'bg-blue-100 text-blue-600' : 'bg-gray-100/50 text-gray-500'
                   }`}>
                     {d.icon}
@@ -189,22 +188,24 @@ export const CharacterSetup: React.FC<Props> = ({ onComplete }) => {
 
             {/* Name Input */}
             <div className="mb-6">
-               <div className="flex gap-2 relative">
+               <div className={`flex items-center bg-white/80 rounded-xl border-2 transition-all shadow-sm ${
+                  !name || isNameValid ? 'border-transparent focus-within:border-blue-500' : 'border-red-400'
+               }`}>
                  <input 
                     type="text" 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="签下你的名字..."
-                    className={`flex-1 p-4 pl-4 border-2 rounded-xl outline-none transition-colors bg-white/80 text-lg font-bold text-center placeholder-gray-400 ${
-                       !name || isNameValid ? 'border-transparent focus:border-blue-500' : 'border-red-400'
-                    }`}
+                    className="flex-1 p-4 bg-transparent outline-none text-lg font-bold text-gray-900 text-center placeholder-gray-400 min-w-0"
                  />
+                 <div className="h-8 w-px bg-gray-300/50 shrink-0"></div>
                  <button 
                    onClick={handleRandomName}
-                   className="absolute right-2 top-2 bottom-2 aspect-square flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors"
+                   className="flex flex-col items-center justify-center px-4 py-2 text-gray-500 hover:text-blue-600 transition-colors active:scale-95 shrink-0"
                    title="随机姓名"
                  >
                    <Dices size={20} />
+                   <span className="text-[10px] font-bold whitespace-nowrap">随机</span>
                  </button>
                </div>
                <div className="text-center mt-2">

@@ -61,7 +61,7 @@ export const ALL_EVENTS: GameEvent[] = [
     stage: GameStage.AMATEUR,
     isMandatory: false,
     repeatable: true, // Filler
-    trigger: (s) => s.stats.looks > 20,
+    trigger: (s) => s.stats.looks > 30,
     options: [
       { text: '酷盖风格', effect: () => ({ looks: 2, fans: 1 }), log: '被夸衣品好。' },
       { text: '邻家少年感', effect: () => ({ looks: 1, fans: 2 }), log: '妈粉直呼可爱。' },
@@ -87,7 +87,7 @@ export const ALL_EVENTS: GameEvent[] = [
     id: 'social_selfie',
     type: 'SOCIAL',
     title: '营业自拍',
-    description: '好久没发动态了，梦里的你提醒你营业一下。',
+    description: '好久没发动态了，做梦提醒你营业一下。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
     repeatable: true, // Filler
@@ -122,8 +122,8 @@ export const ALL_EVENTS: GameEvent[] = [
     trigger: (s) => s.stats.looks > 40 && chance(30),
     options: [
       { text: '积极营业', effect: () => ({ fans: 3, looks: 1 }), log: '获得了不少流量。' },
-      { text: '保持自我风格', effect: () => ({ ethics: 2, fans: -1 }), log: '不随波逐流。' },
-      { text: '让队友去蹭', effect: () => ({ fans: -1, ethics: -1 }), log: '错失良机。' }
+      { text: '保持自我风格', effect: () => ({ looks: 2, fans: -1 }), log: '不随波逐流。' },
+      { text: '让队友去蹭', effect: () => ({ fans: -2 }), log: '错失良机。' }
     ]
   },
   {
@@ -137,7 +137,7 @@ export const ALL_EVENTS: GameEvent[] = [
     options: [
       { text: '纯素颜直出', effect: () => ({ fans: 3, looks: -1 }), log: '真实感拉满，部分颜粉脱粉。' },
       { text: '心机伪素颜', effect: () => ({ looks: 2, fans: 2 }), log: '妈生粉狂欢。' },
-      { text: '假装没看见', effect: () => ({ ethics: -1 }), log: '被说偶像包袱重。' }
+      { text: '假装没看见', effect: () => ({ ethics: -1, fans: -1 }), log: '被说偶像包袱重。' }
     ]
   },
   {
@@ -147,11 +147,11 @@ export const ALL_EVENTS: GameEvent[] = [
     description: '你的粉丝和对家粉丝在广场撕起来了，场面混乱。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
-    trigger: (s) => s.stats.fans > 50 && chance(40),
+    trigger: (s) => s.stats.fans > 30 && chance(40),
     options: [
       { text: '发美图转移视线', effect: () => ({ fans: 2, looks: 1 }), log: '用美照平息战火。' },
       { text: '发练习视频', effect: () => ({ vocal: 1, dance: 1, fans: 1 }), log: '用实力说话。' },
-      { text: '关评论装死', effect: () => ({ fans: -2, ethics: 2 }), log: '被说没担当。' }
+      { text: '微博艾特对家，表示友好，请粉丝停战', effect: () => ({ fans: -5, ethics: 2 }), log: '和平鸽，气死粉丝。' }
     ]
   },
   {
@@ -259,7 +259,7 @@ export const ALL_EVENTS: GameEvent[] = [
     description: '粉丝控评总是慢半拍，你在评论区暗示技巧。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
-    trigger: (s) => s.stats.fans > 80 && chance(30),
+    trigger: (s) => s.stats.fans > 60 && chance(30),
     options: [
       { text: '发教程贴', effect: () => ({ fans: 2, ethics: -1 }), log: '被营销号截图夸专业。' },
       { text: '让粉丝自由发挥', effect: () => ({ fans: -1, ethics: 2 }), log: '评论区一片混乱。' },
@@ -270,14 +270,14 @@ export const ALL_EVENTS: GameEvent[] = [
     id: 'social_sasaeng',
     type: 'SOCIAL',
     title: '私生跟车',
-    description: '发博吐槽私生跟车，但怕被说卖惨。',
+    description: '遇到了私生粉丝跟你到飞机上，对你狂拍。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
     trigger: (s) => s.stats.fans > 100 && chance(40),
     options: [
-      { text: '严肃警告', effect: () => ({ fans: 1, ethics: 2 }), log: '获得路人支持。' },
-      { text: '温柔劝导', effect: () => ({ fans: 2, ethics: -1 }), log: '私生更猖狂了。' },
-      { text: '不回应', effect: () => ({ ethics: -2 }), log: '憋出内伤。' }
+      { text: '反拍私生，怒骂', effect: () => ({ fans: 2, ethics: 2, health: 2}), log: '获得路人支持，就该硬刚私生。' },
+      { text: '温柔劝导', effect: () => ({ fans: -2, ethics: -1 }), log: '私生更猖狂了，粉丝怒了' },
+      { text: '不回应，忍了', effect: () => ({ health: -2 }), log: '憋出内伤。' }
     ]
   },
   {
@@ -476,12 +476,12 @@ export const ALL_EVENTS: GameEvent[] = [
     id: 'random_family',
     type: 'RANDOM',
     title: '家人来电',
-    description: '妈妈打电话问你什么时候放弃回家。',
+    description: '妈妈打电话问你什么时候放弃做爱豆。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
     trigger: (s) => chance(25),
     options: [
-      { text: '保证会出道', effect: () => ({ ethics: -2 }), log: '压力山大。' },
+      { text: '保证会出道', effect: () => ({ ethics: -2, health: -1}), log: '压力山大。' },
       { text: '撒娇求支持', effect: () => ({ ethics: 3, fans: 1 }), log: '家人心软了。' },
       { text: '沉默挂电话', effect: () => ({ ethics: -3, health: -1 }), log: '情绪低落。' }
     ]
@@ -493,25 +493,11 @@ export const ALL_EVENTS: GameEvent[] = [
     description: '你代言的奶茶品牌被曝食品安全问题。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
-    trigger: (s) => s.stats.fans > 80 && chance(30),
+    trigger: (s) => s.stats.fans > 50 && chance(30),
     options: [
       { text: '立即解约', effect: () => ({ fans: 1, ethics: 1 }), log: '损失违约金但保住口碑。' },
       { text: '装死不回应', effect: () => ({ fans: -3, ethics: -2 }), log: '被喷"要钱不要命"。' },
       { text: '转发声明', effect: () => ({ fans: -1 }), log: '粉丝帮你洗广场。' }
-    ]
-  },
-  {
-    id: 'random_styling',
-    type: 'RANDOM',
-    title: '造型灾难',
-    description: '公司给的回归造型是"非主流杀马特"。',
-    stage: GameStage.AMATEUR,
-    isMandatory: false,
-    trigger: (s) => s.stats.looks > 50 && chance(35),
-    options: [
-      { text: '咬牙接受', effect: () => ({ looks: -3, fans: 2 }), log: '黑图出圈，但黑红也是红。' },
-      { text: '私下改动', effect: () => ({ looks: 1, ethics: 2 }), log: '化妆师对你印象极差。' },
-      { text: '拒绝造型', effect: () => ({ looks: 1, ethics: -3 }), log: '被说耍大牌。' }
     ]
   },
   {
@@ -563,7 +549,7 @@ export const ALL_EVENTS: GameEvent[] = [
     description: '你的大粉站姐突然发博说"脱粉了，累了"。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
-    trigger: (s) => s.stats.fans > 70 && chance(30),
+    trigger: (s) => s.stats.fans > 50 && chance(30),
     options: [
       { text: '私信挽留', effect: () => ({ fans: 1, ethics: -2 }), log: '卑微挽留。' },
       { text: '潇洒放手', effect: () => ({ fans: -3, ethics: 2 }), log: '被赞体面，但粉丝流失。' },
@@ -619,11 +605,11 @@ export const ALL_EVENTS: GameEvent[] = [
     description: '评论区说你"发腮"、"馒化"，像发面馒头。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
-    trigger: (s) => s.stats.looks > 60 && chance(30),
+    trigger: (s) => s.stats.looks > 50 && chance(30),
     options: [
       { text: '怒晒健身照', effect: () => ({ looks: 2, health: 1 }), log: '用腹肌说话。' },
       { text: '发素颜怼脸拍', effect: () => ({ looks: 1, fans: 2 }), log: '妈粉护体。' },
-      { text: '删评闭麦', effect: () => ({ ethics: -2 }), log: '玻璃心碎了。' }
+      { text: '删评闭麦', effect: () => ({ health: -2 }), log: '玻璃心碎了。' }
     ]
   },
   {

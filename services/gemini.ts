@@ -31,9 +31,9 @@ export const generateGameSummary = async (gameState: GameState): Promise<string>
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3-pro-preview',
       contents: prompt,
-      config: { thinkingConfig: { thinkingBudget: 0 } }
+      config: { thinkingConfig: { thinkingBudget: -1 } }
     });
     return response.text || "星光虽微，亦有光芒。感谢游玩。";
   } catch (error) {
@@ -59,7 +59,7 @@ export const generateAnnualSummary = async (gameState: GameState): Promise<strin
   // Allow slightly longer timeout for annual summary as it's a major transition
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-2.0-flash-lite',
       contents: prompt,
       config: { thinkingConfig: { thinkingBudget: 0 } }
     });
@@ -91,7 +91,7 @@ export const generateFanComments = async (gameState: GameState, context: 'START'
     (async () => {
       try {
         const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.0-flash-lite',
             contents: prompt,
             config: { thinkingConfig: { thinkingBudget: 0 } }
         });
@@ -222,7 +222,7 @@ export const generateEventOutcome = async (
     (async () => {
       try {
         const response = await ai.models.generateContent({
-          model: 'gemini-3-flash-preview',
+          model: 'gemini-2.0-flash-lite',
           contents: prompt,
           config: {
             responseMimeType: 'application/json',

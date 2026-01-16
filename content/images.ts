@@ -6,6 +6,7 @@
 export const STORY_IMAGES: Record<string, string> = {
   // --- 系统背景 ---
   setup_bg: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png", // 角色创建页背景
+  guide_bg: "https://s3.bmp.ovh/imgs/2026/01/17/a0d0b82303a01c29.png", // 指引页背景 (使用唯美星空图)
 
   // --- 事件背景 ---
   event_social: "https://s3.bmp.ovh/imgs/2026/01/14/b181aebe7ab7fa01.png", // 社媒营业
@@ -14,10 +15,10 @@ export const STORY_IMAGES: Record<string, string> = {
   
   // --- 签约事件背景 (各公司) ---
   // 请在此处替换为您为各家公司准备的插画
-  signing_coffee: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png",    // 咖啡粒文化
-  signing_origin: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png",    // 原计划
-  signing_starlight: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png", // 星华娱乐
-  signing_agray: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png",     // 艾灰音乐
+  signing_coffee: "https://s3.bmp.ovh/imgs/2026/01/15/3d0e54476e7d4844.png",    // 咖啡粒文化
+  signing_origin: "https://s3.bmp.ovh/imgs/2026/01/15/0d19cabb03f829ae.png",    // 原计划
+  signing_starlight: "https://s3.bmp.ovh/imgs/2026/01/15/09018cd0cedc25f5.png", // 星华娱乐
+  signing_agray: "https://s3.bmp.ovh/imgs/2026/01/16/339996571040d5d4.png",     // 艾灰音乐
 
   // --- 练习生阶段 (16-18岁) ---
   default: "https://s3.bmp.ovh/imgs/2026/01/14/76df613fa07ca668.png",

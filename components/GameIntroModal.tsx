@@ -9,68 +9,86 @@ interface Props {
 
 export const GameIntroModal: React.FC<Props> = ({ onStart }) => {
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in font-sans">
-      {/* Background Image with Blur */}
-      <div className="absolute inset-0 z-0">
-         <img src={STORY_IMAGES.setup_bg} alt="bg" className="w-full h-full object-cover blur-sm opacity-50" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 font-sans">
+      {/* Background Image Layer */}
+      <div className="absolute inset-0 z-0 bg-gray-100">
+         <img 
+            src={STORY_IMAGES.setup_bg} 
+            alt="bg" 
+            className="w-full h-full object-cover opacity-100" 
+         />
+         <div className="absolute inset-0 bg-black/10"></div>
       </div>
 
-      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-sm w-full p-8 relative z-10 border border-white/50 animate-fade-in-up">
+      {/* Main Card - High Transparency White */}
+      <div className="relative z-10 w-full max-w-sm bg-white/60 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/40 animate-fade-in-up">
         
-        <div className="text-center mb-8">
-           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner">
-             ✨
-           </div>
-           <h2 className="text-2xl font-bold text-gray-900 mb-2">欢迎踏上星途</h2>
-           <p className="text-gray-500 text-sm">通往顶流偶像的旅程即将开始，<br/>请查收这份新人指南。</p>
+        {/* Title Section */}
+        <div className="text-center mb-10 mt-2">
+           <h2 className="text-3xl font-bold text-gray-900 tracking-wider mb-3 drop-shadow-sm">
+             欢迎踏上星途
+           </h2>
+           <div className="w-10 h-1.5 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mx-auto shadow-sm"></div>
+           <p className="text-gray-800 text-sm mt-4 font-bold drop-shadow-sm">
+             通往顶流偶像的旅程即将开始
+           </p>
         </div>
 
-        <div className="space-y-6 mb-8">
+        {/* Feature List */}
+        <div className="space-y-8 mb-12 px-2">
            {/* Step 1 */}
-           <div className="flex gap-4 items-start group">
-              <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
-                 <Sparkles size={20} />
+           <div className="flex gap-5 items-start group">
+              <div className="text-blue-600 mt-0.5 bg-blue-50/80 p-2 rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+                 <Sparkles size={20} strokeWidth={2} />
               </div>
               <div>
-                 <h3 className="font-bold text-gray-800 text-sm mb-1">随机机遇</h3>
-                 <p className="text-xs text-gray-600 leading-relaxed">
-                    每季度开始，都会触发2到4个<span className="text-purple-600 font-bold">事件</span>。你的选择将带来意外的成长和收获。
+                 <h3 className="font-bold text-gray-900 text-base mb-1 drop-shadow-sm">随机机遇</h3>
+                 <p className="text-sm text-gray-800 font-medium leading-relaxed">
+                    每季度<span className="text-gray-900 font-black">随机事件</span>，每一次选择是内心的声音，也是命运的转折。
                  </p>
               </div>
            </div>
 
            {/* Step 2 */}
-           <div className="flex gap-4 items-start group">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
-                 <Zap size={20} />
+           <div className="flex gap-5 items-start group">
+              <div className="text-purple-600 mt-0.5 bg-purple-50/80 p-2 rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+                 <Zap size={20} strokeWidth={2} />
               </div>
               <div>
-                 <h3 className="font-bold text-gray-800 text-sm mb-1">行动规划</h3>
-                 <p className="text-xs text-gray-600 leading-relaxed">
-                    每轮拥有 <span className="text-blue-600 font-bold">3或5 个行动点 (AP)</span>。合理安排训练、休息，勿浪费每次变强的机会。
+                 <h3 className="font-bold text-gray-900 text-base mb-1 drop-shadow-sm">行动规划</h3>
+                 <p className="text-sm text-gray-800 font-medium leading-relaxed">
+                    合理分配<span className="text-gray-900 font-black">行动点 (AP)</span>，在训练与休息间寻找平衡。
                  </p>
               </div>
            </div>
 
            {/* Step 3 */}
-           <div className="flex gap-4 items-start group">
-              <div className="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
-                 <TrendingUp size={20} />
+           <div className="flex gap-5 items-start group">
+              <div className="text-pink-600 mt-0.5 bg-pink-50/80 p-2 rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+                 <TrendingUp size={20} strokeWidth={2} />
               </div>
               <div>
-                 <h3 className="font-bold text-gray-800 text-sm mb-1">能力属性</h3>
-                 <p className="text-xs text-gray-600 leading-relaxed">
-                    围绕阶段目标指引规划努力方向。<span className="text-blue-500 font-bold">唱/跳/颜值</span>影响签约和出道；<span className="text-red-500 font-bold">健康/道德</span>一旦归零，生涯将中止。
+                 <h3 className="font-bold text-gray-900 text-base mb-1 drop-shadow-sm">事业规划</h3>
+                 <p className="text-sm text-gray-800 font-medium leading-relaxed">
+                    提升<span className="text-gray-900 font-black">唱跳颜值</span>以赢取更多机会，规划好自己要走的道路。
                  </p>
               </div>
            </div>
         </div>
 
+        {/* Dreamy Button */}
         <button 
           onClick={onStart}
-          className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 rounded-full font-bold text-white text-lg tracking-wider flex items-center justify-center gap-2 transition-all transform hover:scale-[1.03] active:scale-95
+          bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500
+          border-2 border-white/40 
+          shadow-[0_4px_20px_rgba(217,70,239,0.5)] hover:shadow-[0_6px_25px_rgba(217,70,239,0.7)]
+          group relative overflow-hidden backdrop-blur-sm"
         >
-           正式出发 <ArrowRight size={20} />
+           <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-full"></span>
+           <span className="relative flex items-center gap-2 drop-shadow-md">
+             正式出发 <Sparkles size={20} className="animate-pulse" />
+           </span>
         </button>
 
       </div>

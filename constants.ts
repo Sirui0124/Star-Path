@@ -1,4 +1,3 @@
-
 import { Action, Company } from './types';
 
 // --- Loading Messages ---
@@ -27,7 +26,7 @@ export const RANDOM_PLAYER_NAMES = [
 export const COMPANIES = {
   [Company.COFFEE]: { name: '咖啡粒文化', desc: '小唱片公司', bonus: '每季 Vocal+10, 粉丝+2w' },
   [Company.ORIGIN]: { name: '原计划', desc: '爱豆型公司', bonus: '每季 颜值+5, 粉丝+10w' },
-  [Company.STARLIGHT]: { name: '星华娱乐', desc: '影视资源丰富', bonus: '每季 颜值+10, 情商+5, 粉丝+5w' },
+  [Company.STARLIGHT]: { name: '星华娱乐', desc: '影视资源丰富', bonus: '每季 颜值+10, 情商+3, 粉丝+5w' },
   [Company.AGRAY]: { name: '艾灰音乐', desc: '头部音乐公司', bonus: '每季 Vocal+5, Dance+5, 粉丝+10w' },
 };
 
@@ -114,7 +113,7 @@ export const SHOW_ACTIONS: Action[] = [
   {
     id: 'show_practice',
     name: '独自苦练（无镜头）',
-    description: 'Vocal+5,Dance+5,票数--, 概率出圈',
+    description: 'Vocal+5, Dance+5, 票数--, 概率出圈',
     apCost: 1,
     effect: () => ({
       vocal: 10,
@@ -126,134 +125,61 @@ export const SHOW_ACTIONS: Action[] = [
     })
   },
   {
+    id: 'show_fan_service',
+    name: '粉丝营业（媚粉）',
+    description: '粉丝++, 票数++, 道德-, 概率CP',
+    apCost: 1,
+    effect: () => ({
+      fans: rand(5, 10),
+      votes: rand(3, 8),
+      ethics: -2,
+      hotCp: chance(10) ? 1 : 0
+    })
+  },
+  {
+    id: 'show_social',
+    name: '搞好关系（蹭镜头）',
+    description: '情商++, 票数+, 概率CP',
+    apCost: 1,
+    effect: () => ({
+      eq: 5,
+      votes: rand(1, 5),
+      hotCp: chance(20) ? 1 : 0
+    })
+  },
+  {
     id: 'show_rest',
-    name: '补觉休息',
-    description: '健康+10, 粉丝/票数下降',
+    name: '偷懒休息',
+    description: '健康+10, 票数--',
     apCost: 1,
     effect: () => ({
-      health: 15,
-      fans: -rand(1, 3),
-      votes: -3
-    })
-  },
-  {
-    id: 'show_makeup',
-    name: '化妆造型',
-    description: '健康-2, 颜值+8, 票数+2, 粉丝+',
-    apCost: 1,
-    effect: () => ({
-      health: -2,
-      looks: 8,
-      votes: 2,
-      fans: chance(20) ? rand(3, 6) : rand(0, 2)
-    })
-  },
-  {
-    id: 'show_help',
-    name: '帮助他人',
-    description: '道德+10, 情商+3, 随机能力-5',
-    apCost: 1,
-    effect: () => ({
-      ethics: 10,
-      eq: 3,
-      vocal: Math.random() > 0.5 ? -5 : 0,
-      dance: Math.random() <= 0.5 ? -5 : 0,
-    })
-  },
-  {
-    id: 'show_vlog',
-    name: '录制Vlog',
-    description: '健康-5, 粉丝+5, 票数+8, 概率出圈',
-    apCost: 1,
-    effect: () => ({
-      health: -5,
-      fans: 5,
-      votes: 8,
-      viralMoments: chance(10) ? 1 : 0,
-      sincerity: 2
-    })
-  },
-  {
-    id: 'show_camera',
-    name: '抢镜头',
-    description: '健康-5, 道德-5, 票数++',
-    apCost: 1,
-    effect: () => ({
-      health: -5,
-      ethics: -5,
-      votes: chance(25) ? rand(20,30) : rand(5,10),
-      sincerity: -5
-    })
-  },
-  {
-    id: 'show_cp',
-    name: '炒CP',
-    description: '健康-5, 道德-10, 粉丝++, 票数++',
-    apCost: 2,
-    effect: () => ({
-      health: -5,
-      ethics: -10,
-      fans: chance(25) ? rand(10, 20) : rand(3, 8),
-      votes: chance(25) ? rand(20,30) : rand(5,10),
-      sincerity: -10,
-      hotCp: chance(15) ? 1 : 0
+      health: 10,
+      votes: -rand(2, 5)
     })
   }
 ];
 
-// --- Social Feedback Library (Male Idol Context) ---
-// Expanded with diverse archetypes
 export const SOCIAL_FEEDBACKS = {
-  // 1. General Fans (WEIBO) - Mixed Archetypes
   GENERAL: [
-    // Visuals (颜狗)
-    { type: 'WEIBO', sender: '颜狗', content: '这张脸是真实存在的吗？女娲毕设！' },
-    { type: 'WEIBO', sender: '颜粉', content: '帅得我神魂颠倒，今天的造型师必须加鸡腿！' },
-    { type: 'WEIBO', sender: '路人', content: '纯路人，这小哥哥长得有点东西，垂直入坑了。' },
-    { type: 'WEIBO', sender: '颜狗', content: '杀疯了杀疯了！这个眼神杀我！' },
-
-    // Girlfriend Fans (女友粉 - 老公/男友)
-    { type: 'WEIBO', sender: '女友粉', content: '老公！今天的自拍我直接存做壁纸！' },
-    { type: 'WEIBO', sender: '女友粉', content: '什么时候来娶我？民政局我搬来了。' },
-    { type: 'WEIBO', sender: '梦女', content: '这是我素未谋面的男朋友，谢谢大家。' },
-    { type: 'WEIBO', sender: '女友粉', content: '命给你！都给你！' },
-
-    // Mom Fans (妈粉 - 崽崽/儿砸/宝宝)
-    { type: 'WEIBO', sender: '妈粉', content: '崽崽太瘦了，妈妈心疼，多吃点！' },
-    { type: 'WEIBO', sender: '亲妈粉', content: '宝宝真棒！妈妈为你骄傲！' },
-    { type: 'WEIBO', sender: '妈粉', content: '在外面要照顾好自己，别太累了乖乖。' },
-
-    // Career Fans (事业粉 - 全名/哥哥/ACE)
-    { type: 'WEIBO', sender: '事业粉', content: '这眼神绝了，内娱紫微星预定！' },
-    { type: 'WEIBO', sender: 'i舞台', content: '这身段，这卡点，全能ACE入股不亏！' },
-    { type: 'WEIBO', sender: '数据粉', content: '别废话了，做数据去！送哥哥出道！' },
-    { type: 'WEIBO', sender: '事业批', content: '请保持这个搞事业的节奏，不要停！' },
-
-    // Internet Slang / Funny (搞笑/路人)
-    { type: 'WEIBO', sender: '泥塑粉', content: '嗨，老婆！(bushi) 真的好美。' },
-    { type: 'WEIBO', sender: '吃瓜群众', content: '有点意思，前排占座吃瓜。' },
-    { type: 'WEIBO', sender: '某网友', content: '这不比博人传燃？' },
-    { type: 'WEIBO', sender: '路人', content: '虽然不追星，但这图我存了。' },
-    { type: 'WEIBO', sender: '氪金粉', content: '钱包准备好了，什么时候出周边？' },
-    { type: 'WEIBO', sender: '营销号', content: '网传某练习生又有新动作，这波怎么看？' },
+    { type: 'WEIBO', sender: '吃瓜路人', content: '有一说一，这波操作确实有点意思。' },
+    { type: 'WEIBO', sender: '颜狗', content: '虽然但是，脸是好看的。' },
+    { type: 'WEIBO', sender: '路人甲', content: '这是谁？最近老刷到。' },
+    { type: 'WEIBO', sender: '营销号', content: '据知情人士爆料，这位很有野心。' },
+    { type: 'WEIBO', sender: '互联网嘴替', content: '笑死我了，这是什么展开？' },
+    { type: 'WEIBO', sender: '柠檬精', content: '这就红了？我不理解。' }
   ],
-  
-  // 2. Family & Friends (WECHAT)
   FAMILY: [
-    { type: 'WECHAT', sender: '妈妈', content: '宝贝，天冷了记得穿秋裤，别只要风度。' },
-    { type: 'WECHAT', sender: '爸爸', content: '钱够不够花？不够跟爸说。' },
-    { type: 'WECHAT', sender: '老同学', content: '苟富贵，勿相忘啊兄弟！' },
-    { type: 'WECHAT', sender: '发小', content: '下次回来请你吃烧烤，别太拼了。' },
-    { type: 'WECHAT', sender: '表妹', content: '哥！我同学想要你的签名照！' },
+    { type: 'WECHAT', sender: '妈妈', content: '宝贝，看了你的节目，瘦了好多，心疼。' },
+    { type: 'WECHAT', sender: '爸爸', content: '钱够花吗？不够跟爸说。' },
+    { type: 'WECHAT', sender: '表妹', content: '姐！帮我要个签名照！我同学都想要！' },
+    { type: 'WECHAT', sender: '奶奶', content: '乖孙，什么时候回来吃饭啊？' },
+    { type: 'WECHAT', sender: '大姨', content: '在电视上看到你了，真出息了！' }
   ],
-  
-  // 3. Company & Staff (WECHAT) - Only if Signed
   COMPANY: [
-    { type: 'WECHAT', sender: '经纪人', content: '这波热度维持得不错，继续保持人设。' },
-    { type: 'WECHAT', sender: '经纪人', content: '注意表情管理！别被截图做成表情包。' },
-    { type: 'WECHAT', sender: '宣传总监', content: '热搜已经安排上了，配合发条微博。' },
-    { type: 'WECHAT', sender: '生活助理', content: '明早5点通告，车在楼下等你。' },
-    { type: 'WECHAT', sender: '老板', content: '好好干，公司不会亏待你。' },
-    { type: 'WECHAT', sender: '选管', content: '后台这边准备一下，马上轮到你了。' },
+    { type: 'WECHAT', sender: '经纪人', content: '最近数据不错，继续保持这个势头。' },
+    { type: 'WECHAT', sender: '宣发组', content: '这波热搜很及时，正在跟进话题。' },
+    { type: 'WECHAT', sender: '老板', content: '好好练，公司看好你。' },
+    { type: 'WECHAT', sender: '助理', content: '明天的行程表发你了，记得确认。' },
+    { type: 'WECHAT', sender: '运营', content: '记得发微博营业，别冷落了粉丝。' }
   ]
 };

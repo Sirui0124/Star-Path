@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { EventOutcome, EventType } from '../types';
 import { ArrowUp, ArrowDown, MessageCircle, User, Bell } from 'lucide-react';
@@ -26,91 +25,90 @@ export const EventResultModal: React.FC<Props> = ({ outcome, eventType, onClose 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden flex flex-col relative animate-fade-in-up border-2 border-white/20 min-h-[500px]">
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6 animate-fade-in">
+      <div className="bg-transparent rounded-3xl shadow-2xl w-full max-w-[320px] overflow-hidden flex flex-col relative animate-fade-in-up border border-white/40 aspect-[1/1.15]">
         
         {/* Background Layer */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 bg-slate-900">
           <img 
             src={getBackgroundImage()} 
             alt="Event Background" 
             className="w-full h-full object-cover"
           />
-          {/* Gradient: Light top to show image, White bottom for content */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-white/95"></div>
+          {/* Subtle overlay to ensure text contrast on glass - Reduced to 10% */}
+          <div className="absolute inset-0 bg-black/10"></div>
         </div>
 
         {/* Content Layer */}
-        <div className="relative z-10 flex flex-col h-full">
+        <div className="relative z-10 flex flex-col h-full justify-between p-5">
           
-          {/* Header - Floating Narrative Pill */}
-          <div className="p-6 pt-12 text-center">
-             <div className="text-5xl mb-6 animate-bounce drop-shadow-[0_4px_4px_rgba(0,0,0,0.3)]">✨</div>
+          {/* Header - Narrative - Aligned Start (Top) */}
+          <div className="text-center flex-1 flex flex-col justify-start items-center pt-2">
+             <div className="text-4xl mb-4 animate-bounce drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">✨</div>
              
-             <div className="bg-white/80 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/60 shadow-xl inline-block max-w-[90%]">
-                <h3 className="text-lg font-bold text-gray-900 leading-snug">{narrative}</h3>
+             {/* Narrative Pill - Dark Glass Style with Quotes - Tuned Transparency */}
+             <div className="relative w-full">
+                <div className="bg-slate-900/20 backdrop-blur-md p-5 rounded-xl border border-white/10 text-white text-base font-bold leading-relaxed text-center shadow-inner relative">
+                    <span className="absolute top-1 left-2 text-3xl text-white/40 font-serif leading-none">“</span>
+                    <span className="relative z-10 px-2 block drop-shadow-md">{narrative}</span>
+                    <span className="absolute -bottom-3 right-2 text-3xl text-white/40 font-serif leading-none">”</span>
+                </div>
              </div>
           </div>
 
-          <div className="p-6 flex-1 flex flex-col justify-end gap-4 pb-8">
-            {/* Social Feedback */}
+          <div className="flex flex-col gap-3">
+            {/* Social Feedback - Increased Opacity */}
             <div className="animate-fade-in-up delay-100">
                {socialType === 'WECHAT' && (
-                 <div className="bg-white/70 backdrop-blur-md p-3 rounded-lg border border-gray-200 shadow-lg">
-                    <div className="flex items-center gap-2 mb-2 border-b border-gray-200/50 pb-1">
-                       <div className="bg-green-500 text-white p-1 rounded-full"><MessageCircle size={12} /></div>
-                       <span className="text-xs font-bold text-gray-700">{socialSender}</span>
+                 <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-white/50 shadow-md">
+                    <div className="flex items-center gap-2 mb-1.5 border-b border-gray-500/10 pb-1">
+                       <div className="bg-green-500 text-white p-1 rounded-full shadow-sm"><MessageCircle size={10} /></div>
+                       <span className="text-xs font-bold text-gray-800">{socialSender}</span>
                     </div>
-                    <div className="bg-gray-50 p-2 rounded-lg text-sm text-gray-900 shadow-inner inline-block relative ml-1 border border-gray-200">
+                    <div className="bg-gray-50/50 p-2 rounded-xl text-xs text-gray-900 font-bold leading-relaxed shadow-inner">
                        {socialContent}
-                       <div className="absolute top-2 -left-1.5 w-3 h-3 bg-gray-50 transform rotate-45 border-l border-b border-gray-200"></div>
                     </div>
                  </div>
                )}
 
                {socialType === 'WEIBO' && (
-                 <div className="bg-white/95 backdrop-blur-md p-3 rounded-lg border border-orange-100 shadow-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                       <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center border border-orange-200 shadow-inner">
-                         <User size={16} />
+                 <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-white/50 shadow-md">
+                    <div className="flex items-center gap-2 mb-1.5">
+                       <div className="w-6 h-6 rounded-full bg-orange-100/80 text-orange-600 flex items-center justify-center border border-orange-200 shadow-sm">
+                         <User size={12} />
                        </div>
                        <div className="flex flex-col">
-                          <span className="text-xs font-bold text-orange-900">{socialSender}</span>
-                          <span className="text-[10px] text-gray-500">刚刚 来自 iPhone客户端</span>
+                          <span className="text-xs font-bold text-gray-900">{socialSender}</span>
                        </div>
                     </div>
-                    <div className="text-sm text-gray-800 pl-10 leading-relaxed font-medium">
+                    <div className="text-xs text-gray-900 pl-8 leading-relaxed font-bold">
                        {socialContent}
                     </div>
                  </div>
                )}
                
                {socialType === 'SYSTEM' && (
-                  <div className="bg-blue-50/95 backdrop-blur-md p-4 rounded-lg border border-blue-200 flex items-center gap-3 shadow-lg">
-                     <div className="text-blue-500 bg-blue-100 p-1.5 rounded-full"><Bell size={18} /></div>
-                     <div className="text-sm text-blue-900 font-bold">{socialContent}</div>
+                  <div className="bg-blue-50/90 backdrop-blur-md p-3 rounded-2xl border border-white/50 flex items-center gap-3 shadow-md">
+                     <div className="text-blue-600 bg-blue-100/50 p-1.5 rounded-full"><Bell size={14} /></div>
+                     <div className="text-xs text-blue-900 font-bold leading-tight">{socialContent}</div>
                   </div>
                )}
             </div>
 
-            {/* Stat Changes */}
+            {/* Stat Changes - Increased Opacity */}
             {statChanges.length > 0 && (
-               <div className="bg-white/80 backdrop-blur-md rounded-lg p-4 border border-white/60 shadow-md animate-fade-in-up delay-200">
-                  <h4 className="text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider flex items-center gap-1">
-                    <div className="w-1 h-3 bg-gray-500 rounded-full"></div>
-                    属性变更
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
+               <div className="bg-white/90 backdrop-blur-md rounded-xl p-2.5 border border-white/50 shadow-md animate-fade-in-up delay-200">
+                  <div className="flex flex-wrap gap-2 justify-center">
                      {statChanges.map(([key, val]) => {
                         const isPositive = (val as number) > 0;
                         const nameMap: any = { vocal: 'Vocal', dance: 'Dance', looks: '颜值', eq: '情商', ethics: '道德', health: '健康', fans: '粉丝', votes: '票数', dream: '梦想' };
                         return (
-                          <div key={key} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold border shadow-sm ${
+                          <div key={key} className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black border shadow-sm ${
                              isPositive 
-                             ? 'bg-green-100/80 text-green-800 border-green-200' 
-                             : 'bg-red-100/80 text-red-800 border-red-200'
+                             ? 'bg-green-100/50 text-green-900 border-green-200/50' 
+                             : 'bg-red-100/50 text-red-900 border-red-200/50'
                           }`}>
-                             {isPositive ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
+                             {isPositive ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
                              <span>{nameMap[key] || key}</span>
                              <span>{Math.abs(val as number)}</span>
                           </div>
@@ -122,7 +120,7 @@ export const EventResultModal: React.FC<Props> = ({ outcome, eventType, onClose 
 
             <button 
               onClick={onClose}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-xl hover:shadow-2xl w-full flex items-center justify-center gap-2 group mt-2"
+              className="bg-white/90 hover:bg-white text-blue-900 font-black py-3.5 rounded-2xl transition-all shadow-lg backdrop-blur-md border border-white/50 w-full flex items-center justify-center gap-2 group text-sm active:scale-95 mt-1"
             >
               继续前行 <span className="group-hover:translate-x-1 transition-transform">→</span>
             </button>

@@ -8,6 +8,7 @@ import { EventResultModal } from './components/EventResultModal';
 import { EventChoiceModal } from './components/EventChoiceModal';
 import { CharacterSetup } from './components/CharacterSetup';
 import { GameIntroModal } from './components/GameIntroModal';
+import { GuideModal } from './components/GuideModal';
 import { STAGE_GUIDES } from './content/guides';
 import { ANNUAL_NARRATIVES } from './content/narratives';
 import { STORY_IMAGES, getEndingImageKey } from './content/images';
@@ -24,7 +25,7 @@ const INITIAL_STATE: GameState = {
     vocal: 30, dance: 0, looks: 30, eq: 10,
     ethics: 50, health: 50, fans: 1, votes: 0
   },
-  hiddenStats: { sincerity: 50, dream: 50, hotCp: 0, viralMoments: 0 },
+  hiddenStats: { dream: 50, sincerity: 50, hotCp: 0, viralMoments: 0 },
   time: { year: 1, quarter: 1, age: 16 },
   stage: GameStage.AMATEUR,
   company: Company.NONE,
@@ -82,6 +83,7 @@ export default function App() {
       STORY_IMAGES.signing_origin,
       STORY_IMAGES.signing_starlight,
       STORY_IMAGES.signing_agray,
+      STORY_IMAGES.guide_bg,
     ];
     imagesToPreload.forEach(src => {
       const img = new Image();
@@ -135,14 +137,15 @@ export default function App() {
       if (effect.vocal) newStats.vocal = Math.min(300, Math.max(0, newStats.vocal + effect.vocal));
       if (effect.dance) newStats.dance = Math.min(300, Math.max(0, newStats.dance + effect.dance));
       if (effect.looks) newStats.looks = Math.min(300, Math.max(0, newStats.looks + effect.looks));
-      if (effect.eq) newStats.eq = Math.min(100, Math.max(0, newStats.eq + effect.eq));
+      // EQ has no upper limit
+      if (effect.eq) newStats.eq = Math.max(0, newStats.eq + effect.eq);
       if (effect.ethics) newStats.ethics = Math.min(100, Math.max(0, newStats.ethics + effect.ethics));
       if (effect.health) newStats.health = Math.min(100, Math.max(0, newStats.health + effect.health));
       if (effect.fans) newStats.fans = Math.max(0, newStats.fans + effect.fans);
       if (effect.votes) newStats.votes = Math.max(0, newStats.votes + effect.votes);
 
-      if (effect.sincerity) newHidden.sincerity += effect.sincerity;
       if (effect.dream) newHidden.dream += effect.dream;
+      if (effect.sincerity) newHidden.sincerity += effect.sincerity;
       if (effect.hotCp) newHidden.hotCp += effect.hotCp;
       if (effect.viralMoments) newHidden.viralMoments += effect.viralMoments;
 
@@ -246,7 +249,7 @@ export default function App() {
         }
 
     } else {
-        // Amateur Stage Logic: Strictly 1-2 Social AND 1-2 Random
+        // Amateur Stage Logic: Strictly 1-2 Social AND 1 Random
         
         // A. Add Mandatory Events first
         queue.push(...mandatoryEvents);
@@ -259,11 +262,11 @@ export default function App() {
         const selectedSocials = socialPool.slice(0, socialTarget);
         queue.push(...selectedSocials);
 
-        // C. Add Random Events (Target: 1-2)
+        // C. Add Random Events (Target: 1)
         const randomPool = poolEvents.filter(e => e.type === 'RANDOM');
         randomPool.sort(() => 0.5 - Math.random());
 
-        const randomTarget = 1 + Math.floor(Math.random() * 2); // Randomly 1 or 2
+        const randomTarget = 1; // Fixed to 1
         const selectedRandoms = randomPool.slice(0, randomTarget);
         queue.push(...selectedRandoms);
     }
@@ -529,7 +532,7 @@ export default function App() {
         maxAp: nextAp
       }));
       
-      setCurrentVoteBreakdown({ base: 5, action: actionVotes, bonus: bonusVotes, total: totalNewVotes });
+      setCurrentVoteBreakdown({ base: baseVotes, action: actionVotes, bonus: bonusVotes, total: totalNewVotes });
       setShowRankModal(true); // Will trigger queue gen on close
       // No setPhase here, modal close handles it
   };
@@ -733,17 +736,17 @@ export default function App() {
     const endingImage = STORY_IMAGES[getEndingImageKey(gameState.gameResult || '')];
     
     return (
-      <div className="min-h-screen max-w-md mx-auto bg-white shadow-xl overflow-hidden flex flex-col">
+      <div className="h-[100dvh] max-h-[100dvh] max-w-md mx-auto bg-white shadow-xl overflow-hidden flex flex-col">
          {/* Ending Header Image */}
-         <div className="relative w-full aspect-[6/5] bg-gray-100">
+         <div className="relative w-full aspect-[6/5] bg-gray-100 shrink-0">
             <img src={endingImage} alt="Ending" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent"></div>
          </div>
 
-         <div className="p-8 flex-1 overflow-y-auto -mt-6 relative">
+         <div className="p-8 flex-1 overflow-y-auto -mt-6 relative z-10">
             <h1 className="text-3xl font-bold text-center text-blue-600 mb-2">星途终章</h1>
             <div className="text-center text-xl font-medium text-gray-700 mb-6">{gameState.gameResult}</div>
-            <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 mb-6">
+            <div className="bg-blue-50 p-6 rounded-md border border-blue-100 mb-6">
                <h2 className="text-lg font-bold text-blue-800 mb-4">最终数据</h2>
                <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>粉丝: {gameState.stats.fans}万</div>
@@ -754,7 +757,7 @@ export default function App() {
                   <div>情商: {gameState.stats.eq}</div>
                </div>
             </div>
-            <div className="prose prose-blue">
+            <div className="prose prose-blue pb-4">
               <h3 className="font-bold text-gray-800 mb-2">星途回溯</h3>
               {isLoadingAi ? (
                 <div className="flex items-center gap-2 text-blue-600 font-medium animate-pulse">
@@ -765,32 +768,41 @@ export default function App() {
               )}
             </div>
          </div>
-         <button onClick={() => window.location.reload()} className="m-4 bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-blue-700">再玩一次</button>
+         <div className="p-4 bg-white border-t">
+           <button onClick={() => window.location.reload()} className="w-full bg-blue-600 text-white py-3 rounded-md font-bold shadow-lg hover:bg-blue-700">再玩一次</button>
+         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen max-w-md mx-auto bg-gray-50 shadow-2xl overflow-hidden flex flex-col font-sans relative">
+    <div className="h-[100dvh] w-full max-w-md mx-auto shadow-2xl flex flex-col font-sans relative bg-gradient-to-b from-[#bae1ff] to-[#e6d4ff] overflow-hidden">
       
       {/* Header */}
-      <header className="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-10 flex justify-between items-center">
+      <header className="bg-white/30 backdrop-blur-md text-slate-800 px-4 py-3 sticky top-0 z-20 flex justify-between items-center border-b border-white/20 shrink-0">
         <h1 className="text-lg font-bold flex items-center gap-2"><span>✨</span> 星途 Star Path</h1>
-        <button onClick={() => setShowGuide(true)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-700/50 hover:bg-blue-700 rounded-full transition text-sm font-medium border border-blue-500/30">
+        <button onClick={() => setShowGuide(true)} className="flex items-center gap-1 px-3 py-1.5 bg-white/50 hover:bg-white/80 rounded-full transition text-sm font-medium border border-white/40 text-blue-800">
           <HelpCircle size={16} /> 目标与指引
         </button>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-4">
-        <StatsPanel stats={gameState.stats} hiddenStats={gameState.hiddenStats} time={gameState.time} stage={gameState.stage} rank={gameState.rank} />
+      <main className="flex-1 overflow-y-auto p-3 scrollbar-hide">
+        <StatsPanel 
+            stats={gameState.stats} 
+            hiddenStats={gameState.hiddenStats} 
+            time={gameState.time} 
+            stage={gameState.stage} 
+            rank={gameState.rank} 
+            name={gameState.name}
+        />
 
         {/* Narrative Modal (Beginning of Year) */}
         {showNarrative && (
           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6 animate-fade-in">
           
-            <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center relative border-2 border-blue-200 overflow-hidden">
-              <div className="w-full aspect-[4/3] bg-gray-100 rounded-lg mb-4 overflow-hidden shadow-inner">
+            <div className="bg-white rounded-md shadow-2xl max-w-sm w-full p-6 text-center relative border-2 border-blue-200 overflow-hidden">
+              <div className="w-full aspect-[4/3] bg-gray-100 rounded-md mb-4 overflow-hidden shadow-inner">
                 <img 
                    src={STORY_IMAGES[gameState.time.age] || STORY_IMAGES.default} 
                    alt="Chapter Start" 
@@ -814,8 +826,8 @@ export default function App() {
         {/* Annual Summary Modal (End of Year) */}
         {showAnnualSummaryModal && (
           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6 animate-fade-in">
-            <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 relative border-2 border-indigo-200">
-               <div className="w-full aspect-[4/3] bg-gray-100 rounded-lg mb-4 overflow-hidden shadow-inner">
+            <div className="bg-white rounded-md shadow-2xl max-w-sm w-full p-6 relative border-2 border-indigo-200">
+               <div className="w-full aspect-[4/3] bg-gray-100 rounded-md mb-4 overflow-hidden shadow-inner">
                  <img 
                     src={STORY_IMAGES[gameState.time.age] || STORY_IMAGES.default} 
                     alt="Annual Summary" 
@@ -830,7 +842,7 @@ export default function App() {
                   </h2>
                </div>
                
-               <div className="bg-indigo-50 p-4 rounded-lg text-sm text-indigo-900 leading-relaxed min-h-[100px] mb-6 whitespace-pre-wrap border border-indigo-100">
+               <div className="bg-indigo-50 p-4 rounded-md text-sm text-indigo-900 leading-relaxed min-h-[100px] mb-6 whitespace-pre-wrap border border-indigo-100">
                   {isLoadingAi ? (
                     <div className="flex items-center justify-center h-full gap-2 text-indigo-500 font-medium animate-pulse py-8">
                        <span>✨</span> {loadingTip}
@@ -845,7 +857,7 @@ export default function App() {
                     setShowAnnualSummaryModal(false);
                     advanceTime(); // Actually advance time when user closes summary
                   }}
-                  className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 w-full"
+                  className="bg-indigo-600 text-white px-8 py-3 rounded-md font-bold shadow-lg hover:bg-indigo-700 w-full"
                   disabled={isLoadingAi}
                >
                   {isLoadingAi ? '请稍候...' : '继续前行'}
@@ -857,7 +869,7 @@ export default function App() {
         {/* Company Signing Modal */}
         {signModal && (
            <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6 animate-fade-in">
-              <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden flex flex-col relative animate-fade-in-up">
+              <div className="bg-white rounded-md shadow-2xl max-w-sm w-full overflow-hidden flex flex-col relative animate-fade-in-up">
                  
                  {/* Image Header */}
                  <div className="relative w-full aspect-[4/3] bg-blue-50">
@@ -877,7 +889,7 @@ export default function App() {
                     <h2 className="text-2xl font-bold text-blue-900 mb-1">签约成功</h2>
                     <h3 className="text-base font-medium text-gray-600 mb-6">{signModal.name}</h3>
                  
-                    <div className="bg-blue-50 p-5 rounded-xl border border-blue-100 text-blue-800 font-medium italic mb-6 text-sm leading-relaxed relative">
+                    <div className="bg-blue-50 p-5 rounded-md border border-blue-100 text-blue-800 font-medium italic mb-6 text-sm leading-relaxed relative">
                        <span className="absolute top-2 left-2 text-3xl text-blue-200/50 leading-none">"</span>
                        {signModal.text}
                        <span className="absolute bottom-[-10px] right-2 text-3xl text-blue-200/50 leading-none">"</span>
@@ -885,7 +897,7 @@ export default function App() {
 
                     <button 
                         onClick={() => setSignModal(null)}
-                        className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2"
+                        className="w-full bg-blue-600 text-white py-3.5 rounded-md font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2"
                     >
                         <CheckCircle size={18} /> 开启职业生涯
                     </button>
@@ -912,69 +924,9 @@ export default function App() {
            <EventResultModal outcome={eventOutcome} eventType={activeEventType || 'RANDOM'} onClose={closeEventResultModal} />
         )}
 
-        {/* Guide Modal */}
+        {/* Aesthetic Guide Modal */}
         {showGuide && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-fade-in-up relative max-h-[85vh] overflow-y-auto">
-               <button onClick={() => setShowGuide(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><X /></button>
-               <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-                 <Briefcase size={20} /> {currentGuide.title}
-               </h2>
-               <div className="space-y-4 text-sm text-gray-700">
-                 <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                    <h3 className="font-bold mb-2 text-blue-800">当前目标</h3>
-                    <ul className="space-y-1">
-                      {currentGuide.goals.map((g: string, i: number) => <li key={i}>{g}</li>)}
-                    </ul>
-                 </div>
-                 <div className="bg-orange-50 p-3 rounded-lg border border-orange-100">
-                    <div className="whitespace-pre-wrap font-medium text-orange-800">{currentGuide.conditions}</div>
-                 </div>
-                 
-                 {currentGuide.companies && (
-                   <div className="bg-purple-50 p-2 rounded-lg border border-purple-100">
-                      <h3 className="font-bold mb-2 text-purple-800 flex items-center gap-2 text-sm"><Building2 size={16}/> 经纪公司签约指南</h3>
-                      
-                      {currentGuide.companyNote && (
-                        <div className="mb-2 text-xs text-purple-600 font-medium">{currentGuide.companyNote}</div>
-                      )}
-
-                      <div className="overflow-hidden rounded-lg border border-purple-200 bg-white">
-                        <table className="w-full text-[10px] text-center border-collapse">
-                          <thead>
-                            <tr className="bg-purple-100 text-purple-900">
-                              {currentGuide.companies.map((c: any, i: number) => (
-                                <th key={i} className="p-1 border-r border-purple-200 last:border-0 font-bold whitespace-nowrap">{c.name}</th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody className="text-gray-600">
-                             {/* Row 2: Type */}
-                             <tr className="bg-purple-50/50">
-                               {currentGuide.companies.map((c: any, i: number) => (
-                                 <td key={i} className="p-1 border-r border-t border-purple-200 last:border-r-0">{c.type}</td>
-                               ))}
-                             </tr>
-                             {/* Row 3: Requirements */}
-                             <tr>
-                               {currentGuide.companies.map((c: any, i: number) => (
-                                 <td key={i} className="p-1 border-r border-t border-purple-200 last:border-r-0 whitespace-pre-wrap align-top h-12">{c.req}</td>
-                               ))}
-                             </tr>
-                             {/* Row 4: Benefits */}
-                             <tr className="bg-purple-50/30 text-purple-800 font-medium">
-                               {currentGuide.companies.map((c: any, i: number) => (
-                                 <td key={i} className="p-1 border-r border-t border-purple-200 last:border-r-0 whitespace-pre-wrap align-top">{c.benefit}</td>
-                               ))}
-                             </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                   </div>
-                 )}
-               </div>
-             </div>
-          </div>
+          <GuideModal guide={currentGuide} onClose={() => setShowGuide(false)} />
         )}
 
         {/* Current Event Choice Modal */}
@@ -989,14 +941,24 @@ export default function App() {
 
         {/* Action Phase Panel */}
         {!currentEvent && !eventOutcome && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100 max-h-32 overflow-y-auto text-sm text-gray-600 space-y-1">
-              {logs.length === 0 ? <p className="text-gray-400 italic">本季度暂无动态...</p> : logs.map((l, i) => (
-                <div key={i} className={l.includes('⚠️') ? 'text-red-600 font-bold' : ''}>• {l}</div>
-              ))}
+          <div className="space-y-3">
+            {/* Event Logs - Compacted */}
+            <div className="bg-white/60 backdrop-blur-md rounded-md p-2.5 shadow-sm border border-white/50 h-24 overflow-y-auto">
+               {logs.length === 0 ? (
+                   <p className="text-gray-500 text-xs italic text-center py-2">新的一季开始了...</p>
+               ) : (
+                   <ul className="space-y-1">
+                       {logs.slice().reverse().map((l, i) => ( 
+                           <li key={i} className={`text-xs leading-tight flex items-start gap-1 py-0.5 ${l.includes('⚠️') ? 'text-red-600 font-bold' : 'text-gray-800 font-medium'}`}>
+                               <span className="shrink-0 mt-[3px] w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                               <span>{l.replace(/^\d+岁\d+季度: /, '')}</span>
+                           </li>
+                       ))}
+                   </ul>
+               )}
             </div>
             
-            {(gameState.stage === GameStage.AMATEUR && gameState.company === Company.NONE && gameState.time.quarter === 4) && (
+            {(gameState.stage === GameStage.AMATEUR && gameState.company === Company.NONE && (gameState.time.quarter === 3 || gameState.time.quarter === 4)) && (
                 (() => {
                     const { vocal, dance, looks, fans, eq } = gameState.stats;
                     const eligible = [];
@@ -1006,15 +968,15 @@ export default function App() {
                     if (vocal >= 60 && (dance >= 30 || looks >= 30) && fans >= 30) eligible.push(Company.AGRAY);
                     if (eligible.length === 0) return null;
                     return (
-                    <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl border border-purple-100 mb-4 animate-fade-in">
-                        <h3 className="font-bold text-purple-800 mb-2 flex items-center gap-2">
-                        <Briefcase size={18} /> 收到经纪公司邀约！
+                    <div className="bg-white/60 backdrop-blur-md p-3 rounded-md border border-purple-100 mb-3 animate-fade-in shadow-sm">
+                        <h3 className="font-bold text-purple-800 mb-2 flex items-center gap-2 text-sm">
+                        <Briefcase size={16} /> 收到经纪公司邀约！
                         </h3>
                         <div className="grid gap-2">
                         {eligible.map(c => (
-                            <button key={c} onClick={() => signCompany(c)} className="bg-white p-3 rounded-lg border border-purple-200 text-left hover:shadow-md transition-all">
-                            <div className="font-bold text-purple-700">{COMPANIES[c].name}</div>
-                            <div className="text-xs text-gray-600">{COMPANIES[c].desc} | 福利: {COMPANIES[c].bonus}</div>
+                            <button key={c} onClick={() => signCompany(c)} className="bg-white/80 p-3 rounded-md border border-purple-100 text-left hover:shadow-md transition-all">
+                            <div className="font-bold text-purple-700 text-sm">{COMPANIES[c].name}</div>
+                            <div className="text-[10px] text-gray-600">{COMPANIES[c].desc} | 福利: {COMPANIES[c].bonus}</div>
                             </button>
                         ))}
                         </div>
@@ -1027,11 +989,11 @@ export default function App() {
                 (() => {
                     if (gameState.isSignedUpForShow) {
                         return (
-                          <div className="bg-green-50 p-4 rounded-xl border border-green-200 mb-4 flex items-center gap-3">
+                          <div className="bg-green-50/80 backdrop-blur-sm p-3 rounded-md border border-green-200 mb-3 flex items-center gap-3">
                              <div className="bg-green-100 p-2 rounded-full text-green-600"><Briefcase size={20} /></div>
                              <div>
-                               <h3 className="font-bold text-green-800">已报名《青春404》</h3>
-                               <p className="text-xs text-green-600">海选已通过！请等待明年春季节目组通知。</p>
+                               <h3 className="font-bold text-green-800 text-sm">已报名《青春404》</h3>
+                               <p className="text-xs text-green-700">海选已通过！请等待明年春季节目组通知。</p>
                              </div>
                           </div>
                         );
@@ -1041,21 +1003,21 @@ export default function App() {
                      const canEnter = ((vocal + dance >= 150) || looks >= 100 || fans >= 100) && eq >= 40;
                      
                      return (
-                       <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200 mb-4">
+                       <div className="bg-blue-900 backdrop-blur-sm p-3 rounded-md border border-blue-800 mb-3 shadow-md">
                          <div className="flex justify-between items-center">
                            <div>
-                             <h3 className="font-bold text-orange-800">《青春404》海选报名中</h3>
-                             <p className="text-xs text-orange-600 mt-1">
+                             <h3 className="font-bold text-white text-sm">《青春404》海选报名中</h3>
+                             <p className="text-[10px] text-blue-100 mt-1">
                                 门槛: (唱跳≥150 或 颜值≥100 或 粉丝≥100w) 且 情商≥40
                              </p>
-                             <p className="text-[10px] text-orange-500 mt-0.5">*报名后将于次年春季开启录制</p>
+                             <p className="text-[10px] text-blue-300 mt-0.5">*报名后将于次年春季开启录制</p>
                            </div>
                            {canEnter ? (
-                              <button onClick={signUpForShow} className="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-orange-600 animate-bounce">
+                              <button onClick={signUpForShow} className="bg-white text-blue-900 px-3 py-1.5 text-xs rounded-md font-bold shadow hover:bg-gray-100 animate-bounce">
                                 立即报名
                               </button>
                            ) : (
-                              <span className="text-xs bg-gray-200 text-gray-500 px-2 py-1 rounded">条件未达标</span>
+                              <span className="text-[10px] bg-blue-800 text-blue-300 px-2 py-1 rounded-md border border-blue-700">条件未达标</span>
                            )}
                          </div>
                        </div>
@@ -1064,50 +1026,51 @@ export default function App() {
             )}
 
             <div>
-              <h3 className="font-bold text-gray-700 mb-3 flex flex-wrap items-center justify-between gap-2">
-                 <span>行动安排</span>
-                 <div className="flex items-center gap-2">
-                    {(gameState.warnings.health || gameState.warnings.ethics) && (
-                        <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded animate-pulse">
-                           ⚠️ 状态危急
-                        </span>
-                    )}
-                    <span className="text-sm bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
-                        AP剩余: {gameState.ap}/{gameState.maxAp}
-                    </span>
-                 </div>
-              </h3>
+               {/* Action Header */}
+               <div className="flex justify-between items-center px-2 mb-2">
+                  <h3 className="font-bold text-gray-800 flex items-center gap-2 text-base">
+                     <span>行动安排</span>
+                  </h3>
+                  <div className="bg-white/50 px-3 py-0.5 rounded-full text-sm font-bold text-blue-800 border border-white/40 shadow-sm">
+                      AP剩余: {gameState.ap}/{gameState.maxAp}
+                  </div>
+               </div>
 
               {(gameState.warnings.health || gameState.warnings.ethics) && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3 text-sm text-red-800 flex items-start gap-2 shadow-sm">
+                  <div className="bg-red-50/90 border border-red-200 rounded-md p-2.5 mb-2.5 text-sm text-red-800 flex items-start gap-2 shadow-sm">
                      <AlertCircle size={18} className="shrink-0 mt-0.5 text-red-600" />
                      <div className="flex-1">
-                        {gameState.warnings.health && <div className="font-bold">⚠️ 身体已达极限！</div>}
-                        {gameState.warnings.health && <div className="text-xs mt-1 text-red-700">请立即执行行动恢复健康，若再次消耗健康将直接退圈。</div>}
+                        {gameState.warnings.health && <div className="font-bold text-xs">⚠️ 身体已达极限！</div>}
+                        {gameState.warnings.health && <div className="text-[10px] mt-0.5 text-red-700">请立即执行行动恢复健康，若再次消耗健康将直接退圈。</div>}
                         
-                        {gameState.warnings.ethics && <div className="font-bold mt-1">⚠️ 心态濒临崩溃！</div>}
-                        {gameState.warnings.ethics && <div className="text-xs mt-1 text-red-700">请立即执行行动恢复道德，若再次消耗道德将直接退圈。</div>}
+                        {gameState.warnings.ethics && <div className="font-bold text-xs mt-1">⚠️ 心态濒临崩溃！</div>}
+                        {gameState.warnings.ethics && <div className="text-[10px] mt-0.5 text-red-700">请立即执行行动恢复道德，若再次消耗道德将直接退圈。</div>}
                      </div>
                   </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5 pb-2">
                 {(gameState.stage === GameStage.AMATEUR ? AMATEUR_ACTIONS : SHOW_ACTIONS).map(act => (
                   <button
                     key={act.id}
                     onClick={() => handleAction(act)}
                     disabled={gameState.ap < act.apCost || gameState.isGameOver}
-                    className={`p-3 rounded-lg border text-left transition-colors ${
+                    className={`p-3 rounded-md text-left transition-all border shadow-sm relative overflow-hidden group min-h-[56px] h-auto flex flex-col justify-center ${
                       gameState.ap < act.apCost 
-                      ? 'bg-gray-100 text-gray-400 border-gray-200' 
-                      : 'bg-white hover:bg-blue-50 border-blue-200 text-gray-800 shadow-sm'
+                      ? 'bg-gray-100/80 text-gray-400 border-transparent' 
+                      : 'bg-white/70 hover:bg-white/90 text-gray-800 border-white/50 hover:shadow-md active:scale-98'
                     }`}
                   >
-                    <div className="font-bold flex justify-between">
-                      {act.name}
-                      <span className="text-xs font-normal bg-gray-100 px-1 rounded text-gray-500">AP: {act.apCost}</span>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">{act.description}</div>
+                     <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                     
+                     <div className="relative z-10 w-full">
+                        <div className="font-bold text-sm mb-0.5 flex justify-between items-center">
+                           <span>{act.name}</span>
+                        </div>
+                        <div className="text-xs text-gray-500 leading-tight line-clamp-2">
+                            {act.description}
+                        </div>
+                     </div>
                   </button>
                 ))}
               </div>
@@ -1116,14 +1079,14 @@ export default function App() {
         )}
       </main>
 
-      <footer className="p-4 bg-white border-t border-gray-200">
+      <footer className="px-4 py-2.5 bg-white/30 backdrop-blur-md border-t border-white/20 shrink-0">
         <button
           onClick={nextQuarter}
           disabled={(gameState.ap > 0 && !currentEvent) || isLoadingAi || !!eventOutcome}
-          className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+          className={`w-full py-2.5 rounded-md font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${
             gameState.ap === 0 
-              ? (isLoadingAi ? 'bg-indigo-400 cursor-wait' : 'bg-blue-600 text-white shadow-lg hover:bg-blue-700')
-              : 'bg-gray-100 text-gray-400'
+              ? (isLoadingAi ? 'bg-indigo-400 cursor-wait text-white' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-xl active:scale-95')
+              : 'bg-white/50 text-gray-400 border border-white/50'
           }`}
         >
           {isLoadingAi ? loadingTip : (gameState.ap > 0 ? <><span className="text-sm font-normal">行动点未耗尽</span> <SkipForward size={18} /></> : <>结束本季度 <Play size={18} /></>)}
