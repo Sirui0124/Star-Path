@@ -44,7 +44,7 @@ export const StatsPanel: React.FC<Props> = ({ stats, hiddenStats, time, stage, r
       <div className="grid grid-cols-2 gap-x-3 gap-y-1">
         <div>
            <StatBar label="健康" value={stats.health} max={100} icon={<Heart size={14} />} color="red" />
-           <StatBar label="道德" value={stats.morale} max={100} icon={<Smile size={14} />} color="green" />
+           <StatBar label="道德" value={stats.ethics} max={100} icon={<Smile size={14} />} color="green" />
            <StatBar label="颜值" value={stats.looks} max={300} icon={<User size={14} />} color="pink" />
         </div>
         <div>

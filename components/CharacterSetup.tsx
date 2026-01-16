@@ -27,7 +27,7 @@ const DREAMS = [
   {
     id: 'artist',
     title: '实力明星',
-    desc: '不被定义，演戏、综艺、唱跳，定义属于我的星途传奇。',
+    desc: '以多元身份解锁无限可能，穿梭在镜头和舞台之间，用作品见证成长。',
     icon: <Music size={24} />,
     defaultStats: { vocal: 15, dance: 10, looks: 35 }
   }

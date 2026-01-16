@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Trainee, VoteBreakdown } from '../types';
 import { Trophy, Users, Star, MessageCircle } from 'lucide-react';
 
 interface Props {
+  title: string;
   rank: number;
   votes: number;
   voteBreakdown: VoteBreakdown | null;
@@ -11,7 +13,7 @@ interface Props {
   onClose: () => void;
 }
 
-export const ShowRankModal: React.FC<Props> = ({ rank, votes, voteBreakdown, trainees, comments, onClose }) => {
+export const ShowRankModal: React.FC<Props> = ({ title, rank, votes, voteBreakdown, trainees, comments, onClose }) => {
   // Combine user (as temp trainee) with trainees to get sorted list for display logic
   const allTrainees = [
     { id: 'player', name: '我 (你)', votes: votes, trend: 0 },
@@ -27,7 +29,7 @@ export const ShowRankModal: React.FC<Props> = ({ rank, votes, voteBreakdown, tra
       <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden flex flex-col max-h-[90vh]">
         <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-center text-white relative shrink-0">
           <Trophy className="mx-auto mb-2 w-12 h-12 text-yellow-300 drop-shadow-md" />
-          <h2 className="text-2xl font-bold">青春404 · 顺位发布</h2>
+          <h2 className="text-2xl font-bold">{title}</h2>
           <div className="mt-2 text-indigo-100 text-sm">全民制作人请多指教</div>
         </div>
 

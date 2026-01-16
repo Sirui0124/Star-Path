@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { GameState, GameStage, Company, Action, GameEvent, Trainee, VoteBreakdown, EventOutcome, Gender, EventType } from './types';
-import { AMATEUR_ACTIONS, SHOW_ACTIONS, COMPANIES, LOADING_MESSAGES } from './constants';
+import { AMATEUR_ACTIONS, SHOW_ACTIONS, COMPANIES, LOADING_MESSAGES, SOCIAL_FEEDBACKS } from './constants';
 import { ALL_EVENTS } from './content/events';
 import { StatsPanel } from './components/StatsPanel';
 import { ShowRankModal } from './components/ShowRankModal';
@@ -13,8 +12,9 @@ import { STAGE_GUIDES } from './content/guides';
 import { ANNUAL_NARRATIVES } from './content/narratives';
 import { STORY_IMAGES, getEndingImageKey } from './content/images';
 import { generateGameSummary, generateAnnualSummary, generateFanComments, generateEventOutcome } from './services/gemini';
+import { logGameEvent } from './services/firebase';
 import { formatEffectLog, generateTrainees } from './utils';
-import { Play, SkipForward, AlertCircle, Briefcase, HelpCircle, X, Building2, Calendar } from 'lucide-react';
+import { Play, SkipForward, AlertCircle, Briefcase, HelpCircle, X, Building2, Calendar, CheckCircle } from 'lucide-react';
 
 const INITIAL_STATE: GameState = {
   name: '练习生', // Default placeholder
@@ -22,7 +22,7 @@ const INITIAL_STATE: GameState = {
   dreamLabel: '追梦人',
   stats: {
     vocal: 30, dance: 0, looks: 30, eq: 10,
-    morale: 50, health: 50, fans: 1, votes: 0
+    ethics: 50, health: 50, fans: 1, votes: 0
   },
   hiddenStats: { sincerity: 50, dream: 50, hotCp: 0, viralMoments: 0 },
   time: { year: 1, quarter: 1, age: 16 },
@@ -31,6 +31,7 @@ const INITIAL_STATE: GameState = {
   ap: 3,
   maxAp: 3,
   history: [],
+  triggeredEventIds: [], // Initialize empty
   
   isSignedUpForShow: false,
   showTurnCount: 0,
@@ -38,26 +39,15 @@ const INITIAL_STATE: GameState = {
   trainees: [],
   
   isGameOver: false,
-  warnings: { health: false, morale: false },
+  warnings: { health: false, ethics: false },
 };
 
 type TurnPhase = 'SETUP' | 'INTRO' | 'START' | 'EVENT' | 'ACTION' | 'END';
 
-// --- FALLBACK LIBRARY ---
-const FALLBACK_SOCIALS = [
-    { type: 'WEIBO', sender: '吃瓜路人', content: '这就有点意思了。' },
-    { type: 'WEIBO', sender: '娱乐博主', content: '前排吃瓜，坐等后续。' },
-    { type: 'WEIBO', sender: '秀粉', content: '抱走我家孩子不约！' },
-    { type: 'WECHAT', sender: '经纪人', content: '这次处理得不错，继续保持。' },
-    { type: 'WECHAT', sender: '妈妈', content: '注意身体，别太累了。' },
-    { type: 'WEIBO', sender: '路人', content: '纯路人，感觉还行吧。' },
-    { type: 'WEIBO', sender: '营销号', content: '网传某练习生又有新动作？' },
-    { type: 'WECHAT', sender: '选管姐姐', content: '收到，已报备给导演组。' },
-];
-
 export default function App() {
   const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
-  const [phase, setPhase] = useState<TurnPhase>('SETUP');
+  // Start with INTRO instead of SETUP
+  const [phase, setPhase] = useState<TurnPhase>('INTRO');
   
   // Event Queue System
   const [eventQueue, setEventQueue] = useState<GameEvent[]>([]);
@@ -78,6 +68,8 @@ export default function App() {
   const [annualSummaryText, setAnnualSummaryText] = useState('');
   const [eventOutcome, setEventOutcome] = useState<EventOutcome | null>(null);
   const [activeEventType, setActiveEventType] = useState<EventType | null>(null);
+  // Updated state to include image URL
+  const [signModal, setSignModal] = useState<{name: string, text: string, image: string} | null>(null);
 
   // --- Preload Images ---
   useEffect(() => {
@@ -86,6 +78,10 @@ export default function App() {
       STORY_IMAGES.event_random,
       STORY_IMAGES.event_show,
       STORY_IMAGES.setup_bg,
+      STORY_IMAGES.signing_coffee,
+      STORY_IMAGES.signing_origin,
+      STORY_IMAGES.signing_starlight,
+      STORY_IMAGES.signing_agray,
     ];
     imagesToPreload.forEach(src => {
       const img = new Image();
@@ -118,6 +114,17 @@ export default function App() {
     setGameState(prev => ({ ...prev, history: [...prev.history, `${prev.time.age}岁${prev.time.quarter}季度: ${text}`] }));
   };
 
+  const getShowRankTitle = (turn: number) => {
+    switch (turn) {
+      case 1: return "青春404 · 初始顺位";
+      case 2: return "青春404 · 第一轮公演";
+      case 3: return "青春404 · 第二轮公演";
+      case 4: return "青春404 · 第三轮公演";
+      case 5: return "青春404 · 总决赛成团夜";
+      default: return "青春404 · 顺位发布";
+    }
+  };
+
   const updateStats = (effect: Partial<GameState['stats']> & Partial<GameState['hiddenStats']>) => {
     setGameState(prev => {
       const newStats = { ...prev.stats };
@@ -129,7 +136,7 @@ export default function App() {
       if (effect.dance) newStats.dance = Math.min(300, Math.max(0, newStats.dance + effect.dance));
       if (effect.looks) newStats.looks = Math.min(300, Math.max(0, newStats.looks + effect.looks));
       if (effect.eq) newStats.eq = Math.min(100, Math.max(0, newStats.eq + effect.eq));
-      if (effect.morale) newStats.morale = Math.min(100, Math.max(0, newStats.morale + effect.morale));
+      if (effect.ethics) newStats.ethics = Math.min(100, Math.max(0, newStats.ethics + effect.ethics));
       if (effect.health) newStats.health = Math.min(100, Math.max(0, newStats.health + effect.health));
       if (effect.fans) newStats.fans = Math.max(0, newStats.fans + effect.fans);
       if (effect.votes) newStats.votes = Math.max(0, newStats.votes + effect.votes);
@@ -140,7 +147,7 @@ export default function App() {
       if (effect.viralMoments) newHidden.viralMoments += effect.viralMoments;
 
       if (effect.health && effect.health > 0) newWarnings.health = false;
-      if (effect.morale && effect.morale > 0) newWarnings.morale = false;
+      if (effect.ethics && effect.ethics > 0) newWarnings.ethics = false;
 
       return { ...prev, stats: newStats, hiddenStats: newHidden, warnings: newWarnings };
     });
@@ -161,11 +168,24 @@ export default function App() {
       },
       history: [`游戏开始：你叫${name}，是一个怀揣【${dreamLabel}】梦想的16岁${gender === 'male' ? '少年' : '少女'}。`]
     }));
-    setPhase('INTRO'); // Moved from START to INTRO
+    
+    // Analytics: Game Start
+    logGameEvent('game_start', {
+      character_dream: dreamLabel,
+      character_gender: gender,
+      initial_vocal: initialStats.vocal,
+      initial_dance: initialStats.dance,
+      initial_looks: initialStats.looks
+    });
+
+    // Auto show guide at start of Amateur stage
+    setShowGuide(true);
+    setPhase('START'); 
   };
   
   const handleIntroComplete = () => {
-    setPhase('START');
+    // Intro finishes -> Go to Character Setup
+    setPhase('SETUP');
   };
 
   // --- Core Game Loop Logic ---
@@ -175,10 +195,14 @@ export default function App() {
     const queue: GameEvent[] = [];
     const isShowStage = currentState.stage === GameStage.SHOW;
 
-    // 1. Filter events applicable to current stage & trigger
+    // 1. Filter events applicable to current stage & trigger & REPEATABLE CHECK
     const validEvents = ALL_EVENTS.filter(e => {
         // Stage Check
         if (e.stage !== 'ALL' && e.stage !== currentState.stage) return false;
+        
+        // Repeatable Check: If not repeatable and already triggered, skip it.
+        if (!e.repeatable && currentState.triggeredEventIds.includes(e.id)) return false;
+
         // Trigger Check
         try {
             return e.trigger(currentState);
@@ -201,7 +225,7 @@ export default function App() {
         // Fill remaining slots with pool events (Show Events)
         // Prefer SHOW type events in SHOW stage
         const showPool = poolEvents.filter(e => e.type === 'SHOW');
-        const otherPool = poolEvents.filter(e => e.type !== 'SHOW');
+        const otherPool = poolEvents.filter(e => e.type !== 'SHOW'); // Should be empty ideally if strict
         
         // Shuffle pools
         showPool.sort(() => 0.5 - Math.random());
@@ -215,7 +239,7 @@ export default function App() {
         const fromShow = showPool.slice(0, needed);
         queue.push(...fromShow);
         
-        // If still needed, take from others
+        // If still needed, take from others (fallback)
         needed -= fromShow.length;
         if (needed > 0) {
             queue.push(...otherPool.slice(0, needed));
@@ -254,11 +278,11 @@ export default function App() {
   // 0. Monitor Vital Signs
   useEffect(() => {
     if (!gameState.isGameOver && phase !== 'SETUP' && phase !== 'INTRO') {
-      if (gameState.stats.health <= 0 || gameState.stats.morale <= 0) {
+      if (gameState.stats.health <= 0 || gameState.stats.ethics <= 0) {
         endGame("因身心状况彻底崩溃，不得不遗憾退圈。");
       }
     }
-  }, [gameState.stats.health, gameState.stats.morale, gameState.isGameOver, phase]);
+  }, [gameState.stats.health, gameState.stats.ethics, gameState.isGameOver, phase]);
 
   // 1. Event Phase Processor
   useEffect(() => {
@@ -284,10 +308,12 @@ export default function App() {
       if (gameState.company !== Company.NONE) {
         const co = COMPANIES[gameState.company];
         let bonusEffect = {};
-        if (gameState.company === Company.COFFEE) bonusEffect = { vocal: 10, fans: 5 };
+        // Updated Bonus Logic
+        if (gameState.company === Company.COFFEE) bonusEffect = { vocal: 10, fans: 2 };
         if (gameState.company === Company.ORIGIN) bonusEffect = { looks: 5, fans: 10 };
-        if (gameState.company === Company.STARLIGHT) bonusEffect = { looks: 5, eq: 5 };
+        if (gameState.company === Company.STARLIGHT) bonusEffect = { looks: 10, eq: 5, fans: 5 };
         if (gameState.company === Company.AGRAY) bonusEffect = { vocal: 5, dance: 5, fans: 10 };
+        
         updateStats(bonusEffect);
         addLog(`【公司资源】${co.name}资源已发放 (${formatEffectLog(bonusEffect)})`);
       }
@@ -319,9 +345,23 @@ export default function App() {
   const handleEventOption = async (idx: number) => {
     if (!currentEvent) return;
     const option = currentEvent.options[idx];
+
+    // Analytics: Event Choice
+    logGameEvent('event_choice', {
+      event_id: currentEvent.id,
+      event_type: currentEvent.type,
+      choice_text: option.text,
+      current_stage: gameState.stage
+    });
     
     // Store type before clearing event
     setActiveEventType(currentEvent.type);
+
+    // Record the event as triggered immediately (for deduplication)
+    setGameState(prev => ({
+        ...prev,
+        triggeredEventIds: [...prev.triggeredEventIds, currentEvent.id]
+    }));
 
     startLoading();
     
@@ -332,7 +372,20 @@ export default function App() {
       setEventOutcome(aiOutcome);
     } else {
       const changes = option.effect(gameState);
-      const randomSocial = FALLBACK_SOCIALS[Math.floor(Math.random() * FALLBACK_SOCIALS.length)];
+      
+      // Dynamic Fallback Logic
+      // 1. Build Pool
+      const feedbackPool = [
+          ...SOCIAL_FEEDBACKS.GENERAL,
+          ...SOCIAL_FEEDBACKS.FAMILY
+      ];
+      // 2. Add Company pool only if signed
+      if (gameState.company !== Company.NONE) {
+          feedbackPool.push(...SOCIAL_FEEDBACKS.COMPANY);
+      }
+      
+      // 3. Pick random
+      const randomSocial = feedbackPool[Math.floor(Math.random() * feedbackPool.length)];
       
       setEventOutcome({
         narrative: option.log || "生活还在继续。",
@@ -360,6 +413,13 @@ export default function App() {
   const handleAction = (action: Action) => {
     if (gameState.ap < action.apCost) return;
     
+    // Analytics: Perform Action
+    logGameEvent('perform_action', {
+      action_id: action.id,
+      action_name: action.name,
+      stage: gameState.stage
+    });
+
     const effect = action.effect(gameState);
 
     if (effect.health && gameState.stats.health + effect.health <= 0) {
@@ -370,9 +430,9 @@ export default function App() {
        }
     }
 
-    if (effect.morale && gameState.stats.morale + effect.morale <= 0) {
-      if (!gameState.warnings.morale) {
-        setGameState(prev => ({ ...prev, warnings: { ...prev.warnings, morale: true } }));
+    if (effect.ethics && gameState.stats.ethics + effect.ethics <= 0) {
+      if (!gameState.warnings.ethics) {
+        setGameState(prev => ({ ...prev, warnings: { ...prev.warnings, ethics: true } }));
         addLog("⚠️【道德预警】请提升道德，否则将被迫退圈。");
         return; 
       }
@@ -387,7 +447,8 @@ export default function App() {
   const nextQuarter = async () => {
     // A. Show Phase Logic
     if (gameState.stage === GameStage.SHOW) {
-      if (gameState.showTurnCount >= 4) {
+      // Extended to 5 turns to accommodate "Finals Debut Night" as the last ranking reveal
+      if (gameState.showTurnCount >= 5) {
         endGameBasedOnShow();
         return;
       }
@@ -454,6 +515,9 @@ export default function App() {
       setIsLoadingAi(false); // <--- FIXED: Ensure loading state is cleared
 
       // Apply changes but don't set queue yet
+      // AP Reduced to 4 if in company
+      const nextAp = gameState.company !== Company.NONE ? 4 : 5;
+      
       setGameState(prev => ({
         ...prev,
         stats: { ...prev.stats, votes: newPlayerVotes },
@@ -461,16 +525,24 @@ export default function App() {
         rank: myRank,
         showTurnCount: prev.showTurnCount + 1,
         time: { ...prev.time, quarter: (prev.time.quarter % 4 + 1) as 1|2|3|4 },
-        ap: 5 
+        ap: nextAp,
+        maxAp: nextAp
       }));
       
-      setCurrentVoteBreakdown({ base: baseVotes, action: actionVotes, bonus: bonusVotes, total: totalNewVotes });
+      setCurrentVoteBreakdown({ base: 5, action: actionVotes, bonus: bonusVotes, total: totalNewVotes });
       setShowRankModal(true); // Will trigger queue gen on close
       // No setPhase here, modal close handles it
   };
 
   const handleShowRankModalClose = () => {
       setShowRankModal(false);
+      
+      // If we just finished the Finals (Turn 5), end the game
+      if (gameState.showTurnCount >= 5) {
+          endGameBasedOnShow();
+          return;
+      }
+
       // Generate Show Events Queue
       const newQueue = generateEventQueue(gameState);
       setEventQueue(newQueue);
@@ -548,13 +620,16 @@ export default function App() {
         setFanComments(comments);
         setIsLoadingAi(false);
 
+        // AP logic: 4 if signed, 5 if amateur
+        const startAp = gameState.company !== Company.NONE ? 4 : 5;
+
         setGameState(prev => {
             let newState = {
                 ...prev,
                 time: { year: year, quarter: quarter, age: age },
                 stage: GameStage.SHOW,
-                ap: 5,
-                maxAp: 5,
+                ap: startAp,
+                maxAp: startAp,
                 showTurnCount: 1,
                 trainees: initialTrainees,
                 stats: { ...prev.stats, votes: initialVotes },
@@ -565,13 +640,44 @@ export default function App() {
         });
         
         setCurrentVoteBreakdown({ base: initialVotes, action: 0, bonus: 0, total: initialVotes });
-        setShowRankModal(true); // Will trigger queue gen on close
+        setShowRankModal(true);
+        // Auto show guide at start of Show stage
+        setShowGuide(true);
         // No setPhase here, modal close handles it
   };
 
   const signCompany = (c: Company) => {
+    // Determine welcome text and image
+    let text = "";
+    let image = STORY_IMAGES.default;
+
+    switch(c) {
+      case Company.COFFEE: 
+        text = "CEO申饼紧张地喝了口咖啡：欢迎入伙，我们用心做歌，冰美式和饼管够。"; 
+        image = STORY_IMAGES.signing_coffee;
+        break;
+      case Company.ORIGIN: 
+        text = "老板侯悦把合约拍在桌上：签了字就别想偷懒。"; 
+        image = STORY_IMAGES.signing_origin;
+        break;
+      case Company.STARLIGHT: 
+        text = "刘姐推了推墨镜：啧啧，这张脸不红简直天理难容，我们会把你捧成顶流。"; 
+        image = STORY_IMAGES.signing_starlight;
+        break;
+      case Company.AGRAY: 
+        text = "Tony总监：音色很有辨识度。来艾灰，我们用作品说话。"; 
+        image = STORY_IMAGES.signing_agray;
+        break;
+      default:
+        text = "欢迎加入！";
+        image = STORY_IMAGES.default;
+    }
+
     setGameState(prev => ({ ...prev, company: c, maxAp: 2 }));
     addLog(`成功签约 ${COMPANIES[c].name}！`);
+    
+    // Show Modal
+    setSignModal({ name: COMPANIES[c].name, text, image });
   };
 
   const signUpForShow = () => {
@@ -596,6 +702,15 @@ export default function App() {
   const endGame = async (result: string) => {
     if (gameState.isGameOver) return; 
     setGameState(prev => ({ ...prev, isGameOver: true, stage: GameStage.ENDED, gameResult: result }));
+    
+    // Analytics: Game Complete
+    logGameEvent('game_complete', {
+      result_type: result,
+      final_fans: gameState.stats.fans,
+      final_votes: gameState.stats.votes,
+      company: gameState.company
+    });
+
     startLoading();
     const summary = await generateGameSummary({ ...gameState, gameResult: result });
     setAiSummary(summary);
@@ -604,12 +719,12 @@ export default function App() {
 
   // --- Render Sections ---
 
-  if (phase === 'SETUP') {
-    return <CharacterSetup onComplete={handleSetupComplete} />;
+  if (phase === 'INTRO') {
+     return <GameIntroModal onStart={handleIntroComplete} />;
   }
 
-  if (phase === 'INTRO') {
-    return <GameIntroModal onStart={handleIntroComplete} />;
+  if (phase === 'SETUP') {
+    return <CharacterSetup onComplete={handleSetupComplete} />;
   }
 
   const currentGuide = (gameState.stage === GameStage.AMATEUR ? STAGE_GUIDES.AMATEUR : STAGE_GUIDES.SHOW) as any;
@@ -739,9 +854,50 @@ export default function App() {
           </div>
         )}
 
+        {/* Company Signing Modal */}
+        {signModal && (
+           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6 animate-fade-in">
+              <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden flex flex-col relative animate-fade-in-up">
+                 
+                 {/* Image Header */}
+                 <div className="relative w-full aspect-[4/3] bg-blue-50">
+                    <img 
+                      src={signModal.image} 
+                      alt="Signing" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+                 </div>
+
+                 <div className="p-6 -mt-12 relative z-10 text-center">
+                    <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-white shadow-lg border-4 border-white">
+                        <Building2 size={24} />
+                    </div>
+                    
+                    <h2 className="text-2xl font-bold text-blue-900 mb-1">签约成功</h2>
+                    <h3 className="text-base font-medium text-gray-600 mb-6">{signModal.name}</h3>
+                 
+                    <div className="bg-blue-50 p-5 rounded-xl border border-blue-100 text-blue-800 font-medium italic mb-6 text-sm leading-relaxed relative">
+                       <span className="absolute top-2 left-2 text-3xl text-blue-200/50 leading-none">"</span>
+                       {signModal.text}
+                       <span className="absolute bottom-[-10px] right-2 text-3xl text-blue-200/50 leading-none">"</span>
+                    </div>
+
+                    <button 
+                        onClick={() => setSignModal(null)}
+                        className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2"
+                    >
+                        <CheckCircle size={18} /> 开启职业生涯
+                    </button>
+                 </div>
+              </div>
+           </div>
+        )}
+
         {/* Show Ranking Modal */}
         {showRankModal && (
           <ShowRankModal 
+            title={getShowRankTitle(gameState.showTurnCount)}
             rank={gameState.rank}
             votes={gameState.stats.votes}
             voteBreakdown={currentVoteBreakdown}
@@ -776,20 +932,44 @@ export default function App() {
                  </div>
                  
                  {currentGuide.companies && (
-                   <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
-                      <h3 className="font-bold mb-3 text-purple-800 flex items-center gap-2"><Building2 size={16}/> 经纪公司签约指南</h3>
-                      <div className="space-y-3">
-                        {currentGuide.companies.map((c: any, i: number) => (
-                          <div key={i} className="bg-white p-2 rounded border border-purple-100 shadow-sm">
-                             <div className="font-bold text-purple-700">{c.name}</div>
-                             <div className="text-xs text-gray-600 mt-1"><span className="font-semibold">条件:</span> {c.req}</div>
-                             <div className="text-xs text-gray-600 mt-0.5"><span className="font-semibold">收益:</span> {c.benefit}</div>
-                          </div>
-                        ))}
-                      </div>
+                   <div className="bg-purple-50 p-2 rounded-lg border border-purple-100">
+                      <h3 className="font-bold mb-2 text-purple-800 flex items-center gap-2 text-sm"><Building2 size={16}/> 经纪公司签约指南</h3>
+                      
                       {currentGuide.companyNote && (
-                        <div className="mt-2 text-xs text-purple-600 italic">{currentGuide.companyNote}</div>
+                        <div className="mb-2 text-xs text-purple-600 font-medium">{currentGuide.companyNote}</div>
                       )}
+
+                      <div className="overflow-hidden rounded-lg border border-purple-200 bg-white">
+                        <table className="w-full text-[10px] text-center border-collapse">
+                          <thead>
+                            <tr className="bg-purple-100 text-purple-900">
+                              {currentGuide.companies.map((c: any, i: number) => (
+                                <th key={i} className="p-1 border-r border-purple-200 last:border-0 font-bold whitespace-nowrap">{c.name}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody className="text-gray-600">
+                             {/* Row 2: Type */}
+                             <tr className="bg-purple-50/50">
+                               {currentGuide.companies.map((c: any, i: number) => (
+                                 <td key={i} className="p-1 border-r border-t border-purple-200 last:border-r-0">{c.type}</td>
+                               ))}
+                             </tr>
+                             {/* Row 3: Requirements */}
+                             <tr>
+                               {currentGuide.companies.map((c: any, i: number) => (
+                                 <td key={i} className="p-1 border-r border-t border-purple-200 last:border-r-0 whitespace-pre-wrap align-top h-12">{c.req}</td>
+                               ))}
+                             </tr>
+                             {/* Row 4: Benefits */}
+                             <tr className="bg-purple-50/30 text-purple-800 font-medium">
+                               {currentGuide.companies.map((c: any, i: number) => (
+                                 <td key={i} className="p-1 border-r border-t border-purple-200 last:border-r-0 whitespace-pre-wrap align-top">{c.benefit}</td>
+                               ))}
+                             </tr>
+                          </tbody>
+                        </table>
+                      </div>
                    </div>
                  )}
                </div>
@@ -887,7 +1067,7 @@ export default function App() {
               <h3 className="font-bold text-gray-700 mb-3 flex flex-wrap items-center justify-between gap-2">
                  <span>行动安排</span>
                  <div className="flex items-center gap-2">
-                    {(gameState.warnings.health || gameState.warnings.morale) && (
+                    {(gameState.warnings.health || gameState.warnings.ethics) && (
                         <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded animate-pulse">
                            ⚠️ 状态危急
                         </span>
@@ -898,15 +1078,15 @@ export default function App() {
                  </div>
               </h3>
 
-              {(gameState.warnings.health || gameState.warnings.morale) && (
+              {(gameState.warnings.health || gameState.warnings.ethics) && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3 text-sm text-red-800 flex items-start gap-2 shadow-sm">
                      <AlertCircle size={18} className="shrink-0 mt-0.5 text-red-600" />
                      <div className="flex-1">
                         {gameState.warnings.health && <div className="font-bold">⚠️ 身体已达极限！</div>}
                         {gameState.warnings.health && <div className="text-xs mt-1 text-red-700">请立即执行行动恢复健康，若再次消耗健康将直接退圈。</div>}
                         
-                        {gameState.warnings.morale && <div className="font-bold mt-1">⚠️ 心态濒临崩溃！</div>}
-                        {gameState.warnings.morale && <div className="text-xs mt-1 text-red-700">请立即执行行动恢复道德，若再次消耗道德将直接退圈。</div>}
+                        {gameState.warnings.ethics && <div className="font-bold mt-1">⚠️ 心态濒临崩溃！</div>}
+                        {gameState.warnings.ethics && <div className="text-xs mt-1 text-red-700">请立即执行行动恢复道德，若再次消耗道德将直接退圈。</div>}
                      </div>
                   </div>
               )}

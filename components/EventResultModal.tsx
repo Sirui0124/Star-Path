@@ -103,7 +103,7 @@ export const EventResultModal: React.FC<Props> = ({ outcome, eventType, onClose 
                   <div className="flex flex-wrap gap-2">
                      {statChanges.map(([key, val]) => {
                         const isPositive = (val as number) > 0;
-                        const nameMap: any = { vocal: 'Vocal', dance: 'Dance', looks: '颜值', eq: '情商', morale: '道德', health: '健康', fans: '粉丝', votes: '票数', dream: '梦想' };
+                        const nameMap: any = { vocal: 'Vocal', dance: 'Dance', looks: '颜值', eq: '情商', ethics: '道德', health: '健康', fans: '粉丝', votes: '票数', dream: '梦想' };
                         return (
                           <div key={key} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold border shadow-sm ${
                              isPositive 

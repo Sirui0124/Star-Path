@@ -34,7 +34,7 @@ export const GameIntroModal: React.FC<Props> = ({ onStart }) => {
               <div>
                  <h3 className="font-bold text-gray-800 text-sm mb-1">随机机遇</h3>
                  <p className="text-xs text-gray-600 leading-relaxed">
-                    每一季度开始，都会触发2到4个<span className="text-purple-600 font-bold">突发事件</span>。你的选择将决定星途走向，带来意外的数值收获。
+                    每季度开始，都会触发2到4个<span className="text-purple-600 font-bold">事件</span>。你的选择将带来意外的成长和收获。
                  </p>
               </div>
            </div>
@@ -47,7 +47,7 @@ export const GameIntroModal: React.FC<Props> = ({ onStart }) => {
               <div>
                  <h3 className="font-bold text-gray-800 text-sm mb-1">行动规划</h3>
                  <p className="text-xs text-gray-600 leading-relaxed">
-                    每轮拥有 <span className="text-blue-600 font-bold">3或5 个行动点 (AP)</span>。合理安排训练、休息，勿浪费每一次变强的机会。
+                    每轮拥有 <span className="text-blue-600 font-bold">3或5 个行动点 (AP)</span>。合理安排训练、休息，勿浪费每次变强的机会。
                  </p>
               </div>
            </div>
@@ -58,9 +58,9 @@ export const GameIntroModal: React.FC<Props> = ({ onStart }) => {
                  <TrendingUp size={20} />
               </div>
               <div>
-                 <h3 className="font-bold text-gray-800 text-sm mb-1">数值平衡</h3>
+                 <h3 className="font-bold text-gray-800 text-sm mb-1">能力属性</h3>
                  <p className="text-xs text-gray-600 leading-relaxed">
-                    除了唱跳颜值，请关注<span className="text-red-500 font-bold">健康</span>与<span className="text-green-600 font-bold">道德</span>。一旦归零，生涯将被迫中止。
+                    围绕阶段目标指引规划努力方向。<span className="text-blue-500 font-bold">唱/跳/颜值</span>影响签约和出道；<span className="text-red-500 font-bold">健康/道德</span>一旦归零，生涯将中止。
                  </p>
               </div>
            </div>

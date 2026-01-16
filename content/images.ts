@@ -7,30 +7,37 @@ export const STORY_IMAGES: Record<string, string> = {
   // --- 系统背景 ---
   setup_bg: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png", // 角色创建页背景
 
-  // --- 事件背景 (新增) ---
+  // --- 事件背景 ---
   event_social: "https://s3.bmp.ovh/imgs/2026/01/14/b181aebe7ab7fa01.png", // 社媒营业
   event_random: "https://s3.bmp.ovh/imgs/2026/01/14/c234302c56b34c0a.png", // 突发事件
   event_show: "https://s3.bmp.ovh/imgs/2026/01/14/d4275123ddcdeddb.png",    // 选秀事件
+  
+  // --- 签约事件背景 (各公司) ---
+  // 请在此处替换为您为各家公司准备的插画
+  signing_coffee: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png",    // 咖啡粒文化
+  signing_origin: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png",    // 原计划
+  signing_starlight: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png", // 星华娱乐
+  signing_agray: "https://s3.bmp.ovh/imgs/2026/01/14/d68fd5a5272fc14a.png",     // 艾灰音乐
 
   // --- 练习生阶段 (16-18岁) ---
   default: "https://s3.bmp.ovh/imgs/2026/01/14/76df613fa07ca668.png",
   16: "https://s3.bmp.ovh/imgs/2026/01/14/76df613fa07ca668.png", // 粉色系，懵懂
-  17: "https://placehold.co/600x400/fecdd3/9f1239?text=Age+17+Hard+Training", // 深粉，汗水
-  18: "https://placehold.co/600x400/fbcfe8/831843?text=Age+18+Coming+of+Age", // 紫粉，成长
+  17: "https://s3.bmp.ovh/imgs/2026/01/15/c26bca5e78bb8700.png", // 深粉，汗水
+  18: "https://s3.bmp.ovh/imgs/2026/01/15/900fb73b79ed0b23.png", // 紫粉，成长
 
   // --- 奋斗阶段 (19-21岁) ---
-  19: "https://placehold.co/600x400/e0f2fe/075985?text=Age+19+Dream+Persistence", // 浅蓝，坚持
-  20: "https://placehold.co/600x400/bae6fd/0369a1?text=Age+20+Turning+Point", // 蓝色，转折
-  21: "https://placehold.co/600x400/7dd3fc/0c4a6e?text=Age+21+Growing+Pains", // 深蓝，成熟
+  19: "https://s3.bmp.ovh/imgs/2026/01/15/af2ac27bddcadbd5.png", // 浅蓝，坚持
+  20: "https://s3.bmp.ovh/imgs/2026/01/15/49329851e46e00e4.png", // 蓝色，转折
+  21: "https://s3.bmp.ovh/imgs/2026/01/15/900fb73b79ed0b23.png", // 深蓝，成熟
 
-  // --- 蜕变阶段 (22-24岁) ---
-  22: "https://placehold.co/600x400/f3e8ff/6b21a8?text=Age+22+Shining+Star", // 浅紫，光芒
-  23: "https://placehold.co/600x400/d8b4fe/581c87?text=Age+23+New+Chapter", // 紫色，篇章
-  24: "https://placehold.co/600x400/c084fc/3b0764?text=Age+24+True+Strength", // 深紫，实力
+  // --- 蜕变阶段 (22-24岁) ---暂时以后先都用22岁的
+  22: "https://s3.bmp.ovh/imgs/2026/01/15/5984a86c28e48793.png", // 浅紫，光芒
+  23: "https://s3.bmp.ovh/imgs/2026/01/15/5984a86c28e48793.png", // 紫色，篇章
+  24: "https://s3.bmp.ovh/imgs/2026/01/15/5984a86c28e48793.png", // 深紫，实力
 
   // --- 终章阶段 (25-26岁) ---
-  25: "https://placehold.co/600x400/fef9c3/854d0e?text=Age+25+Original+Intention", // 浅黄，初心
-  26: "https://placehold.co/600x400/fde047/713f12?text=Age+26+Final+Chapter", // 金色，终章
+  25: "https://s3.bmp.ovh/imgs/2026/01/15/5984a86c28e48793.png", // 浅黄，初心
+  26: "https://s3.bmp.ovh/imgs/2026/01/15/5984a86c28e48793.png", // 金色，终章
 
   // --- 结局插画 ---
   ending_center: "https://s3.bmp.ovh/imgs/2026/01/14/00917a62999f88b8.png", // C位-橙金辉煌

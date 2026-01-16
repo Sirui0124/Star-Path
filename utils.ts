@@ -9,7 +9,7 @@ export const formatEffectLog = (effect: Partial<Stats & HiddenStats>): string =>
     dance: 'Dance',
     looks: '颜值',
     eq: '情商',
-    morale: '道德',
+    ethics: '道德', // Updated
     health: '健康',
     fans: '粉丝',
     votes: '票数',

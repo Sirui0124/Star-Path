@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { GameState, GameEvent, EventOutcome, GameStage } from "../types";
+import { GameState, GameEvent, EventOutcome, GameStage, Company } from "../types";
 
 const TIMEOUT_MS = 3500; // 3.5 seconds timeout
 
@@ -31,7 +31,7 @@ export const generateGameSummary = async (gameState: GameState): Promise<string>
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: { thinkingConfig: { thinkingBudget: 0 } }
     });
@@ -59,7 +59,7 @@ export const generateAnnualSummary = async (gameState: GameState): Promise<strin
   // Allow slightly longer timeout for annual summary as it's a major transition
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: { thinkingConfig: { thinkingBudget: 0 } }
     });
@@ -77,9 +77,13 @@ export const generateFanComments = async (gameState: GameState, context: 'START'
 
   const prompt = `
     生成3条简短的选秀粉丝评论(每条15字内)。
-    选手:${gameState.gender}, 排名:${gameState.rank}, 票数:${gameState.stats.votes}万
-    风格: 饭圈用语/路人吃瓜/颜狗/事业粉。
-    直接返回纯文本列表。
+    选手性别: 男 (务必使用多样化称呼，如: 老公/哥哥/崽崽/大帅哥/全名，尽量少用"弟弟")。
+    当前排名:${gameState.rank}, 票数:${gameState.stats.votes}万
+    
+    要求:
+    1. 混合不同粉丝属性: 女友粉(喊老公/想嫁)、妈粉(喊崽崽/心疼)、事业粉(喊哥哥/冲榜)、路人(喊帅哥/吃瓜)。
+    2. 语气要有"饭圈味"，可以使用适量黑话(如: 绝绝子/入股不亏/紫微星/鲨疯了)。
+    3. 直接返回纯文本列表。
   `;
 
   // Strict timeout for comments
@@ -87,7 +91,7 @@ export const generateFanComments = async (gameState: GameState, context: 'START'
     (async () => {
       try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3-flash-preview',
             contents: prompt,
             config: { thinkingConfig: { thinkingBudget: 0 } }
         });
@@ -110,42 +114,107 @@ export const generateEventOutcome = async (
   const ai = getClient();
   if (!ai) return null;
 
-  // Determine Luck Level based on EQ thresholds
+  // --- NEW STAGE-BASED LUCK & DRAMA MECHANISM ---
   const eq = gameState.stats.eq;
-  let luckDescription = "普通";
-  let luckGuidance = "结果中立随机";
-
-  if (eq < 20) {
-    luckDescription = "极低";
-    luckGuidance = "极易倒霉，遭遇意外坏事，属性大概率减少";
-  } else if (eq < 40) {
-    luckDescription = "较低";
-    luckGuidance = "运气欠佳，容易碰壁或引发小麻烦";
-  } else if (eq < 70) {
-    luckDescription = "较高";
-    luckGuidance = "运势不错，大概率顺利，可能获得额外收益";
-  } else {
-    luckDescription = "极高";
-    luckGuidance = "锦鲤附体，逢凶化吉，触发奇迹般的极好结果";
+  const luckRoll = Math.random() * 100; // 0 - 100 pure randomness
+  const hasCompany = gameState.company !== Company.NONE;
+  
+  // 1. Determine Stage Benchmark for EQ
+  // Amateur: 40 is average. Show: 50 is average. Ended: 60 is average.
+  let eqBenchmark = 40; 
+  if (gameState.stage === GameStage.SHOW) {
+      eqBenchmark = 50; 
+  } else if (gameState.stage === GameStage.ENDED) {
+      eqBenchmark = 60; 
   }
 
-  const isAmateur = gameState.stage === GameStage.AMATEUR;
-  const voteInstruction = isAmateur ? "禁止修改票数(votes)。" : "";
+  // 2. Normalize EQ Score (Center around 50 based on benchmark)
+  // If EQ == Benchmark, normalized score is 50.
+  // If EQ is 20 points higher than benchmark, score is 70.
+  const eqPerformance = Math.max(0, Math.min(100, 50 + (eq - eqBenchmark)));
+
+  // 3. Calculate Weighted Score
+  // 60% EQ Competence + 40% Pure Luck
+  const weightedScore = (eqPerformance * 0.6) + (luckRoll * 0.4);
+  
+  let luckType = "";
+  let luckGuidance = "";
+  let statRange = "[-3, +6]"; // Default range reference
+
+  // 4. Determine Outcome
+  if (luckRoll <= 5) {
+      // 5% Chance: Critical Failure (Drama!)
+      luckType = "大凶 (CRITICAL FAILURE)";
+      luckGuidance = "【戏剧性转折-恶】无论玩家选择多明智、情商多高，强制触发意外背锅、恶意剪辑或突发灾难。虽然你做得对，但世界对你不公。";
+      statRange = "[-4, -2]"; // Reduced range to fit the -8 sum constraint safely
+  } else if (luckRoll >= 95) {
+      // 5% Chance: Critical Success (Miracle!)
+      luckType = "大吉 (CRITICAL SUCCESS)";
+      luckGuidance = "【戏剧性转折-喜】无论情商高低，触发意想不到的奇迹（如被大佬赏识、黑红出圈、锦鲤附体）。傻人有傻福，结果出奇的好。";
+      statRange = "[+4, +7]"; // Adjusted to fit the +15 sum constraint
+  } else {
+      // Standard Logic (Weighted Score)
+      if (weightedScore < 35) {
+          luckType = "凶 (BAD)";
+          luckGuidance = `综合判定分${weightedScore.toFixed(0)} (低)。情商表现不足(基准${eqBenchmark})或运气太差。试图解决问题但搞砸了，或者被误解。`;
+          statRange = "[-3, +1]"; 
+      } else if (weightedScore < 75) {
+          luckType = "平 (MIXED)";
+          luckGuidance = `综合判定分${weightedScore.toFixed(0)} (中)。结果中规中矩，有得有失。情商发挥了作用但运气一般，或者运气好但情商没跟上。`;
+          statRange = "[-2, +2]"; 
+      } else {
+          luckType = "吉 (GOOD)";
+          luckGuidance = `综合判定分${weightedScore.toFixed(0)} (高)。情商在线(基准${eqBenchmark})且运势不错。完美化解危机，或者因得当的应对获得了额外收益。`;
+          statRange = "[+1, +5]"; 
+      }
+  }
+
+  const isSocialOrRandom = event.type === 'SOCIAL' || event.type === 'RANDOM';
+  let statsInstruction = "";
+  
+  if (isSocialOrRandom) {
+      statsInstruction = "⚠️ 绝对禁止修改: votes (票数), eq (情商)。必须从以下属性中选择2-3个修改: fans, health, ethics, looks, vocal, dance。";
+  } else {
+      const isAmateur = gameState.stage === GameStage.AMATEUR;
+      statsInstruction = isAmateur ? "禁止修改票数(votes)。" : "";
+  }
+
+  const companyConstraint = hasCompany 
+      ? "" 
+      : "⚠️ 玩家目前【未签约】经纪公司，SocialSender 绝对禁止生成 '经纪人'、'公司'、'助理'、'老板' 等官方角色回复。请生成粉丝、路人、家人或朋友的回复。";
 
   const prompt = `
     RPG事件结算。
     事件: "${event.title}"
-    选择: "${choiceLabel}"
-    当前情商: ${eq} (系统判定运气: ${luckDescription})。
-    生成指导: ${luckGuidance}。
-    数值约束: 必须修改2-3个属性，单项数值变化严格控制在[-3, +6]之间(整数)。${voteInstruction}
+    玩家选择: "${choiceLabel}"
+    玩家性别: 男 (粉丝称呼多样化: 老公/崽崽/哥哥/宝宝/大帅哥, 拒绝单一)
+    
+    【运势判定数据】
+    当前阶段: ${gameState.stage} (情商基准线: ${eqBenchmark})
+    玩家情商: ${eq} (表现分: ${eqPerformance})
+    命运骰子: ${luckRoll.toFixed(0)}
+    最终判定: ${luckType}
+    
+    【生成指导】
+    ${luckGuidance}
+    
+    【数值约束】
+    1. 必须修改2-3个属性。
+    2. 单项属性变化范围推荐: ${statRange}。
+    3. ⚠️ 绝对约束：所有属性变化的数值之和 (Sum of all changes) 必须在 [-8, 15] 之间。
+    4. ${statsInstruction}
+    5. 如果判定为“大凶”或“大吉”，请让narrative极具戏剧性。
+    
+    【社交反馈约束】
+    ${companyConstraint}
+    socialContent应简短有力，符合当代饭圈文化(女友粉/妈粉/事业粉/路人/黑粉)。
     
     输出JSON:
-    1. narrative: 结果描述(20字内)。
+    1. narrative: 结果描述(25字内，剧情要有起伏)。
     2. changes: 属性变化(对象, 包含2-3个属性)。
     3. socialType: "WECHAT"|"WEIBO"。
     4. socialSender: 发送者(5字内)。
-    5. socialContent: 反馈(15字内)。
+    5. socialContent: 社交反馈(20字内，符合运势判定)。
   `;
 
   // Strict timeout for events
@@ -153,7 +222,7 @@ export const generateEventOutcome = async (
     (async () => {
       try {
         const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3-flash-preview',
           contents: prompt,
           config: {
             responseMimeType: 'application/json',
@@ -168,7 +237,7 @@ export const generateEventOutcome = async (
                     dance: { type: Type.INTEGER },
                     looks: { type: Type.INTEGER },
                     eq: { type: Type.INTEGER },
-                    morale: { type: Type.INTEGER },
+                    ethics: { type: Type.INTEGER },
                     health: { type: Type.INTEGER },
                     fans: { type: Type.INTEGER },
                     votes: { type: Type.INTEGER },

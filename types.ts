@@ -20,7 +20,7 @@ export interface Stats {
   dance: number;
   looks: number;
   eq: number;
-  morale: number; // 道德
+  ethics: number; // 道德
   health: number;
   fans: number; // 单位：万
   votes: number; // 单位：万 (404阶段)
@@ -67,6 +67,9 @@ export interface GameState {
   maxAp: number;
   history: string[]; 
   
+  // New: Track triggered events to prevent duplication
+  triggeredEventIds: string[];
+
   // Show specific logic
   isSignedUpForShow: boolean; // 是否已报名等待明年春季
   showTurnCount: number; // Tracks turns inside the show (max 4)
@@ -79,7 +82,7 @@ export interface GameState {
   // Warnings for critical stats
   warnings: {
     health: boolean;
-    morale: boolean;
+    ethics: boolean;
   };
 }
 
@@ -88,7 +91,7 @@ export interface ActionEffect {
   dance?: number;
   looks?: number;
   eq?: number;
-  morale?: number;
+  ethics?: number;
   health?: number;
   fans?: number; // range [min, max] or fixed
   votes?: number;
@@ -116,6 +119,7 @@ export interface GameEvent {
   description: string;
   stage: GameStage | 'ALL'; // Restrict event to specific stage
   isMandatory: boolean; // If true, it MUST happen if triggered. If false, it competes in the random pool.
+  repeatable?: boolean; // New: If true, this event can happen multiple times. Defaults to false.
   trigger: (state: GameState) => boolean;
   options: {
     text: string;
