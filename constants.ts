@@ -86,7 +86,7 @@ export const AMATEUR_ACTIONS: Action[] = [
   {
     id: 'street_perform',
     name: '街头演出',
-    description: '健康-8, Vocal+5, 情商+3, 粉丝+',
+    description: '健康-8, Vocal+5, 情商+3, 粉+',
     apCost: 1,
     effect: (state) => ({
       health: -8,
@@ -113,48 +113,70 @@ export const SHOW_ACTIONS: Action[] = [
   {
     id: 'show_practice',
     name: '独自苦练（无镜头）',
-    description: 'Vocal+5, Dance+5, 票数--, 概率出圈',
+    description: 'Vocal+8, Dance+8, 票数-5, 概率出圈',
     apCost: 1,
     effect: () => ({
       vocal: 10,
       dance: 10,
-      fans: -rand(2, 4),
-      votes: -3,
+      votes: -5,
       dream: 2,
       viralMoments: chance(20) ? 1 : 0
+    })
+  },
+    {
+    id: 'show_communicate',
+    name: '学员交流（搞好关系）',
+    description: '情商+5, 粉丝++, 概率CP',
+    apCost: 1,
+    effect: () => ({
+      eq: +5,
+      fans: rand(5,10),
+      hotCp: chance(15) ? 1 : 0
+    })
+  },
+    {
+    id: 'show_performane',
+    name: '公演彩排',
+    description: '颜值+5, 票数+',
+    apCost: 1,
+    effect: () => ({
+      looks: +5,
+      votes: rand(3,8),
+    })
+  },
+    {
+    id: 'show_looks',
+    name: '刻意锐评抢镜头',
+    description: '道德-3, 票数++,概率出圈',
+    apCost: 1,
+    effect: () => ({
+      ethics: -3,
+      votes: rand(5,10),
+      viralMoments: chance(30) ? 1 : 0
     })
   },
   {
     id: 'show_fan_service',
     name: '粉丝营业（媚粉）',
-    description: '粉丝++, 票数++, 道德-, 概率CP',
+    description: '道德-3,粉丝++, 票数+, 概率出圈',
     apCost: 1,
     effect: () => ({
       fans: rand(5, 10),
       votes: rand(3, 8),
-      ethics: -2,
-      hotCp: chance(10) ? 1 : 0
+      ethics: -3,
+      viralMoments: chance(15) ? 1 : 0
     })
   },
   {
     id: 'show_social',
-    name: '搞好关系（蹭镜头）',
-    description: '情商++, 票数+, 概率CP',
-    apCost: 1,
+    name: '炒CP（有机会大爆）',
+    description: '道德-10,粉丝++,票数++,大概率CP',
+    apCost: 2,
     effect: () => ({
-      eq: 5,
-      votes: rand(1, 5),
-      hotCp: chance(20) ? 1 : 0
-    })
-  },
-  {
-    id: 'show_rest',
-    name: '偷懒休息',
-    description: '健康+10, 票数--',
-    apCost: 1,
-    effect: () => ({
-      health: 10,
-      votes: -rand(2, 5)
+      ethics: -10,
+      fans:chance(20)? 20: rand(8,12),
+      votes: chance(20)? 10 : rand(3, 6),
+      hotCp: chance(30) ? 1 : 0
     })
   }
 ];

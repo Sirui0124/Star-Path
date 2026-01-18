@@ -1,15 +1,17 @@
+
 import React from 'react';
 import { EventOutcome, EventType } from '../types';
-import { ArrowUp, ArrowDown, MessageCircle, User, Bell } from 'lucide-react';
+import { ArrowUp, ArrowDown, MessageCircle, User, Bell, ChevronRight, Hash } from 'lucide-react';
 import { STORY_IMAGES } from '../content/images';
 
 interface Props {
   outcome: EventOutcome;
   eventType: EventType;
+  context: { title: string, desc: string, options: string[], selectedIndex: number } | null;
   onClose: () => void;
 }
 
-export const EventResultModal: React.FC<Props> = ({ outcome, eventType, onClose }) => {
+export const EventResultModal: React.FC<Props> = ({ outcome, eventType, context, onClose }) => {
   const { narrative, changes, socialType, socialSender, socialContent } = outcome;
   
   // Format stats for display - Filter out hidden stats like sincerity
@@ -25,105 +27,137 @@ export const EventResultModal: React.FC<Props> = ({ outcome, eventType, onClose 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6 animate-fade-in">
-      <div className="bg-transparent rounded-3xl shadow-2xl w-full max-w-[320px] overflow-hidden flex flex-col relative animate-fade-in-up border border-white/40 aspect-[1/1.15]">
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 md:p-6 font-sans">
+      <div className="bg-transparent rounded-3xl shadow-2xl w-full max-w-[340px] aspect-[5/8] max-h-[85vh] overflow-hidden flex flex-col relative border border-white/30">
         
-        {/* Background Layer */}
-        <div className="absolute inset-0 z-0 bg-slate-900">
+        {/* Background Layer - Removed fade-in state */}
+        <div className="absolute inset-0 z-0 bg-gray-900">
           <img 
             src={getBackgroundImage()} 
             alt="Event Background" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-90"
           />
-          {/* Subtle overlay to ensure text contrast on glass - Reduced to 10% */}
-          <div className="absolute inset-0 bg-black/10"></div>
+          {/* Subtle gradient to ensure text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
         </div>
 
         {/* Content Layer */}
-        <div className="relative z-10 flex flex-col h-full justify-between p-5">
+        <div className="relative z-10 flex flex-col h-full justify-between p-5 md:p-6">
           
-          {/* Header - Narrative - Aligned Start (Top) */}
-          <div className="text-center flex-1 flex flex-col justify-start items-center pt-2">
-             <div className="text-4xl mb-4 animate-bounce drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">✨</div>
-             
-             {/* Narrative Pill - Dark Glass Style with Quotes - Tuned Transparency */}
-             <div className="relative w-full">
-                <div className="bg-slate-900/20 backdrop-blur-md p-5 rounded-xl border border-white/10 text-white text-base font-bold leading-relaxed text-center shadow-inner relative">
-                    <span className="absolute top-1 left-2 text-3xl text-white/40 font-serif leading-none">“</span>
-                    <span className="relative z-10 px-2 block drop-shadow-md">{narrative}</span>
-                    <span className="absolute -bottom-3 right-2 text-3xl text-white/40 font-serif leading-none">”</span>
-                </div>
+          {/* --- TOP SECTION: CONTEXT --- */}
+          {/* Make this section flex-1 but allow it to shrink if needed */}
+          <div className="flex flex-col gap-1 overflow-y-auto scrollbar-hide min-h-0 mb-2">
+             <div className="flex items-center gap-2 mb-1 opacity-80 shrink-0">
+                <span className="text-[9px] md:text-[10px] font-bold text-white tracking-[0.2em] uppercase border border-white/30 px-2 py-0.5 rounded-sm">Event Log</span>
+             </div>
+
+             {/* Original Event Title */}
+             <h2 className="text-xl md:text-2xl font-black text-white drop-shadow-md leading-none mb-1 md:mb-2 shrink-0">
+                {context?.title || "事件回溯"}
+             </h2>
+
+             {/* Brief Description */}
+             <p className="text-[10px] md:text-xs text-gray-200 line-clamp-2 leading-relaxed opacity-90 mb-2 shrink-0">
+                {context?.desc}
+             </p>
+
+             {/* Options List - Compact */}
+             <div className="flex flex-col gap-1.5 shrink-0">
+                {context?.options.map((opt, idx) => {
+                  const isSelected = idx === context.selectedIndex;
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`
+                        px-3 py-1.5 rounded-lg text-[9px] md:text-[10px] font-bold border backdrop-blur-md transition-all flex items-center gap-2 transform-gpu
+                        ${isSelected 
+                          ? 'bg-white/20 border-yellow-300/50 text-white shadow-sm' 
+                          : 'bg-black/20 border-white/5 text-gray-400'
+                        }
+                      `}
+                    >
+                      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isSelected ? 'bg-yellow-400 animate-pulse' : 'bg-gray-600'}`}></div>
+                      <span className={`${isSelected ? 'text-yellow-100' : ''} line-clamp-1`}>{opt}</span>
+                      {isSelected && <span className="ml-auto text-yellow-300 text-[9px] shrink-0">YOU</span>}
+                    </div>
+                  );
+                })}
              </div>
           </div>
 
-          <div className="flex flex-col gap-3">
-            {/* Social Feedback - Increased Opacity */}
-            <div className="animate-fade-in-up delay-100">
-               {socialType === 'WECHAT' && (
-                 <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-white/50 shadow-md">
-                    <div className="flex items-center gap-2 mb-1.5 border-b border-gray-500/10 pb-1">
-                       <div className="bg-green-500 text-white p-1 rounded-full shadow-sm"><MessageCircle size={10} /></div>
-                       <span className="text-xs font-bold text-gray-800">{socialSender}</span>
+          {/* --- BOTTOM SECTION: RESULT CARD --- */}
+          {/* Fixed at bottom */}
+          <div className="flex flex-col gap-3 shrink-0">
+             
+             {/* Unified Glass Pane for Results */}
+             <div className="bg-slate-900/60 backdrop-blur-xl border border-white/30 rounded-2xl p-3 md:p-4 shadow-xl flex flex-col gap-2 md:gap-3 transform-gpu will-change-transform">
+                
+                {/* 1. Narrative Quote */}
+                <div className="relative text-center px-1">
+                    <div className="text-xs md:text-sm font-bold text-white leading-relaxed drop-shadow-sm font-serif italic max-h-16 overflow-y-auto scrollbar-hide">
+                       “{narrative}”
                     </div>
-                    <div className="bg-gray-50/50 p-2 rounded-xl text-xs text-gray-900 font-bold leading-relaxed shadow-inner">
-                       {socialContent}
-                    </div>
-                 </div>
-               )}
+                </div>
 
-               {socialType === 'WEIBO' && (
-                 <div className="bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-white/50 shadow-md">
-                    <div className="flex items-center gap-2 mb-1.5">
-                       <div className="w-6 h-6 rounded-full bg-orange-100/80 text-orange-600 flex items-center justify-center border border-orange-200 shadow-sm">
-                         <User size={12} />
-                       </div>
-                       <div className="flex flex-col">
-                          <span className="text-xs font-bold text-gray-900">{socialSender}</span>
-                       </div>
-                    </div>
-                    <div className="text-xs text-gray-900 pl-8 leading-relaxed font-bold">
-                       {socialContent}
-                    </div>
-                 </div>
-               )}
-               
-               {socialType === 'SYSTEM' && (
-                  <div className="bg-blue-50/90 backdrop-blur-md p-3 rounded-2xl border border-white/50 flex items-center gap-3 shadow-md">
-                     <div className="text-blue-600 bg-blue-100/50 p-1.5 rounded-full"><Bell size={14} /></div>
-                     <div className="text-xs text-blue-900 font-bold leading-tight">{socialContent}</div>
-                  </div>
-               )}
-            </div>
-
-            {/* Stat Changes - Increased Opacity */}
-            {statChanges.length > 0 && (
-               <div className="bg-white/90 backdrop-blur-md rounded-xl p-2.5 border border-white/50 shadow-md animate-fade-in-up delay-200">
-                  <div className="flex flex-wrap gap-2 justify-center">
+                {/* 2. Stat Changes Grid */}
+                {statChanges.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 md:gap-2 justify-center py-1 border-t border-white/10 border-b">
                      {statChanges.map(([key, val]) => {
                         const isPositive = (val as number) > 0;
                         const nameMap: any = { vocal: 'Vocal', dance: 'Dance', looks: '颜值', eq: '情商', ethics: '道德', health: '健康', fans: '粉丝', votes: '票数', dream: '梦想' };
                         return (
-                          <div key={key} className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-black border shadow-sm ${
+                          <div key={key} className={`flex items-center gap-1 px-1.5 md:px-2 py-0.5 md:py-1 rounded-md text-[9px] md:text-[10px] font-black border shadow-sm ${
                              isPositive 
-                             ? 'bg-green-100/50 text-green-900 border-green-200/50' 
-                             : 'bg-red-100/50 text-red-900 border-red-200/50'
+                             ? 'bg-green-400/20 text-green-100 border-green-300/30' 
+                             : 'bg-red-400/20 text-red-100 border-red-300/30'
                           }`}>
-                             {isPositive ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
+                             {isPositive ? <ArrowUp size={9} /> : <ArrowDown size={9} />}
                              <span>{nameMap[key] || key}</span>
                              <span>{Math.abs(val as number)}</span>
                           </div>
                         );
                      })}
                   </div>
-               </div>
-            )}
+                )}
 
-            <button 
-              onClick={onClose}
-              className="bg-white/90 hover:bg-white text-blue-900 font-black py-3.5 rounded-2xl transition-all shadow-lg backdrop-blur-md border border-white/50 w-full flex items-center justify-center gap-2 group text-sm active:scale-95 mt-1"
-            >
-              继续前行 <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </button>
+                {/* 3. Social Feedback (Embedded) */}
+                <div className="mt-0.5">
+                   {socialType === 'WECHAT' && (
+                     <div className="flex items-start gap-2 bg-white/90 p-2 rounded-lg shadow-sm">
+                        <div className="bg-green-500 text-white p-1 rounded-full shrink-0 mt-0.5"><MessageCircle size={10} /></div>
+                        <div className="min-w-0">
+                           <div className="text-[9px] md:text-[10px] font-bold text-gray-500 mb-0.5">{socialSender}</div>
+                           <div className="text-[10px] md:text-xs font-bold text-gray-800 leading-tight line-clamp-2">{socialContent}</div>
+                        </div>
+                     </div>
+                   )}
+
+                   {socialType === 'WEIBO' && (
+                     <div className="flex items-start gap-2 bg-white/90 p-2 rounded-lg shadow-sm">
+                        <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center shrink-0 border border-orange-200 mt-0.5"><User size={10} /></div>
+                        <div className="min-w-0">
+                           <div className="text-[9px] md:text-[10px] font-bold text-orange-800 mb-0.5">{socialSender}</div>
+                           <div className="text-[10px] md:text-xs font-bold text-gray-800 leading-tight line-clamp-2">{socialContent}</div>
+                        </div>
+                     </div>
+                   )}
+                   
+                   {socialType === 'SYSTEM' && (
+                      <div className="flex items-center gap-2 bg-blue-900/40 p-2 rounded-lg border border-blue-500/30">
+                         <Bell size={12} className="text-blue-200 shrink-0"/>
+                         <div className="text-[10px] md:text-xs text-blue-100 font-bold leading-tight">{socialContent}</div>
+                      </div>
+                   )}
+                </div>
+             </div>
+
+             {/* Continue Button */}
+             <button 
+                onClick={onClose}
+                className="group w-full bg-white hover:bg-gray-100 text-gray-900 py-3 md:py-3.5 rounded-xl font-black text-sm transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95"
+              >
+                继续前行 <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform"/>
+              </button>
           </div>
         </div>
       </div>

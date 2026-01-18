@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { GameEvent } from '../types';
 import { AlertCircle } from 'lucide-react';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export const EventChoiceModal: React.FC<Props> = ({ event, onOptionSelect, isLoading, loadingTip }) => {
+
   const getBackgroundImage = () => {
     switch (event.type) {
       case 'SOCIAL': return STORY_IMAGES.event_social;
@@ -21,73 +23,71 @@ export const EventChoiceModal: React.FC<Props> = ({ event, onOptionSelect, isLoa
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6 animate-fade-in">
-      <div className="bg-transparent rounded-3xl shadow-2xl w-full max-w-[320px] overflow-hidden flex flex-col relative animate-fade-in-up border border-white/40 aspect-[1/1.15]">
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 md:p-6 font-sans">
+      <div className="bg-transparent rounded-3xl shadow-2xl w-full max-w-[340px] aspect-[5/8] max-h-[85vh] overflow-hidden flex flex-col relative border border-white/30">
         
-        {/* Background Layer */}
-        <div className="absolute inset-0 z-0 bg-slate-900">
+        {/* Background Layer - Removed fade-in state */}
+        <div className="absolute inset-0 z-0 bg-gray-900">
           <img 
             src={getBackgroundImage()} 
             alt="Event Choice Background" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-90"
           />
-          {/* Subtle overlay to ensure text contrast on glass - Reduced to 10% */}
-          <div className="absolute inset-0 bg-black/10"></div>
+          {/* Enhanced gradient for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/60"></div>
         </div>
 
         {/* Content Layer */}
-        <div className="relative z-10 flex flex-col h-full justify-between p-5">
+        <div className="relative z-10 flex flex-col h-full justify-between p-5 md:p-6">
           
-          {/* Top Section - Aligned to Start (Top) instead of Center */}
-          <div className="flex flex-col justify-start pt-2">
+          {/* Top Section - Scrollable if text is massive */}
+          <div className="flex flex-col justify-start pt-1 flex-1 min-h-0 overflow-y-auto scrollbar-hide pb-2">
              {/* Tag */}
-             <div className="flex items-center gap-2 mb-3">
-                <div className="bg-white/30 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/30 flex items-center gap-1 shadow-sm">
+             <div className="flex items-center gap-2 mb-3 md:mb-4 shrink-0">
+                <div className="bg-white/20 backdrop-blur-md text-white text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/30 flex items-center gap-1 shadow-sm uppercase tracking-wider">
                     <AlertCircle size={10} />
-                    {event.type === 'SOCIAL' ? '社媒营业' : '突发事件'}
+                    {event.type === 'SOCIAL' ? 'SOCIAL EVENT' : 'RANDOM EVENT'}
                 </div>
              </div>
              
-             {/* Title */}
-             <h2 className="text-2xl font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mb-2 leading-tight tracking-wide">
+             {/* Title - Adaptive Size */}
+             <h2 className="text-2xl md:text-3xl font-black text-white drop-shadow-md mb-2 md:mb-3 leading-tight tracking-wide shrink-0">
                 {event.title}
              </h2>
              
-             {/* Description Card - Quote Style & Transparent Dark Glass - Tuned Transparency */}
-             <div className="relative mt-2 mb-1">
-                <div className="bg-slate-900/20 backdrop-blur-md p-4 rounded-xl border border-white/10 text-white text-sm font-medium leading-relaxed text-center shadow-inner relative">
-                    <span className="absolute top-1 left-2 text-3xl text-white/40 font-serif leading-none">“</span>
-                    <span className="relative z-10 px-2 block drop-shadow-md">{event.description}</span>
-                    <span className="absolute -bottom-3 right-2 text-3xl text-white/40 font-serif leading-none">”</span>
+             {/* Description Card - Improved glass rendering stability */}
+             <div className="relative mt-1 mb-2 shrink-0">
+                <div className="bg-black/30 backdrop-blur-md p-3 md:p-4 rounded-xl border-l-2 border-white/40 text-white text-xs md:text-sm font-medium leading-relaxed shadow-lg relative transform-gpu will-change-transform">
+                    <span className="block drop-shadow-sm opacity-95">{event.description}</span>
                 </div>
              </div>
           </div>
 
-          {/* Bottom Section - Options */}
-          <div className="pt-2">
-            <div className="space-y-2.5">
+          {/* Bottom Section - Options (Fixed at bottom) */}
+          <div className="pt-2 pb-2 shrink-0">
+            <div className="space-y-2 md:space-y-3">
                {event.options.map((opt, idx) => (
                   <button
                     key={idx}
                     onClick={() => onOptionSelect(idx)}
                     disabled={isLoading}
-                    className={`w-full p-3.5 text-sm font-bold rounded-xl text-left transition-all shadow-md border backdrop-blur-md group relative overflow-hidden ${
+                    className={`w-full p-3 md:p-4 text-xs md:text-sm font-bold rounded-xl text-left transition-all shadow-lg border backdrop-blur-md group relative overflow-hidden transform-gpu will-change-transform ${
                       isLoading 
-                      ? 'bg-gray-100/90 text-gray-500 cursor-wait' 
+                      ? 'bg-gray-100/80 text-gray-500 cursor-wait' 
                       : 'bg-white/90 hover:bg-white text-gray-900 border-white/60 hover:scale-[1.02] active:scale-95'
                     }`}
                   >
-                    <span className="relative z-10 flex justify-between items-center drop-shadow-sm">
-                        {isLoading ? '正在生成...' : opt.text}
-                        {!isLoading && <span className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-700">→</span>}
+                    <span className="relative z-10 flex justify-between items-center">
+                        <span className="line-clamp-2 pr-1">{isLoading ? '正在生成...' : opt.text}</span>
+                        {!isLoading && <span className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-600 translate-x-[-5px] group-hover:translate-x-0 shrink-0">→</span>}
                     </span>
                   </button>
                 ))}
             </div>
 
             {isLoading && (
-              <div className="mt-3 text-center absolute bottom-5 left-0 right-0 pointer-events-none">
-                 <div className="inline-block px-3 py-1 rounded-full bg-white/80 backdrop-blur text-[10px] font-bold text-blue-800 animate-pulse border border-white/40 shadow-sm">
+              <div className="mt-4 text-center absolute bottom-8 left-0 right-0 pointer-events-none">
+                 <div className="inline-block px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-xs font-bold text-white animate-pulse border border-white/20 shadow-lg">
                     ✨ {loadingTip}
                  </div>
               </div>

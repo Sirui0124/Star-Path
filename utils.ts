@@ -81,3 +81,32 @@ export const generateTrainees = (count: number): Trainee[] => {
   // Shuffle the result so the strong ones aren't always at the top of the array index (though they will be sorted by votes later)
   return trainees.sort(() => 0.5 - Math.random());
 };
+
+export const generateShowHighlights = (topTrainees: Trainee[]): string[] => {
+    const templates = [
+        "{N}在练习室崩溃大哭，被站姐拍到，引发热议。",
+        "网传{N}是隐形皇族，镜头量超标，遭其他家粉丝围攻。",
+        "有人爆料{N}半夜偷吃火锅，被选管当场抓获。",
+        "{N}的高音车祸现场被做成了鬼畜视频，B站播放量破百万。",
+        "据传{N}和{N2}在后台吵架，互相取关了微博。",
+        "{N}的旧照被扒出，网友惊呼“整容式长大”！",
+        "导师在节目里公开表扬{N}，称其为“天生爱豆”。",
+        "{N}因为太累在录制现场睡着，被封为“睡美人”。",
+        "粉丝不满{N}的妆造，正在向节目组维权刷屏。",
+        "{N}的一句方言口头禅突然爆火，全网都在模仿。"
+    ];
+
+    // Pick 3-4 random templates
+    const shuffledTemplates = templates.sort(() => 0.5 - Math.random()).slice(0, 3);
+    
+    // Pick random trainees to fill the slots
+    const highlights = shuffledTemplates.map(tpl => {
+        const t1 = topTrainees[Math.floor(Math.random() * Math.min(topTrainees.length, 10))]; // Top 10 mostly involved in drama
+        let t2 = topTrainees[Math.floor(Math.random() * Math.min(topTrainees.length, 10))];
+        while(t2.id === t1.id) t2 = topTrainees[Math.floor(Math.random() * topTrainees.length)]; // different person
+
+        return tpl.replace("{N}", t1.name).replace("{N2}", t2.name);
+    });
+
+    return highlights;
+};

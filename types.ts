@@ -47,10 +47,11 @@ export interface Trainee {
 }
 
 export interface VoteBreakdown {
-  base: number;
-  action: number;
-  bonus: number;
-  total: number;
+  fansVote: number;    // 粉丝打投
+  stagePool: number;   // 本赛段额外票池
+  publicAppeal: number;// 路人盘 (实力/颜值)
+  bonus: number;       // 额外 (CP/出圈)
+  total: number;       // 本轮新增总计
 }
 
 export interface GameState {
@@ -69,6 +70,9 @@ export interface GameState {
   
   // New: Track triggered events to prevent duplication
   triggeredEventIds: string[];
+  
+  // New: Narrative Flags for Card Unlocking (e.g. { "script_candy": true })
+  flags: Record<string, boolean>;
 
   // Show specific logic
   isSignedUpForShow: boolean; // 是否已报名等待明年春季
@@ -99,6 +103,9 @@ export interface ActionEffect {
   dream?: number;
   hotCp?: number;
   viralMoments?: number;
+  
+  // New: Ability to set flags via actions/events
+  flags?: Record<string, boolean>;
 }
 
 export interface Action {
@@ -119,12 +126,19 @@ export interface GameEvent {
   description: string;
   stage: GameStage | 'ALL'; // Restrict event to specific stage
   isMandatory: boolean; // If true, it MUST happen if triggered. If false, it competes in the random pool.
-  repeatable?: boolean; // New: If true, this event can happen multiple times. Defaults to false.
+  repeatable?: boolean; // If true, this event can happen multiple times. Defaults to false.
+  
+  // Control Flag: If false, use hardcoded options.effect and options.log for the result.
+  // AI will only be used for social comments (best effort).
+  // Default is true (AI controls outcome).
+  useAiForOutcome?: boolean; 
+
   trigger: (state: GameState) => boolean;
   options: {
     text: string;
-    effect: (state: GameState) => Partial<Stats>; // Fallback effect
-    log: string; // Fallback log
+    // Allow effect to return an optional log string for dynamic narratives
+    effect: (state: GameState) => Partial<ActionEffect> & { log?: string }; 
+    log?: string; // Static Fallback log
   }[];
 }
 
