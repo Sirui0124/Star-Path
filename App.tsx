@@ -12,13 +12,15 @@ import { CharacterSetup } from './components/CharacterSetup';
 import { GameIntroModal } from './components/GameIntroModal';
 import { GuideModal } from './components/GuideModal';
 import { CardCollectionModal } from './components/CardCollectionModal'; // Import Component
+import { SaveLoadModal } from './components/SaveLoadModal'; // Import SaveLoad
+import { FeedbackModal } from './components/FeedbackModal'; // Import Feedback
 import { STAGE_GUIDES } from './content/guides';
 import { ANNUAL_NARRATIVES } from './content/narratives';
 import { STORY_IMAGES, getEndingImageKey } from './content/images';
 import { generateGameSummary, generateAnnualSummary, generateFanComments, generateEventOutcome, generateSocialFeedback, testAiConnectivity } from './services/gemini';
 import { logGameEvent } from './services/firebase';
 import { formatEffectLog, generateTrainees, generateShowHighlights } from './utils';
-import { Play, SkipForward, AlertCircle, Briefcase, HelpCircle, X, Building2, Calendar, CheckCircle, Wifi, WifiOff, Sparkles, Zap, Download, Mic, Music, User, TrendingUp, Flame, RefreshCcw, Trophy, BookOpen } from 'lucide-react';
+import { Play, SkipForward, AlertCircle, Briefcase, HelpCircle, X, Building2, Calendar, CheckCircle, Wifi, WifiOff, Sparkles, Zap, Download, Mic, Music, User, TrendingUp, Flame, RefreshCcw, Trophy, BookOpen, Save, MessageSquare } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 const INITIAL_STATE: GameState = {
@@ -38,6 +40,7 @@ const INITIAL_STATE: GameState = {
   history: [],
   triggeredEventIds: [], 
   flags: {}, // Initialize flags
+  eventsGenerated: false, // Default false
   
   isSignedUpForShow: false,
   showTurnCount: 0,
@@ -70,6 +73,8 @@ export default function App() {
   // Modals
   const [showGuide, setShowGuide] = useState(false);
   const [showCardCollection, setShowCardCollection] = useState(false); // New State
+  const [showSaveLoad, setShowSaveLoad] = useState(false); // New SaveLoad State
+  const [showFeedback, setShowFeedback] = useState(false); // New Feedback State
   const [newlyUnlockedCards, setNewlyUnlockedCards] = useState<UnlockableCard[]>([]); // New Cards Popup
   const [showNarrative, setShowNarrative] = useState<string | null>(null);
   const [showRankModal, setShowRankModal] = useState(false);
@@ -130,6 +135,99 @@ export default function App() {
       }
     });
   }, []);
+
+  // --- Save/Load System ---
+  const handleSaveGame = (slotId: string, stateToSave: GameState = gameState) => {
+    const saveData = {
+        summary: {
+            name: stateToSave.name,
+            timeLabel: `${stateToSave.time.year}年 ${['春','夏','秋','冬'][stateToSave.time.quarter-1]}`,
+            stage: stateToSave.stage,
+            age: stateToSave.time.age,
+            fans: stateToSave.stats.fans,
+            company: stateToSave.company,
+            updatedAt: Date.now()
+        },
+        state: stateToSave
+    };
+    try {
+        localStorage.setItem(`star_path_save_${slotId}`, JSON.stringify(saveData));
+        if (slotId !== 'auto') {
+            addLog("存档成功！");
+        }
+    } catch (e) {
+        console.error("Save failed", e);
+        alert("存档失败：存储空间不足或权限受限");
+    }
+  };
+
+  const handleLoadGame = (loadedState: GameState) => {
+      // Merge with INITIAL_STATE to ensure new fields are present (e.g. flags, hiddenStats) if missing in old saves
+      const mergedState: GameState = {
+          ...INITIAL_STATE,
+          ...loadedState,
+          stats: { ...INITIAL_STATE.stats, ...loadedState.stats },
+          hiddenStats: { ...INITIAL_STATE.hiddenStats, ...loadedState.hiddenStats },
+          time: { ...INITIAL_STATE.time, ...loadedState.time },
+          warnings: { ...INITIAL_STATE.warnings, ...loadedState.warnings },
+          flags: { ...INITIAL_STATE.flags, ...(loadedState.flags || {}) },
+          eventsGenerated: loadedState.eventsGenerated ?? false, // Restore flag or default to false
+          
+          // Ensure arrays are arrays
+          history: Array.isArray(loadedState.history) ? loadedState.history : [],
+          triggeredEventIds: Array.isArray(loadedState.triggeredEventIds) ? loadedState.triggeredEventIds : [],
+          trainees: Array.isArray(loadedState.trainees) ? loadedState.trainees : []
+      };
+
+      setGameState(mergedState);
+      
+      // Force Close All Modals
+      setShowSaveLoad(false);
+      setShowCardCollection(false);
+      setShowGuide(false);
+      setShowFeedback(false);
+
+      // Reset critical UI states
+      setEventQueue([]);
+      setCurrentEvent(null);
+      setEventOutcome(null);
+      setShowNarrative(null);
+      setShowRankModal(false);
+      setShowAnnualSummaryModal(false);
+      setSignModal(null);
+      
+      // Reconstruct logs from history for the current quarter so the log box isn't empty
+      const currentQuarterPrefix = `${mergedState.time.age}岁${mergedState.time.quarter}季度:`;
+      const recentLogs = mergedState.history
+          .filter(h => h.startsWith(currentQuarterPrefix))
+          .map(h => h); // The UI component will strip the prefix
+      
+      if (recentLogs.length > 0) {
+          setLogs([...recentLogs, `--- 已读取存档 ---`]);
+      } else {
+          setLogs([`已读取存档：${mergedState.time.age}岁 ${['春','夏','秋','冬'][mergedState.time.quarter-1]}`]);
+      }
+
+      // INTELLIGENT PHASE RESTORATION
+      // If events were already generated (e.g. saving in Action phase), we skip START to prevent 
+      // double-applying quarterly bonuses or re-rolling events.
+      if (mergedState.eventsGenerated) {
+          setPhase('ACTION');
+      } else {
+          // If not generated (e.g. legacy save or saved at very start), go through standard start sequence
+          setPhase('START'); 
+      }
+  };
+
+  // --- Auto Save Logic ---
+  // Save automatically when entering Winter (Quarter 4)
+  useEffect(() => {
+     if (gameState.time.quarter === 4 && phase === 'START' && !gameState.isGameOver) {
+         handleSaveGame('auto', gameState);
+         // console.log("Auto-saved at start of Winter");
+     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState.time, phase]);
 
   // --- Helpers ---
   const getRandomLoadingTip = () => {
@@ -261,7 +359,8 @@ export default function App() {
         const canvas = await html2canvas(endingRef.current, {
           useCORS: true,
           scale: 2, // High resolution
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          ignoreElements: (element) => element.hasAttribute('data-html2canvas-ignore')
         });
         const link = document.createElement('a');
         link.download = `星途回忆录_${gameState.name}.png`;
@@ -278,7 +377,6 @@ export default function App() {
 
   // Generate Queue of events for the current turn
   const generateEventQueue = (currentState: GameState): GameEvent[] => {
-    const queue: GameEvent[] = [];
     const isShowStage = currentState.stage === GameStage.SHOW;
 
     // 1. Filter valid events (Stage, Trigger, Repeatable)
@@ -286,7 +384,7 @@ export default function App() {
         // Stage Check
         if (e.stage !== 'ALL' && e.stage !== currentState.stage) return false;
         
-        // Repeatable Check: If not repeatable and already triggered, skip it.
+        // Repeatable Check
         if (!e.repeatable && currentState.triggeredEventIds.includes(e.id)) return false;
 
         // Trigger Check
@@ -298,50 +396,66 @@ export default function App() {
         }
     });
 
-    // 2. Separate Pools
-    const mandatoryEvents = validEvents.filter(e => e.isMandatory);
-    
-    // Pools for random selection (excluding mandatory)
-    const socialPool = validEvents.filter(e => !e.isMandatory && e.type === 'SOCIAL');
-    const randomPool = validEvents.filter(e => !e.isMandatory && e.type === 'RANDOM');
-    const showPool = validEvents.filter(e => !e.isMandatory && e.type === 'SHOW');
+    const finalQueue: GameEvent[] = [];
 
-    // Shuffle pools
-    socialPool.sort(() => 0.5 - Math.random());
-    randomPool.sort(() => 0.5 - Math.random());
-    showPool.sort(() => 0.5 - Math.random());
+    // Separate mandatory vs optional from the valid pool
+    const mandatory = validEvents.filter(e => e.isMandatory);
+    const optional = validEvents.filter(e => !e.isMandatory);
 
-    // 3. Selection Logic based on Stage
     if (isShowStage) {
-        // Show Stage: Target 3-4 SHOW events TOTAL (Mandatory included)
-        queue.push(...mandatoryEvents);
-        
-        // Target: 3 or 4 events
-        const targetCount = 3 + Math.floor(Math.random() * 2); 
-        
-        // Fill remaining slots with Show events
-        let needed = Math.max(0, targetCount - queue.length);
+        // --- SHOW STAGE STRATEGY ---
+        // Target: 3-4 events total
+        const totalTarget = 3 + Math.floor(Math.random() * 2);
+
+        // 1. Add all mandatory events first
+        finalQueue.push(...mandatory);
+
+        // 2. Determine how many more slots to fill
+        // Note: If mandatory events exceed target, we keep them all (prioritize mandatory)
+        let needed = Math.max(0, totalTarget - finalQueue.length);
+
+        // 3. Fill with Optional SHOW events (prioritize SHOW type in Show stage)
         if (needed > 0) {
-            queue.push(...showPool.slice(0, needed));
+            const showPool = optional.filter(e => e.type === 'SHOW');
+            showPool.sort(() => 0.5 - Math.random());
+            finalQueue.push(...showPool.slice(0, needed));
+        }
+    } else {
+        // --- AMATEUR STAGE STRATEGY ---
+        
+        // A. SOCIAL EVENTS (Target 1-2)
+        const socialTarget = 1 + Math.floor(Math.random() * 2);
+        const socialMandatory = mandatory.filter(e => e.type === 'SOCIAL');
+        const socialOptional = optional.filter(e => e.type === 'SOCIAL');
+        
+        const socialPicks = [...socialMandatory];
+        let socialNeeded = Math.max(0, socialTarget - socialPicks.length);
+        
+        if (socialNeeded > 0) {
+            socialOptional.sort(() => 0.5 - Math.random());
+            socialPicks.push(...socialOptional.slice(0, socialNeeded));
         }
 
-    } else {
-        // Amateur Stage: Mandatory + (1-2 Social) + (1 Random)
-        // Additive logic: Filler events are added *in addition* to mandatory ones.
-        
-        queue.push(...mandatoryEvents);
-
-        // Social: 1-2 events
-        const socialTarget = 1 + Math.floor(Math.random() * 2); // 1 or 2
-        queue.push(...socialPool.slice(0, socialTarget));
-
-        // Random: 1 event
+        // B. RANDOM EVENTS (Target 1)
         const randomTarget = 1;
-        queue.push(...randomPool.slice(0, randomTarget));
+        const randomMandatory = mandatory.filter(e => e.type === 'RANDOM');
+        const randomOptional = optional.filter(e => e.type === 'RANDOM');
+        
+        const randomPicks = [...randomMandatory];
+        let randomNeeded = Math.max(0, randomTarget - randomPicks.length);
+        
+        if (randomNeeded > 0) {
+            randomOptional.sort(() => 0.5 - Math.random());
+            randomPicks.push(...randomOptional.slice(0, randomNeeded));
+        }
+
+        // Combine
+        finalQueue.push(...socialPicks);
+        finalQueue.push(...randomPicks);
     }
 
     // Deduplicate just in case
-    return Array.from(new Set(queue));
+    return Array.from(new Set(finalQueue));
   };
 
 
@@ -400,10 +514,19 @@ export default function App() {
         return; 
       }
 
-      // Prepare Event Queue if not showing narrative
-      const newQueue = generateEventQueue(gameState);
-      setEventQueue(newQueue);
-      setPhase('EVENT');
+      // --- EVENTS GENERATION LOGIC ---
+      // If events were already generated for this period (e.g. loaded from save), skip generation.
+      if (gameState.eventsGenerated) {
+          // Assume queue is empty (since we don't save queue), go straight to Action
+          setPhase('ACTION');
+      } else {
+          // Prepare Event Queue if not showing narrative
+          const newQueue = generateEventQueue(gameState);
+          setEventQueue(newQueue);
+          // Mark events as generated for this period
+          setGameState(prev => ({ ...prev, eventsGenerated: true }));
+          setPhase('EVENT');
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, gameState.time]);
@@ -413,6 +536,8 @@ export default function App() {
     // Prepare Queue after narrative closes
     const newQueue = generateEventQueue(gameState);
     setEventQueue(newQueue);
+    // Mark events as generated
+    setGameState(prev => ({ ...prev, eventsGenerated: true }));
     setPhase('EVENT');
   };
 
@@ -591,19 +716,26 @@ export default function App() {
       const { fans, vocal, dance, looks } = gameState.stats;
       const { viralMoments, hotCp } = gameState.hiddenStats;
       const turn = gameState.showTurnCount;
+      const age = gameState.time.age;
+
+      // Age scaling logic
+      let ageMultiplier = 1.0;
+      if (age === 20) ageMultiplier = 0.95;
+      else if (age >= 21) ageMultiplier = 0.85;
 
       // 1. Stage Multiplier (Increases as show progresses)
       // Turn 1: 1.0x, Turn 2: 1.1x, Turn 3: 1.2x ...
       const stageMultiplier = 1 + (turn * 0.1);
 
       // 2. Component 1: Fan Voting (Base)
-      // Fans * Multiplier * Random Fluctuation (0.8 - 1.2)
-      const fansVote = Math.floor(fans * stageMultiplier * (0.8 + Math.random() * 0.4));
+      // Fans * Multiplier * Random Fluctuation (0.8 - 1.2) * Age Multiplier
+      const fansVote = Math.floor(fans * stageMultiplier * (0.8 + Math.random() * 0.4) * ageMultiplier);
 
       // 3. Component 3: Public Appeal (Skill + Looks)
       // Average skill / 10 * random factor. e.g. 300 total stats -> 30 base votes
+      // Age Penalty applies here too
       const skillFactor = (vocal + dance + looks) / 10;
-      const publicAppeal = Math.floor(skillFactor * stageMultiplier * (0.8 + Math.random() * 0.4));
+      const publicAppeal = Math.floor(skillFactor * stageMultiplier * (0.8 + Math.random() * 0.4) * ageMultiplier);
 
       // 4. Component 4: Bonus (CP / Viral)
       // High random factor here
@@ -681,7 +813,8 @@ export default function App() {
         showTurnCount: prev.showTurnCount + 1,
         time: { ...prev.time, quarter: (prev.time.quarter % 4 + 1) as 1|2|3|4 },
         ap: nextAp,
-        maxAp: nextAp
+        maxAp: nextAp,
+        eventsGenerated: false // Reset flag for new turn
       }));
       
       setCurrentVoteBreakdown({ 
@@ -707,6 +840,7 @@ export default function App() {
       // Generate Show Events Queue
       const newQueue = generateEventQueue(gameState);
       setEventQueue(newQueue);
+      setGameState(prev => ({ ...prev, eventsGenerated: true })); // Mark as generated
       setPhase('EVENT');
   };
 
@@ -745,6 +879,7 @@ export default function App() {
       time: { year: newYear, quarter: newQuarter as 1|2|3|4, age: newAge },
       ap: prev.company !== Company.NONE ? 2 : 3,
       maxAp: prev.company !== Company.NONE ? 2 : 3,
+      eventsGenerated: false // Reset flag for new quarter
     }));
 
     setPhase('START');
@@ -805,6 +940,7 @@ export default function App() {
                 trainees: initialTrainees,
                 stats: { ...prev.stats, votes: initialVotes },
                 rank: myRank,
+                eventsGenerated: false // Reset for first show turn
             };
             newState.history = [...prev.history, `${age}岁${quarter}季度: 春天到了，《青春404》正式入营！你的【${archetypeLabel}】初舞台获得了${initialVotes}万初始票数。`];
             return newState;
@@ -839,7 +975,7 @@ export default function App() {
         image = STORY_IMAGES.signing_starlight;
         break;
       case Company.AGRAY: 
-        text = "Tony总监：音色很有辨识度。来艾灰，我们用作品说话。"; 
+        text = "Amy总监：音色很有辨识度。来艾灰，我们用作品说话。"; 
         image = STORY_IMAGES.signing_agray;
         break;
       default:
@@ -917,9 +1053,18 @@ export default function App() {
          <GameIntroModal 
             onStart={handleIntroComplete} 
             onOpenCollection={() => setShowCardCollection(true)} 
+            onOpenSaveLoad={() => setShowSaveLoad(true)} 
          />
          {showCardCollection && (
             <CardCollectionModal onClose={() => setShowCardCollection(false)} />
+         )}
+         {showSaveLoad && (
+            <SaveLoadModal 
+                currentGameState={gameState}
+                onClose={() => setShowSaveLoad(false)}
+                onLoad={handleLoadGame}
+                onSave={handleSaveGame}
+            />
          )}
        </>
      );
@@ -1002,13 +1147,24 @@ export default function App() {
     
     return (
       <div className="min-h-[100dvh] bg-slate-50 relative pb-20">
+         {/* Top Right Feedback Button */}
+         <button 
+            onClick={() => setShowFeedback(true)}
+            data-html2canvas-ignore="true"
+            className="absolute top-4 right-4 z-20 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[10px] font-bold border border-white/20 shadow-lg flex items-center gap-1.5 transition-all"
+         >
+            <MessageSquare size={12} /> 开发者爆肝中，提建议给TA
+         </button>
+
+         {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
+
          <div ref={endingRef} className="max-w-md mx-auto bg-white shadow-2xl min-h-screen relative overflow-hidden">
             <div className="relative h-72">
                 <img src={endingImage} alt="Ending" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
                 <div className="absolute bottom-6 left-6 right-6 text-center">
                     <div className="inline-block px-3 py-1 bg-black/80 text-white text-[10px] font-bold tracking-[0.3em] uppercase mb-3 rounded-full">
-                        Star Path Final Chapter
+                        星途·终章 -（出道后内容开发中）
                     </div>
                     <h1 className="text-4xl font-black text-slate-900 mb-2 font-serif tracking-tight drop-shadow-sm">
                         {gameState.gameResult}
@@ -1084,8 +1240,11 @@ export default function App() {
                 </div>
 
                 <div className="pt-8 border-t border-slate-100 text-center">
-                    <div className="text-[10px] text-slate-400 tracking-[0.5em] uppercase font-bold">
+                    <div className="text-[10px] text-slate-400 tracking-[0.5em] uppercase font-bold mb-1">
                         Produced by Star Path
+                    </div>
+                    <div className="text-[12px] text-slate-300 font-mono tracking-wide">
+                        https://starpath-ai.com
                     </div>
                 </div>
             </div>
@@ -1135,8 +1294,17 @@ export default function App() {
   return (
     <div className="h-[100dvh] w-full max-w-md mx-auto shadow-2xl flex flex-col font-sans relative bg-gradient-to-b from-[#bae1ff] to-[#e6d4ff] overflow-hidden">
       <header className="bg-white/30 backdrop-blur-md text-slate-800 px-4 py-3 sticky top-0 z-20 flex justify-between items-center border-b border-white/20 shrink-0">
-        <h1 className="text-lg font-bold flex items-center gap-2"><span>✨</span> 星途 Star Path</h1>
+        <div className="flex items-center gap-2">
+            <span className="text-base filter drop-shadow-sm">✨</span>
+            <div className="flex flex-col">
+                <h1 className="text-sm font-bold leading-tight text-slate-900">星途</h1>
+                <span className="text-[10px] text-slate-500 font-mono leading-none tracking-tight">starpath-ai.com</span>
+            </div>
+        </div>
         <div className="flex gap-2">
+            <button onClick={() => setShowSaveLoad(true)} className="flex items-center gap-1 px-3 py-1.5 bg-white/50 hover:bg-white/80 rounded-full transition text-sm font-medium border border-white/40 text-blue-800">
+                <Save size={16} /> 存档
+            </button>
             <button onClick={() => setShowCardCollection(true)} className="flex items-center gap-1 px-3 py-1.5 bg-white/50 hover:bg-white/80 rounded-full transition text-sm font-medium border border-white/40 text-purple-800">
                 <BookOpen size={16} /> 卡册
             </button>
@@ -1216,6 +1384,15 @@ export default function App() {
                </button>
             </div>
           </div>
+        )}
+
+        {showSaveLoad && (
+            <SaveLoadModal 
+                currentGameState={gameState}
+                onClose={() => setShowSaveLoad(false)}
+                onLoad={handleLoadGame}
+                onSave={handleSaveGame}
+            />
         )}
 
         {signModal && (
@@ -1415,7 +1592,7 @@ export default function App() {
                         {gameState.warnings.health && <div className="text-[10px] mt-0.5 text-red-700">请立即执行行动恢复健康，若再次消耗健康将直接退圈。</div>}
                         
                         {gameState.warnings.ethics && <div className="font-bold text-xs mt-1">⚠️ 心态濒临崩溃！</div>}
-                        {gameState.warnings.ethics && <div className="text-[10px] mt-0.5 text-red-700">请立即执行行动恢复道德，若再次消耗道德将直接退圈。</div>}
+                        {gameState.warnings.ethics && <div className="text-[10px] mt-0.5 text-red-700">请不要再消耗道德，若再次消耗道德将直接退圈。</div>}
                      </div>
                   </div>
               )}

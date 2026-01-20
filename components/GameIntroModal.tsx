@@ -1,14 +1,15 @@
 
 import React from 'react';
-import { Sparkles, Zap, TrendingUp, BookOpen } from 'lucide-react';
+import { Sparkles, Zap, TrendingUp, BookOpen, Save } from 'lucide-react';
 import { STORY_IMAGES } from '../content/images';
 
 interface Props {
   onStart: () => void;
   onOpenCollection: () => void;
+  onOpenSaveLoad: () => void;
 }
 
-export const GameIntroModal: React.FC<Props> = ({ onStart, onOpenCollection }) => {
+export const GameIntroModal: React.FC<Props> = ({ onStart, onOpenCollection, onOpenSaveLoad }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans h-[100dvh]">
       {/* Background Image Layer */}
@@ -21,13 +22,19 @@ export const GameIntroModal: React.FC<Props> = ({ onStart, onOpenCollection }) =
          <div className="absolute inset-0 bg-black/10"></div>
       </div>
 
-      {/* Top Right Collection Button */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Top Right Buttons */}
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        <button 
+            onClick={onOpenSaveLoad} 
+            className="flex items-center gap-1 px-3 py-1.5 bg-white/50 hover:bg-white/80 rounded-full transition text-sm font-medium border border-white/40 text-blue-900 shadow-sm backdrop-blur-md"
+        >
+            <Save size={16} /> 读档
+        </button>
         <button 
             onClick={onOpenCollection} 
             className="flex items-center gap-1 px-3 py-1.5 bg-white/50 hover:bg-white/80 rounded-full transition text-sm font-medium border border-white/40 text-purple-900 shadow-sm backdrop-blur-md"
         >
-            <BookOpen size={16} /> 我的卡册
+            <BookOpen size={16} /> 卡册
         </button>
       </div>
 

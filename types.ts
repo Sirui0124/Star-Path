@@ -74,6 +74,10 @@ export interface GameState {
   // New: Narrative Flags for Card Unlocking (e.g. { "script_candy": true })
   flags: Record<string, boolean>;
 
+  // Flag to track if quarterly events have been generated/processed
+  // Prevents re-rolling random events upon loading a save game in the Action phase.
+  eventsGenerated: boolean;
+
   // Show specific logic
   isSignedUpForShow: boolean; // 是否已报名等待明年春季
   showTurnCount: number; // Tracks turns inside the show (max 4)

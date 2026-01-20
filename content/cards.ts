@@ -1,5 +1,5 @@
 
-import { GameState } from '../types';
+import { GameState, Company } from '../types';
 import { STORY_IMAGES } from './images';
 
 export interface UnlockableCard {
@@ -25,7 +25,7 @@ export const ALL_CARDS: UnlockableCard[] = [
   },
   {
     id: 'ending_group',
-    title: '高位成团',
+    title: '最终成团',
     description: '以第2-11名的成绩成功出道。',
     unlockText: '聚是一团火，星途璀璨。',
     image: STORY_IMAGES.card_2,
@@ -44,11 +44,11 @@ export const ALL_CARDS: UnlockableCard[] = [
   {
     id: 'trait_villain',
     title: '黑红顶流',
-    description: '粉丝 > 150w 且 道德 < 30。',
+    description: '粉丝 > 200w 且 道德 <= 10。',
     unlockText: '虽然全网黑，但架不住你红啊。坏女人/坏男人剧本最带感了。',
     image: STORY_IMAGES.card_4,
-    rarity: 'SSR',
-    condition: (s) => s.stats.fans > 150 && s.stats.ethics < 30
+    rarity: 'SR',
+    condition: (s) => s.stats.fans > 200 && s.stats.ethics <= 10
   },
   {
     id: 'trait_angel',
@@ -62,7 +62,7 @@ export const ALL_CARDS: UnlockableCard[] = [
   {
     id: 'trait_cp',
     title: '国民CP',
-    description: 'CP热度(HotCP) >= 4。',
+    description: 'CP热度 >= 4。',
     unlockText: '我是假的，但我的CP是真的！民政局给你们搬来了。',
     image: STORY_IMAGES.card_6,
     rarity: 'SR',
@@ -71,7 +71,7 @@ export const ALL_CARDS: UnlockableCard[] = [
   {
     id: 'trait_viral',
     title: '热搜包年',
-    description: '出圈名场面(Viral) >= 4。',
+    description: '出圈名场面 >= 4。',
     unlockText: '你站在那里就是话题中心，营销号的衣食父母。',
     image: STORY_IMAGES.card_7,
     rarity: 'SR',
@@ -80,20 +80,20 @@ export const ALL_CARDS: UnlockableCard[] = [
   {
     id: 'trait_skill',
     title: '全能ACE',
-    description: 'Vocal > 150 且 Dance > 150。',
+    description: 'Vocal>150且Dance>150且颜值>150。',
     unlockText: '无短板的六边形战士，内娱有你了不起。',
     image: STORY_IMAGES.card_8,
     rarity: 'SSR',
-    condition: (s) => s.stats.vocal > 150 && s.stats.dance > 150
+    condition: (s) => s.stats.vocal > 150 && s.stats.dance > 150&& s.stats.looks > 150
   },
   {
     id: 'ending_rich',
     title: '打了个酱油',
-    description: '参加选秀但排名在50名开外。',
+    description: '参加选秀但低位的酱油选手。',
     unlockText: '混不好就要回去继承亿万家产了，真可怜（bushi）。',
     image: STORY_IMAGES.card_9,
     rarity: 'R',
-    condition: (s) => s.rank > 50
+    condition: (s) => s.rank > 50 && s.rank <=101 && s.gameResult?.includes('淘汰')
   },
   {
     id: 'trait_eq',
@@ -116,11 +116,11 @@ export const ALL_CARDS: UnlockableCard[] = [
   {
     id: 'trait_dumb',
     title: '笨蛋美人',
-    description: '颜值 > 100 且 (情商 < 20 或 Vocal+Dance < 60)。',
+    description: '颜值 > 100 且 (情商 < 40 或 Vocal+Dance < 80)。',
     unlockText: '上帝为你打开了颜值的门，顺手把脑子的窗关得死死的。',
     image: STORY_IMAGES.card_12,
     rarity: 'R',
-    condition: (s) => s.stats.looks > 100 && (s.stats.eq < 20 || s.stats.vocal + s.stats.dance < 60)
+    condition: (s) => s.stats.looks > 100 && (s.stats.eq < 40 || s.stats.vocal + s.stats.dance < 80)
   },
 
   // --- NEW CARDS (13-18) ---
@@ -177,17 +177,49 @@ export const ALL_CARDS: UnlockableCard[] = [
     unlockText: '谁说祭天剧本就不能翻盘？我命由我不由天！',
     image: STORY_IMAGES.card_17,
     rarity: 'UR',
-    condition: (s) => !!s.flags['script_candy'] && s.rank <= 11 && s.gameResult?.includes('成团')
+    condition: (s) => !!s.flags['script_candy'] && s.rank <= 11
   },
 
   // 18. Dream: Stage King
   {
     id: 'dream_king',
-    title: '初心不改',
-    description: '选择了【舞台王者】梦想，并最终C位出道。',
-    unlockText: '你做到了！那个16岁在镜子前许下的愿望，如今在顶峰闪耀。',
+    title: '特别的星',
+    description: '选择了【灵魂歌手】梦想+【咖啡粒文化】，在【决赛圈出道】，且【深夜私信】事件中选择认真回复。',
+    unlockText: '愿他星途璀璨。',
     image: STORY_IMAGES.card_18,
+    rarity: 'UR',
+    condition: (s) => s.dreamLabel === '灵魂歌手' && s.company === Company.COFFEE && s.rank <= 25 && !!s.flags['angel_reply']
+  },
+
+  // 19. Honest Person
+  {
+    id: 'trait_honest',
+    title: '老实人',
+    description: '比赛期间从未做过【刻意锐评】、【粉丝营业】、【炒CP】三个减道德的行动，且成功出道。',
+    unlockText: '在这个大染缸里，你的干净显得格格不入，却又无比珍贵。',
+    image: STORY_IMAGES.card_19,
     rarity: 'SSR',
-    condition: (s) => s.dreamLabel === '舞台王者' && s.rank === 1
+    condition: (s) => {
+        const debuted = s.gameResult?.includes('成团') || s.gameResult?.includes('Solo') || s.gameResult?.includes('C位');
+        if (!debuted) return false;
+        // The exact names from constants.ts are: '刻意锐评抢镜头', '粉丝营业（媚粉）', '炒CP（有机会大爆）'
+        const badActions = ['刻意锐评抢镜头', '粉丝营业（媚粉）', '炒CP（有机会大爆）'];
+        const hasBadAction = s.history.some(log => badActions.some(act => log.includes(`执行 [${act}]`)));
+        return !hasBadAction;
+    }
+  },
+
+  // 20. Pure Strength
+  {
+    id: 'trait_pure_strength',
+    title: '凭实力说话',
+    description: '比赛期间 CP热度+出圈次数 为0，且成功出道。',
+    unlockText: '没有花哨的剧本，没有热闹的CP，你站在那里，就是底气。',
+    image: STORY_IMAGES.card_20,
+    rarity: 'SR',
+    condition: (s) => {
+        const debuted = s.gameResult?.includes('成团') || s.gameResult?.includes('Solo') || s.gameResult?.includes('C位');
+        return debuted && (s.hiddenStats.hotCp + s.hiddenStats.viralMoments === 0);
+    }
   }
 ];

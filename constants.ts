@@ -113,7 +113,7 @@ export const SHOW_ACTIONS: Action[] = [
   {
     id: 'show_practice',
     name: '独自苦练（无镜头）',
-    description: 'Vocal+8, Dance+8, 票数-5, 概率出圈',
+    description: 'Vocal+10, Dance+10, 票数-5, 概率出圈',
     apCost: 1,
     effect: () => ({
       vocal: 10,
@@ -126,22 +126,22 @@ export const SHOW_ACTIONS: Action[] = [
     {
     id: 'show_communicate',
     name: '学员交流（搞好关系）',
-    description: '情商+5, 粉丝++, 概率CP',
+    description: '情商+3, 粉丝+, 概率CP',
     apCost: 1,
     effect: () => ({
-      eq: +5,
-      fans: rand(5,10),
+      eq: +3,
+      fans: rand(3,5),
       hotCp: chance(15) ? 1 : 0
     })
   },
     {
     id: 'show_performane',
-    name: '公演彩排',
-    description: '颜值+5, 票数+',
+    name: '公演做妆造',
+    description: '颜值+10, 票数+',
     apCost: 1,
     effect: () => ({
-      looks: +5,
-      votes: rand(3,8),
+      looks: +10,
+      votes: rand(3,5),
     })
   },
     {
@@ -171,11 +171,11 @@ export const SHOW_ACTIONS: Action[] = [
     id: 'show_social',
     name: '炒CP（有机会大爆）',
     description: '道德-10,粉丝++,票数++,大概率CP',
-    apCost: 2,
+    apCost: 1,
     effect: () => ({
       ethics: -10,
-      fans:chance(20)? 20: rand(8,12),
-      votes: chance(20)? 10 : rand(3, 6),
+      fans:chance(20)? 10: rand(5,8),
+      votes: chance(30)? 20 : rand(8,12),
       hotCp: chance(30) ? 1 : 0
     })
   }

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { X, Compass, AlertCircle } from 'lucide-react';
 import { STORY_IMAGES } from '../content/images';
@@ -142,6 +143,16 @@ export const GuideModal: React.FC<Props> = ({ guide, onClose }) => {
              </div>
           )}
 
+        </div>
+        
+        {/* Confirm Button Area */}
+        <div className="relative z-10 px-4 pt-2 pb-0 flex justify-center">
+             <button 
+                onClick={onClose}
+                className="bg-white/90 hover:bg-white text-slate-900 px-8 py-2.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm transition-all hover:scale-105 active:scale-95 border border-white/50"
+             >
+                我知道了
+             </button>
         </div>
         
         {/* Footer Decoration */}

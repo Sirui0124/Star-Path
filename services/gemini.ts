@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 import { GameState, GameEvent, EventOutcome, GameStage, Company } from "../types";
 import { ANNUAL_SUMMARIES } from "../content/narratives";
 
@@ -69,7 +69,7 @@ export const testAiConnectivity = async (playerName: string, dream: string): Pro
           model: 'gemini-2.5-flash-lite',
           contents: prompt,
           config: { thinkingConfig: { thinkingBudget: 0 } }
-        }), 1, 500); // Fewer retries for connectivity test
+        }), 1, 500) as GenerateContentResponse; // Fewer retries for connectivity test
         return response.text ? response.text.trim() : null;
       } catch (error) {
         return null;
@@ -126,7 +126,7 @@ export const generateGameSummary = async (gameState: GameState): Promise<string>
           thinkingConfig: { thinkingBudget: 512 }, // Allocate budget for thinking
           maxOutputTokens: 4096 
       } 
-    }), 3, 2000); // More retries, longer delay for summary
+    }), 3, 2000) as GenerateContentResponse; // More retries, longer delay for summary
     return response.text || "星光虽微，亦有光芒。感谢游玩。";
   } catch (error) {
     console.error("Gemini summary failed after retries", error);
@@ -159,7 +159,7 @@ export const generateAnnualSummary = async (gameState: GameState): Promise<strin
               model: 'gemini-2.5-flash-lite', // Fast model
               contents: prompt,
               config: { thinkingConfig: { thinkingBudget: 0 } }
-            }), 1, 500);
+            }), 1, 500) as GenerateContentResponse;
             return response.text || fallbackText;
         } catch (error) {
             return fallbackText;
@@ -195,7 +195,7 @@ export const generateFanComments = async (gameState: GameState, context: 'START'
             model: 'gemini-2.5-flash-lite',
             contents: prompt,
             config: { thinkingConfig: { thinkingBudget: 0 } }
-        }), 1, 500);
+        }), 1, 500) as GenerateContentResponse;
         const text = response.text || "";
         const comments = text.split('\n').map(c => c.trim().replace(/^[-*•\d\.]+\s*/, '')).filter(c => c.length > 0);
         return comments.slice(0, 3);
@@ -243,7 +243,7 @@ export const generateSocialFeedback = async (
                         responseMimeType: 'application/json',
                         thinkingConfig: { thinkingBudget: 0 }
                     }
-                }), 1, 500);
+                }), 1, 500) as GenerateContentResponse;
                 if (response.text) {
                     return JSON.parse(response.text);
                 }
@@ -401,7 +401,7 @@ export const generateEventOutcome = async (
             },
             thinkingConfig: { thinkingBudget: 0 }
           }
-        }), 1, 500);
+        }), 1, 500) as GenerateContentResponse;
 
         if (response.text) {
           return JSON.parse(response.text) as EventOutcome;
@@ -414,3 +414,4 @@ export const generateEventOutcome = async (
     null // Fallback value on timeout
   );
 };
+    
