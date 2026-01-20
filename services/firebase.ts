@@ -1,3 +1,4 @@
+// @ts-ignore -- Suppress type error for firebase/app as initializeApp is a valid export in v9+ but types might mismatch in some envs
 import { initializeApp } from "firebase/app";
 // @ts-ignore -- Suppress type errors for firebase/analytics as it might be missing in some environments
 import { getAnalytics, logEvent } from "firebase/analytics";

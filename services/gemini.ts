@@ -69,7 +69,7 @@ export const testAiConnectivity = async (playerName: string, dream: string): Pro
           model: 'gemini-2.5-flash-lite',
           contents: prompt,
           config: { thinkingConfig: { thinkingBudget: 0 } }
-        }), 1, 500) as GenerateContentResponse; // Fewer retries for connectivity test
+        }), 1, 500) as GenerateContentResponse;
         return response.text ? response.text.trim() : null;
       } catch (error) {
         return null;
@@ -87,6 +87,16 @@ export const generateGameSummary = async (gameState: GameState): Promise<string>
   const events = gameState.history.filter(h => h.includes("【") || h.includes("签约") || h.includes("出道"));
   const recentEvents = events.slice(-8); // 取最近的8个关键事件
 
+  const isAmateur = gameState.stage === GameStage.AMATEUR;
+
+  // 根据阶段调整数据展示和 Prompt 侧重点
+  let statsDescription = `粉丝: ${gameState.stats.fans}万 (衡量红不红的关键)\n`;
+  if (isAmateur) {
+      statsDescription += `选秀票数: 无 (玩家止步于练习生阶段，尚未参加选秀)\n`;
+  } else {
+      statsDescription += `选秀票数: ${gameState.stats.votes}万\n`;
+  }
+
   const prompt = `
     你是一位资深的娱乐传记作家，请基于以下数据，为游戏《星途》的主角写一篇**300-600字**的生涯回顾正文。
 
@@ -97,8 +107,7 @@ export const generateGameSummary = async (gameState: GameState): Promise<string>
     签约公司: ${gameState.company === Company.NONE ? '独立艺人' : gameState.company}
     
     【最终数据】
-    粉丝: ${gameState.stats.fans}万 (衡量红不红的关键)
-    选秀票数: ${gameState.stats.votes}万
+    ${statsDescription}
     实力: Vocal ${gameState.stats.vocal} / Dance ${gameState.stats.dance} / 颜值 ${gameState.stats.looks} / 情商 ${gameState.stats.eq}
     特殊: CP热度 ${gameState.hiddenStats.hotCp} / 出圈 ${gameState.hiddenStats.viralMoments}
     
@@ -115,6 +124,7 @@ export const generateGameSummary = async (gameState: GameState): Promise<string>
        - **直接开始讲述**主角的故事。
     3. **文风**: 使用第二人称"你"，深情、有画面感。
        - **${gameState.gameResult}**: 请根据这个结局定下基调（是荣耀登顶、遗憾退场还是独自美丽）。
+       ${isAmateur ? '- **重要**: 玩家在练习生阶段(Amateur)就结束了游戏，正文中**绝对不要**提及“选票”、“排名”或“成团”，要明确写出“还没有来得及参与选秀”或“倒在了舞台大幕拉开之前”这类遗憾或转折。' : ''}
     4. **内容融合**: 将数值（如粉丝数、实力）自然融入叙述中，描述大众对你的印象，不要罗列数据。
   `;
 
@@ -313,14 +323,15 @@ export const generateEventOutcome = async (
   }
 
   const isSocialOrRandom = event.type === 'SOCIAL' || event.type === 'RANDOM';
+  const isAmateur = gameState.stage === GameStage.AMATEUR;
   let statsInstruction = "";
   
-  if (isSocialOrRandom) {
-      // Allow EQ, forbid Votes for SOCIAL/RANDOM
-      statsInstruction = "⚠️ 绝对禁止修改: votes (票数)。可以修改: eq (情商), fans, health, ethics, looks, vocal, dance。";
-  } else {
-      const isAmateur = gameState.stage === GameStage.AMATEUR;
-      statsInstruction = isAmateur ? "禁止修改票数(votes)。" : "";
+  // 严格控制 AMATEUR 阶段的票数修改
+  if (isAmateur) {
+      statsInstruction = "⚠️ **绝对禁止修改: votes (票数)**。当前玩家处于练习生阶段，尚未参加选秀，没有投票系统。只能修改: eq, fans, health, ethics, looks, vocal, dance, dream, sincerity。";
+  } else if (isSocialOrRandom) {
+      // Allow EQ, forbid Votes for SOCIAL/RANDOM in SHOW stage usually, but looser constraint
+      statsInstruction = "禁止修改票数(votes)。可以修改: eq, fans, health, ethics, looks, vocal, dance。";
   }
 
   const companyConstraint = hasCompany 
@@ -333,6 +344,7 @@ export const generateEventOutcome = async (
     
     事件: "${event.title}"
     玩家选择: "${choiceLabel}"
+    当前阶段: ${gameState.stage}
     
     【运势判定】
     命运骰子: ${luckRoll.toFixed(0)} (情商表现: ${eqPerformance})
@@ -347,7 +359,7 @@ export const generateEventOutcome = async (
        - 好例子："操作太下饭，粉丝连夜扛火车跑路。", "凭借一张神图，直接封神。", "试图耍帅，结果把假发片甩飞了。"
     
     2. **changes (数值)**: 
-       - 必须符合逻辑。如果narrative是"社死/被嘲"，必须扣Fans/Looks/Eq。如果是"封神/出圈"，必须加Fans/Votes。
+       - 必须符合逻辑。如果narrative是"社死/被嘲"，必须扣Fans/Looks/Eq。如果是"封神/出圈"，必须加Fans。
        - 数值范围参考: ${statRange}。
        - 必须修改2-3个属性。
        - ${statsInstruction}
@@ -414,4 +426,3 @@ export const generateEventOutcome = async (
     null // Fallback value on timeout
   );
 };
-    
