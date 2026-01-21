@@ -69,9 +69,9 @@ export const STORY_IMAGES: Record<string, string> = {
   card_4: "https://s3.bmp.ovh/imgs/2026/01/18/5189be8c78f0731e.png", // 黑红
   card_5: "https://s3.bmp.ovh/imgs/2026/01/18/717a55ab5d140369.png", // 天使
   card_6: "https://s3.bmp.ovh/imgs/2026/01/18/09e6cefcffac5b9c.png", // CP
-  card_7: "https://s3.bmp.ovh/imgs/2026/01/14/b181aebe7ab7fa01.png", // 热搜
-  card_8: "https://s3.bmp.ovh/imgs/2026/01/18/f983b073f6b0f3a4.png", // 实力
-  card_9: "https://s3.bmp.ovh/imgs/2026/01/14/0e7af0bf4b3d5fc1.png", // 豪门回归-小透明
+  card_7: "https://s3.bmp.ovh/imgs/2026/01/19/f3abdfbb3965b2d0.png", // 热搜
+  card_8: "https://s3.bmp.ovh/imgs/2026/01/20/64b49e227cef79ce.png", // 实力
+  card_9: "https://s3.bmp.ovh/imgs/2026/01/20/16054371961ae157.png", // 打了个酱油，小透明
   card_10: "https://s3.bmp.ovh/imgs/2026/01/15/49329851e46e00e4.png", // 情商
   card_11: "https://s3.bmp.ovh/imgs/2026/01/18/d8ef8f742eac0adf.png", // 独行侠
   card_12: "https://s3.bmp.ovh/imgs/2026/01/17/3cbc43fd6d9e4011.png", // 笨蛋美人
@@ -79,12 +79,12 @@ export const STORY_IMAGES: Record<string, string> = {
   // New Cards
   card_13: "https://s3.bmp.ovh/imgs/2026/01/14/0e7af0bf4b3d5fc1.png", // 病弱
   card_14: "https://s3.bmp.ovh/imgs/2026/01/18/6abd2a0463c3cbcd.png", // 法制
-  card_15: "https://s3.bmp.ovh/imgs/2026/01/14/0e7af0bf4b3d5fc1.png", // 意外
+  card_15: "https://s3.bmp.ovh/imgs/2026/01/20/6363377561c484cf.png", // 意外
   card_16: "https://s3.bmp.ovh/imgs/2026/01/18/f592bf709bb43155.png", // 糖果
-  card_17: "https://s3.bmp.ovh/imgs/2026/01/14/00917a62999f88b8.png", // 逆天
+  card_17: "https://s3.bmp.ovh/imgs/2026/01/21/685dc8de3b2cedaa.png", // 逆天
   card_18: "https://s3.bmp.ovh/imgs/2026/01/19/66a63cbed99c35bc.png", // 初心
   card_19: "https://s3.bmp.ovh/imgs/2026/01/15/900fb73b79ed0b23.png", // 老实人
-  card_20: "https://s3.bmp.ovh/imgs/2026/01/17/d06c955fb8a7f283.png", // 凭实力
+  card_20: "https://s3.bmp.ovh/imgs/2026/01/18/f983b073f6b0f3a4.png", // 凭实力
 
 };
 

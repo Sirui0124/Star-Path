@@ -17,9 +17,11 @@ export const LOADING_MESSAGES = [
 
 // --- Random Player Names ---
 export const RANDOM_PLAYER_NAMES = [
-  "星河", "沐沐", "小七", "阿光", "张寒", "Kiki", "Alex", "Max",
-  "子墨", "云帆", "知夏", "乐天", "艾格", "张瞳孔", "Rain", 
-  "予安", "清欢", "北辰", "南笙", "Zero", "子涵"
+  "星河", "沐沐", "张寒", 
+  "子墨", "云帆", "艾格", "张瞳孔",
+  "予安", "北辰", "Zero", "子涵",
+  "星野", "闻屿", "顾迟","Raine","苏遇", "纪寻","陆遥", "江辰"
+  
 ];
 
 // --- Companies ---

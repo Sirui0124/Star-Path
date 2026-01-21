@@ -1,5 +1,5 @@
 
-import { GameEvent, GameStage } from '../types';
+import { GameEvent, GameStage, Company } from '../types';
 
 // Helper for randomness
 const chance = (percent: number) => Math.random() * 100 < percent;
@@ -162,7 +162,7 @@ export const ALL_EVENTS: GameEvent[] = [
   {
     id: 'social_fan_project',
     type: 'SOCIAL',
-    title: '粉丝应援计划*',
+    title: '粉丝应援计划',
     description: '你的大粉发起"地铁灯箱应援"集资计划，需要粉丝真金白银支持。超话里晒付款截图成风，争议随之而来。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
@@ -210,7 +210,7 @@ export const ALL_EVENTS: GameEvent[] = [
   {
     id: 'social_talent_out',
     type: 'SOCIAL',
-    title: '隐藏技能出圈*',
+    title: '隐藏技能出圈',
     description: '你随手用钢琴弹了一段《告白气球》的即兴变奏，被室友偷拍发上网。#被练习生耽误的音乐人# tag 病毒式传播。',
     stage: GameStage.AMATEUR,
     isMandatory: false,
@@ -270,7 +270,7 @@ export const ALL_EVENTS: GameEvent[] = [
         text: '发训练到凌晨的vlog，配文"汗水不会说谎"', 
         effect: (s) => {
           if (s.stats.eq < 40) {
-            return { dance: 2, eq: -2, log: '怼爽了，但vlog里对B有明显不满表情，被指"情商低"、' };
+            return { dance: 2, eq: -2, log: '怼爽了，但vlog里对B有明显不满表情，被指"情商低"' };
           } else if (s.stats.eq <= 70) {
             return { dance: 2, fans: 2, health: -1, log: '用行动打脸，过度训练影响健康。' };
           } else {
@@ -448,7 +448,7 @@ export const ALL_EVENTS: GameEvent[] = [
 {
   id: 'social_trending_challenge',
   type: 'SOCIAL',
-  title: '爆款挑战赛*',
+  title: '爆款挑战赛',
   description: '你参与了一个#爱豆反油腻舞蹈挑战#，动作干净清爽，被原发起人、顶流舞者转发称赞："有内味了，清爽弟弟。"',
   stage: GameStage.AMATEUR,
   isMandatory: false,
@@ -692,7 +692,7 @@ export const ALL_EVENTS: GameEvent[] = [
 {
   id: 'social_esports_crossover',
   type: 'SOCIAL',
-  title: '游戏直播联动*',
+  title: '游戏直播联动',
   description: '你作为神秘嘉宾，出现在某顶流电竞选手的直播车队里。你游戏技术菜但话多搞笑，直播间人气爆炸。',
   stage: GameStage.AMATEUR,
   isMandatory: false,
@@ -740,7 +740,7 @@ export const ALL_EVENTS: GameEvent[] = [
 {
   id: 'social_doubt_career',
   type: 'SOCIAL',
-  title: 'emo时刻*',
+  title: 'emo时刻',
   description: '连续在练习室记不住舞蹈动作，你深夜emo发了一句："也许我并不适合舞台……"，秒删，但已被手快的粉丝截图。',
   stage: GameStage.AMATEUR,
   isMandatory: false,
@@ -837,7 +837,7 @@ export const ALL_EVENTS: GameEvent[] = [
 {
   id: 'social_viral_hashtag',
   type: 'SOCIAL',
-  title: '莫名的话题爆款*',
+  title: '莫名的话题爆款',
   description: '你三年前发的一条普通日常博文，突然被段子手挖出，配上新的解读，衍生出#XXX的松弛感哲学#话题，阅读量破亿。你完全不知道它为什么火了。',
   stage: GameStage.AMATEUR,
   isMandatory: false,
@@ -885,7 +885,7 @@ export const ALL_EVENTS: GameEvent[] = [
 {
   id: 'social_fan_art_feature',
   type: 'SOCIAL',
-  title: '神仙画手粉丝*',
+  title: '神仙画手粉丝',
   description: '一位粉丝为你创作的古典水墨风格肖像画技惊四座，在画手圈疯传。画手本人@你，希望得到回应。',
   stage: GameStage.AMATEUR,
   isMandatory: true,
@@ -982,7 +982,7 @@ export const ALL_EVENTS: GameEvent[] = [
 {
   id: 'social_food_blogger',
   type: 'SOCIAL',
-  title: '深夜放毒*',
+  title: '深夜放毒',
   description: '好久没营业，看到手机里的美食照片，想着今天发点啥。',
   stage: GameStage.AMATEUR,
   isMandatory: false,
@@ -1030,7 +1030,7 @@ export const ALL_EVENTS: GameEvent[] = [
 {
   id: 'social_penguin_dance',
   type: 'SOCIAL',
-  title: '挑战企鹅舞*',
+  title: '挑战企鹅舞',
   description: '好久没营业，看到全网都在跳那个魔性的企鹅舞，想着你也发一发。',
   stage: GameStage.AMATEUR,
   isMandatory: false,
@@ -1848,7 +1848,7 @@ export const ALL_EVENTS: GameEvent[] = [
       text: '顺势玩梗', 
       effect: (s) => {
         if (s.stats.fans < 30) {
-          return { fans: 2, health:2 log: '完美接住天降流量，成功将路人转化为粉丝。' };
+          return { fans: 2, health:2, log: '完美接住天降流量，成功将路人转化为粉丝。' };
         } else if (s.stats.fans < 50) {
           return { fans: 1, eq: 2, log: '接住流量，路人缘大涨。' };
         } else {
@@ -2055,9 +2055,9 @@ export const ALL_EVENTS: GameEvent[] = [
         if (s.stats.eq >= 70) {
           return { fans: 3, eq: 3, log: '高级自黑，完美化解恶意，路人缘暴涨，黑粉自讨没趣。' };
         } else if (s.stats.eq >= 40) {
-          return { fans: 2, eq: 1, health:1 log: '化戾气为笑料，路人转粉。' };
+          return { fans: 2, eq: 1, health:1, log: '化戾气为笑料，路人转粉。' };
         } else {
-          return { fans: 1, eq:1 log: '用魔法打败魔法。' };
+          return { fans: 1, eq:1, log: '用魔法打败魔法。' };
         }
       }
     },
@@ -2366,402 +2366,1119 @@ export const ALL_EVENTS: GameEvent[] = [
   // 3. SHOW EVENTS (选秀事件 - ONLY SHOW)
   // =================================================================
   {
-    id: 'show_daily_training',
-    type: 'SHOW',
-    title: '节目日常',
-    description: '又是紧张的一天，摄像机正对着你，要表现点什么吗？',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => true,
-    options: [
-      { text: '对着镜头卖萌', effect: () => ({ fans: 1, looks: 1 }), log: '展现了可爱的一面。' },
-      { text: '专注练习', effect: () => ({ vocal: 1, dance: 1 }), log: '努力的人最发光。' },
-      { text: '帮队友扣动作', effect: () => ({ ethics: 2, fans: 1 }), log: '体现了团队精神。' }
-    ]
-  },
-  {
-    id: 'show_cp_event',
-    type: 'SHOW',
-    title: '强制CP',
-    description: '节目组要求你和热门选手炒CP。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 60 && chance(40),
-    options: [
-      { text: '配合营业', effect: () => ({ fans: 4, ethics: -3 }), log: 'CP粉狂欢，毒唯气炸。' },
-      { text: '保持距离', effect: () => ({ fans: -3, ethics: 2 }), log: '被节目组防爆。' },
-      { text: '暗示自己是直男', effect: () => ({ fans: 1, ethics: 1 }), log: '端水但两边不讨好。' }
-    ]
-  },
-  {
-    id: 'show_social_cp',
-    type: 'SHOW',
-    title: 'CP营业',
-    description: '你和队友的合影被CP粉疯狂转发，热度惊人。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 60 && chance(50),
-    options: [
-      { text: '配合发糖', effect: () => ({ fans: 4, ethics: -1 }), log: 'CP粉过年了，唯粉怒了。' },
-      { text: '保持距离', effect: () => ({ fans: -2, ethics: 2 }), log: '被说拆CP，热度下降。' },
-      { text: '模糊处理', effect: () => ({ fans: 2, ethics: 1 }), log: '端水大师。' }
-    ]
-  },
-  {
-    id: 'show_resource',
-    type: 'SHOW',
-    title: '资源被抢',
-    description: '原定你的中插广告，被公司给了"皇族"队友。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 60 && chance(35),
-    options: [
-      { text: '找经纪人理论', effect: () => ({ ethics: 2, fans: -2 }), log: '"皇族"粉丝说你"心机婊"。' },
-      { text: '更努力练习', effect: () => ({ vocal: 2, dance: 2 }), log: '用实力证明自己。' },
-      { text: '发微博内涵', effect: () => ({ fans: 2, ethics: -1 }), log: '被解读为"酸鸡"。' }
-    ]
-  },
-  {
-    id: 'show_fever',
-    type: 'SHOW',
-    title: '高烧不退',
-    description: '发烧39度，但明天有重要公演。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.health < 50 && chance(40),
-    options: [
-      { text: '带病上场', effect: () => ({ vocal: -2, dance: -2, fans: 3 }), log: '敬业人设，但表演砸了。' },
-      { text: '硬撑彩排后晕倒', effect: () => ({ health: -5, fans: 5 }), log: '热搜预定，但身体垮了。' },
-      { text: '申请替补', effect: () => ({ health: 3, fans: -2 }), log: '被说没责任心。' }
-    ]
-  },
-  {
-    id: 'show_black_hot',
-    type: 'SHOW',
-    title: '黑热搜',
-    description: '莫名奇妙#你的名字 耍大牌#上了热搜。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 90 && chance(40),
-    options: [
-      { text: '发律师函', effect: () => ({ fans: 2, ethics: 1 }), log: '硬刚到底。' },
-      { text: '找节目组澄清', effect: () => ({ fans: 1, ethics: -1 }), log: '节目组不置可否。' },
-      { text: '让粉丝洗广场', effect: () => ({ fans: 3, ethics: -2 }), log: '粉丝战斗力MAX，但你心疼。' }
-    ]
-  },
-  {
-    id: 'show_station_leave',
-    type: 'SHOW',
-    title: '站姐脱粉',
-    description: '站姐发长文脱粉回踩，说你有嫂子。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 100 && chance(25),
-    options: [
-      { text: '起诉造谣', effect: () => ({ fans: 3, ethics: 2 }), log: '用法律维权。' },
-      { text: '冷处理', effect: () => ({ fans: -4, ethics: -2 }), log: '塌房实锤既视感。' },
-      { text: '直播澄清', effect: () => ({ health: -3, fans: 3 }), log: '很累，但粉丝很感动。' }
-    ]
-  },
-  {
-    id: 'show_teammate',
-    type: 'SHOW',
-    title: '队友被黑',
-    description: '队友被爆恋爱，找你打掩护。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => chance(40),
-    options: [
-      { text: '帮忙澄清', effect: () => ({ fans: -1, ethics: 1 }), log: '被说"重义气"。' },
-      { text: '拒绝并劝分', effect: () => ({ ethics: -1 }), log: '被说"塑料兄弟情"。' },
-      { text: '装傻不知情', effect: () => ({ fans: 1 }), log: '独善其身。' }
-    ]
-  },
-  {
-    id: 'show_education',
-    type: 'SHOW',
-    title: '学历争议',
-    description: '有人扒出你读的是"野鸡大学"。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => chance(20),
-    options: [
-      { text: '自嘲学历低但业务强', effect: () => ({ vocal: 2, dance: 2 }), log: '转移焦点。' },
-      { text: '晒毕业证', effect: () => ({ fans: -1, ethics: -1 }), log: '越描越黑。' },
-      { text: '不回应', effect: () => ({ fans: -2 }), log: '被嘲默认。' }
-    ]
-  },
-  {
-    id: 'show_love',
-    type: 'SHOW',
-    title: '恋爱风波',
-    description: '网传你在和女生单独吃饭，其实是表妹。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 80 && chance(30),
-    options: [
-      { text: '立即澄清', effect: () => ({ fans: 2 }), log: '速度够快，影响较小。' },
-      { text: '让表妹出面澄清', effect: () => ({ fans: -1, eq: -2 }), log: '群众不信，越扒越有。' },
-      { text: '冷处理', effect: () => ({ fans: -3, ethics: -1 }), log: '塌房既视感。' }
-    ]
-  },
-  {
-    id: 'scandal_rumor',
-    type: 'SHOW',
-    title: '网络谣言',
-    description: '有人在论坛爆料你初中时的黑历史，热度正在上升。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 50 && chance(30),
-    options: [
-      { text: '发律师函', effect: () => ({ ethics: 2, fans: -3 }), log: '硬刚到底。' },
-      { text: '冷处理', effect: () => ({ ethics: 1, fans: -1 }), log: '无视是最好的反击。' },
-      { text: '卖惨澄清', effect: () => ({ fans: 3, ethics: -2 }), log: '获得了一些怜爱。' }
-    ]
-  },
-  {
-    id: 'viral_video',
-    type: 'SHOW',
-    title: '直拍出圈',
-    description: '你在公演中一个抓拍镜头的动图在社交媒体疯传。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => (s.stats.dance > 80 || s.stats.looks > 80) && chance(20),
-    options: [
-      { text: '趁热打铁', effect: () => ({ fans: 5 }), log: '抓住流量密码。' },
-      { text: '保持谦逊', effect: () => ({ ethics: 3, fans: 2 }), log: '路人缘提升了。' },
-      { text: '买热搜加码', effect: () => ({ fans: 3, ethics: -1 }), log: '被扒出买热搜。' }
-    ]
-  },
-  {
-    id: 'evil_editing',
-    type: 'SHOW',
-    title: '恶魔剪辑',
-    description: '节目组把你发呆的镜头剪辑成了对导师翻白眼。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => chance(25),
-    options: [
-      { text: '找选管理论', effect: () => ({ ethics: 2, fans: -2 }), log: '虽然解气但不明智。' },
-      { text: '忍气吞声', effect: () => ({ ethics: 1, health: -1 }), log: '退一步海阔天空。' },
-      { text: '自黑解围', effect: () => ({ fans: 2, ethics: 3 }), log: '化尴尬为幽默。' }
-    ]
-  },
-  {
-    id: 'late_night_practice',
-    type: 'SHOW',
-    title: '深夜练习',
-    description: '练习室的灯只剩下你这一盏，但是明天就是考核了。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.health > 60 && chance(40),
-    options: [
-      { text: '坚持到底', effect: () => ({ vocal: 2, dance: 2, health: -3 }), log: '越努力越幸运。' },
-      { text: '回去休息', effect: () => ({ health: 2, ethics: 1 }), log: '休息是为了走更远。' },
-      { text: '边练边直播', effect: () => ({ fans: 2, health: -2 }), log: '虐粉固粉。' }
-    ]
-  },
-  {
-    id: 'center_battle',
-    type: 'SHOW',
-    title: 'C位之争',
-    description: '小组作业选曲结束，大家正在推选C位。',
-    stage: GameStage.SHOW,
-    isMandatory: true,
-    repeatable: false,
-    trigger: (s) => s.showTurnCount === 2,
-    options: [
-      { text: '毛遂自荐', effect: () => ({ vocal: 3, dance: 3, ethics: -2 }), log: '野心是爱豆最好的装饰品。' },
-      { text: '推荐队友', effect: () => ({ ethics: 5 }), log: '团队凝聚力提升了。' },
-      { text: '服从安排', effect: () => ({ health: 1 }), log: '默默做好了分内之事。' }
-    ]
-  },
-  {
-    id: 'show_song_selection',
-    type: 'SHOW',
-    title: '一公选曲',
-    description: '第一次公演，你要选择哪首歌？',
-    stage: GameStage.SHOW,
-    isMandatory: true,
-    repeatable: false,
-    trigger: (s) => s.showTurnCount === 2,
-    options: [
-      { text: '选最燃的C位曲', effect: () => ({ dance: 3, vocal: 2, ethics: -2 }), log: '高风险高回报。' },
-      { text: '选适合自己的', effect: () => ({ vocal: 3, ethics: 1 }), log: '稳妥但不出彩。' },
-      { text: '让队友先选', effect: () => ({ ethics: 2 }), log: '佛系选手。' }
-    ]
-  },
-  {
-    id: 'show_grade',
-    type: 'SHOW',
-    title: '等级评定',
-    description: '初舞台评级，导师们一脸严肃。你准备以什么样的作品登场？',
-    stage: GameStage.SHOW,
-    useAiForOutcome: false,
-    isMandatory: true,
-    repeatable: false,
-    trigger: (s) => s.showTurnCount === 1,
-    options: [
-      { text: '听导演组安排', 
-        effect: (s) => {
-            if (s.stats.looks >= 100 && s.stats.fans >= 100 && s.stats.vocal + s.stats.dance >= 150) {
-              return { fans: 5, vocal: 2, dance: 2, log: '导演看重你的颜值和粉丝基数，给你了剧本' };
-            } else {
-              return { fans: -8, ethics: -2, flags: {script_candy: true },log: '实力不足，喜提祭天剧本：糖果超甜。' };
-            }
+  id: 'show_daily_training',
+  type: 'SHOW',
+  title: '训练室日常',
+  description: '镜头悄悄对准练习室，你正对着镜子抠动作。选管暗示：这是展现个人特色的好机会”。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => true,
+  options: [
+    { 
+      text: '即兴创作小剧场', 
+      effect: (s) => {
+        if (s.stats.eq >= 70) {
+          return { fans: 3, ethics: 1, log: '幽默反应被剪进花絮，网友夸你“综艺感拉满”' };
+        } else {
+          return { fans: -2, log: '尬演被嘲“硬炒人设”，弹幕吐槽：别加了' };
         }
-      },
-      { text: '展示专业能力的舞台', effect: () => ({vocal:2, fans: -2, ethics: +3 }), log: '被一剪梅。' },
-      { text: '听公司安排', effect: () => ({ looks:+2, eq:+1, fans:+3 }), log: '公司发力了' }
-    ] 
-  },
-  {
-    id: 'show_dorm_live',
-    type: 'SHOW',
-    title: '宿舍直播',
-    description: '节目组要求你们宿舍开直播互动。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => chance(40),
-    options: [
-      { text: '主动cue流程', effect: () => ({ fans: 2, ethics: 1 }), log: '展现了队长潜质。' },
-      { text: '安静背景板', effect: () => ({ fans: -1 }), log: '全程查无此人。' },
-      { text: '和队友互怼', effect: () => ({ fans: 3, ethics: -1 }), log: '综艺感拉满。' }
+      }
+    },
+    { 
+      text: '加练高音和舞蹈', 
+      effect: () => ({ vocal: 2, dance: 2, fans: -1}), 
+      log: '汗水不会骗人，导师悄悄点头，粉丝看不明白' 
+    },
+    { 
+      text: '帮队友调整动作', 
+      effect: (s) => {
+        if (s.stats.dance >= 100) {
+          return { ethics: 3, fans: 2, log: '专业指导被赞“团魂炸裂”，镜头量增加' };
+        } else {
+          return { ethics: 1, log: '心意到位，但队友表情复杂：要不你先练好自己？' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_cp_event',
+  type: 'SHOW',
+  title: '强制CP剧本',
+  description: '导演组递来小纸条：“和人气选手××多互动，故事线已铺好”。拒绝可能被防爆，配合则可能沦为背景板。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false, // 30%设置之一
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 60 && chance(40),
+  options: [
+    { 
+      text: '配合演出深情对视', 
+      effect: (s) => {
+        if (s.stats.looks >= 120) {
+          return { fans: 5, ethics: -1, log: '颜值加成，CP超话一夜涨粉十万' };
+        } else {
+          return { fans: 1, ethics: -3, log: '被骂“吸血咖”，唯粉脱粉回踩' };
+        }
+      }
+    },
+    { 
+      text: '保持距离专注舞台', 
+      effect: () => ({ votes: -3, ethics: 2, vocal: 1 }), 
+      log: '节目组减少镜头，但口碑上升' 
+    },
+    { 
+      text: '用幽默化解尴尬', 
+      effect: (s) => {
+        if (s.stats.eq >= 60) {
+          return { fans: 2, ethics: 1, log: '一句“兄弟情比金坚”成功破局' };
+        } else {
+          return { fans: -3, eq: 1, log: '玩笑过火，被批“不尊重对手”' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_social_cp',
+  type: 'SHOW',
+  title: 'CP热搜暴击',
+  description: '你和队友的练习室互动被剪成“超甜故事线”，CP粉狂欢，唯粉炸锅。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 60 && chance(50),
+  options: [
+    { 
+      text: '直播发糖固粉', 
+      effect: () => ({ fans: 4, ethics: -3 }), 
+      log: '话题度暴涨，但毒唯发起抵制' 
+    },
+    { 
+      text: '冷静辟谣拆CP', 
+      effect: () => ({ fans: -3, ethics: 3 }), 
+      log: '热度下降，但路人夸“清醒”' 
+    },
+    { 
+      text: '沉默让子弹飞', 
+      effect: (s) => {
+        if (s.stats.eq >= 50) {
+          return { fans: 1, ethics: 1, log: '舆论自然平息，安全过关' };
+        } else {
+          return { fans: -2, log: '被解读为默认，争议升级' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_resource',
+  type: 'SHOW',
+  title: '资源争夺战',
+  description: '你的中插广告被换给“皇族”队友。经纪人叹气：“公司押宝别人了。”',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false, // 30%设置之一
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 60 && chance(35),
+  options: [
+    { 
+      text: '找导演组争取', 
+      effect: (s) => {
+        if (s.stats.vocal >= 100) {
+          return { ethics: 3, fans: 1, log: '实力背书，争取到备用方案' };
+        } else {
+          return { ethics: -2, fans: -3, log: '被批“看不清位置”，镜头一剪没' };
+        }
+      }
+    },
+    { 
+      text: '加练舞台逆袭', 
+      effect: () => ({ vocal: 1, dance: 1}), 
+      log: '公演表现优秀，口碑提升' 
+    },
+    { 
+      text: '发背影照内涵', 
+      effect: () => ({ fans: 2, ethics: -2 }), 
+      log: '粉圈心疼打投，但得罪资本' 
+    }
+  ]
+},
+{
+  id: 'show_fever',
+  type: 'SHOW',
+  title: '高烧舞台劫',
+  description: '公演前夜突发高烧39度，“身体要紧。”',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.health < 50 && chance(40),
+  options: [
+    { 
+      text: '打封闭针上场', 
+      effect: (s) => {
+        if (s.stats.dance >= 80) {
+          return { fans: 4, health: -4, log: '强撑完成高难度动作，热搜#敬业天花板' };
+        } else {
+          return { vocal: -3, dance: -3, health: -3, log: '舞台失误，被嘲“不自量力”' };
+        }
+      }
+    },
+    { 
+      text: '晕倒送医抢救', 
+      effect: () => ({ethics:-2, vocal:2, fans: 5 }), 
+      log: '病床照出圈，虐粉打投暴增' 
+    },
+    { 
+      text: '让位给替补', 
+      effect: () => ({ ethics: 2, fans: -3 }), 
+      log: '队友感激，但粉丝失望脱粉' 
+    }
+  ]
+},
+{
+  id: 'show_black_hot',
+  type: 'SHOW',
+  title: '黑热搜屠榜',
+  description: '热搜上榜：#你 黑脸#，片段是你累到发呆的镜头。对家水军下场：“滚出节目！”',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false, // 30%设置之一
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 90 && chance(40),
+  options: [
+    { 
+      text: '发练习室视频自证', 
+      effect: (s) => {
+        if (s.stats.vocal >= 90 && s.stats.dance >= 90) {
+          return { fans: 4, ethics: 2, log: '实力打脸，路人转粉：黑子睁眼看看' };
+        } else {
+          return { fans: -1, votes: -2, log: '练习室实力不济，群嘲“越努力越心酸”' };
+        }
+      }
+    },
+    { 
+      text: '高情商回应化解', 
+      effect: (s) => {
+        if (s.stats.eq >= 70) {
+          return { ethics: 3, fans: 2, log: '玩梗“谢谢关心下班状态”，风评反转' };
+        } else {
+          return { fans: -3, log: '回应生硬，被批“茶言茶语”' };
+        }
+      }
+    },
+    { 
+      text: '沉默等热度过去', 
+      effect: () => ({ fans: -2, ethics: 1 }), 
+      log: '争议渐熄，但形象受损' 
+    }
+  ]
+},
+{
+  id: 'show_station_leave',
+  type: 'SHOW',
+  title: '站姐回踩地震',
+  description: '最大站姐发小作文脱粉：“私联粉丝、恋爱实锤！”配图是你和表妹吃饭的模糊照片。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false, // 30%设置之一
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 100 && chance(25),
+  options: [
+    { 
+      text: '直播晒聊天记录', 
+      effect: (s) => {
+        if (s.stats.eq >= 60) {
+          return { fans: 3, ethics: 2, log: '冷静澄清获信任，站姐删文道歉' };
+        } else {
+          return { fans: -4, ethics: -2, log: '情绪失控说错话，塌房盖章' };
+        }
+      }
+    },
+    { 
+      text: '起诉法律维权', 
+      effect: () => ({ ethics: 3, fans: 2 }), 
+      log: '律师函警告，黑粉收敛' 
+    },
+    { 
+      text: '冷处理不置可否', 
+      effect: () => ({ fans: -5, ethics: -3 }), 
+      log: '默认既视感，后援会解散' 
+    }
+  ]
+},
+{
+  id: 'show_teammate',
+  type: 'SHOW',
+  title: '队友塌房危机',
+  description: '队友被爆恋爱瓜，深夜求你：“就说那晚我们在一起练舞！”镜头正对着你。',
+  stage: GameStage.SHOW,
+  isMandatory: true,
+  repeatable: false,
+  trigger: (s) => chance(40),
+  options: [
+    { 
+      text: '仗义出面作证', 
+      effect: () => ({ ethics: 2, fans: -2 }), 
+      log: '被卷入漩涡，口碑两极' 
+    },
+    { 
+      text: '拒绝并劝分手', 
+      effect: (s) => {
+        if (s.stats.eq >= 50) {
+          return { ethics: 1, fans: 1, log: '队友醒悟止损，关系缓和' };
+        } else {
+          return { ethics: -2, log: '队友翻脸，内部矛盾曝光' };
+        }
+      }
+    },
+    { 
+      text: '装傻转移话题', 
+      effect: () => ({ fans: 1, ethics: -1 }), 
+      log: '独善其身，但被批冷漠' 
+    }
+  ]
+},
+{
+  id: 'show_education',
+  type: 'SHOW',
+  title: '学历打假风波',
+  description: '网友扒出你母校是“野鸡大学”，话题#学术造假#升温。导师静静看着你。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(20),
+  options: [
+    { 
+      text: '自嘲但秀专业', 
+      effect: (s) => {
+        if (s.stats.vocal >= 100) {
+          return { vocal: 3, fans: 2, log: '一段清唱扭转焦点，网友：实力说话' };
+        } else {
+          return { fans: -2, ethics: -1, log: '翻车现场，被嘲“九漏鱼”' };
+        }
+      }
+    },
+    { 
+      text: '晒证书硬刚', 
+      effect: () => ({ ethics: -2, fans: -1 }), 
+      log: '越描越黑，争议升级' 
+    },
+    { 
+      text: '沉默用舞台回应', 
+      effect: () => ({ dance: 2, ethics: 1 }), 
+      log: '时间冲淡话题，专注本职' 
+    }
+  ]
+},
+{
+  id: 'show_love',
+  type: 'SHOW',
+  title: '恋爱乌龙事件',
+  description: '狗仔曝光你与异性聚餐照片，实为表妹探班。营销号带节奏：#偶像失格#。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 80 && chance(30),
+  options: [
+    { 
+      text: '火速晒家属合照', 
+      effect: () => ({ fans: 3, ethics: 1 }), 
+      log: '澄清及时，反赚一波亲情粉' 
+    },
+    { 
+      text: '让表妹直播说明', 
+      effect: (s) => {
+        if (s.stats.looks >= 100) {
+          return { fans: 2, log: '颜值家族出圈，话题反转' };
+        } else {
+          return { fans: -2, eq: -2, log: '被疑炒作，路人缘下滑' };
+        }
+      }
+    },
+    { 
+      text: '冷处理不置可否', 
+      effect: () => ({ fans: -4, ethics: -2 }), 
+      log: '默认传闻，脱粉潮爆发' 
+    }
+  ]
+},
+{
+  id: 'scandal_rumor',
+  type: 'SHOW',
+  title: '黑历史考古',
+  description: '论坛爆出你中学时期“非主流”言论截图，黑粉狂欢：“人设崩塌！”',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 50 && chance(30),
+  options: [
+    { 
+      text: '玩梗自黑化解', 
+      effect: (s) => {
+        if (s.stats.eq >= 70) {
+          return { fans: 3, ethics: 2, log: '一句“谁没年轻过”拉回好感' };
+        } else {
+          return { fans: -2, ethics: -1, log: '自黑变真黑，嘲讽加剧' };
+        }
+      }
+    },
+    { 
+      text: '严肃发声明', 
+      effect: () => ({ ethics: 2, fans: -1 }), 
+      log: '态度强硬，但被批玻璃心' 
+    },
+    { 
+      text: '沉默等自然冷却', 
+      effect: () => ({ fans: -2 }), 
+      log: '热度渐退，但留下污点' 
+    }
+  ]
+},
+{
+  id: 'viral_video',
+  type: 'SHOW',
+  title: '直拍血洗B站',
+  description: '你公演的一个wink镜头被剪成病毒视频，播放量破百万。弹幕：“蛊王降临！”',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => (s.stats.dance > 80 || s.stats.looks > 80) && chance(20),
+  options: [
+    { 
+      text: '翻跳挑战加码', 
+      effect: (s) => {
+        if (s.stats.dance >= 100) {
+          return { fans: 5, dance: 1, log: '专业翻跳引爆二创，热度翻倍' };
+        } else {
+          return { fans: 2, ethics: -1, log: '画虎不成反类犬，被嘲蹭热度' };
+        }
+      }
+    },
+    { 
+      text: '谦逊感谢关注', 
+      effect: () => ({ ethics: 3, fans: 2 }), 
+      log: '路人夸“低调务实”，口碑提升' 
+    },
+    { 
+      text: '买热搜强推', 
+      effect: () => ({ fans: 2, ethics: -2 }), 
+      log: '数据注水被扒，反噬口碑' 
+    }
+  ]
+},
+{
+  id: 'evil_editing',
+  type: 'SHOW',
+  title: '恶剪风暴',
+  description: '节目组将你休息时打哈欠的镜头，剪进导师批评段落。热搜：#你 不尊重舞台#。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(25),
+  options: [
+    { 
+      text: '找选管对质', 
+      effect: () => ({ ethics: 1, fans: -3, votes: -5 }), 
+      log: '硬刚无效，反被剪进“drama合集”' 
+    },
+    { 
+      text: '咬牙更努力', 
+      effect: () => ({ vocal: 2, dance: 2 }), 
+      log: '用下次舞台证明，谣言不攻自破' 
+    },
+    { 
+      text: '高情商玩梗', 
+      effect: (s) => {
+        if (s.stats.eq >= 60) {
+          return { fans: 3, ethics: 2, log: '微博发“哈欠是怕舞台太燃”，风评逆转' };
+        } else {
+          return { fans: -2, log: '玩梗失败，被批“不诚恳”' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'late_night_practice',
+  type: 'SHOW',
+  title: '通宵练习室',
+  description: '凌晨三点，练习室只剩你一人。镜头记录下你反复摔倒又爬起的瞬间。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.health > 60 && chance(40),
+  options: [
+    { 
+      text: '练到昏厥', 
+      effect: () => ({ dance: 3, vocal: 2, health: -4 }), 
+      log: '汗水铸就直拍出圈，但送医急救' 
+    },
+    { 
+      text: '适度休息', 
+      effect: () => ({ health: 3, ethics: 1 }), 
+      log: '状态饱满，次日舞台稳定' 
+    },
+    { 
+      text: '开直播虐粉', 
+      effect: () => ({ fans: 3, health: -2 }), 
+      log: '粉丝心疼打投，但被嘲卖惨' 
+    }
+  ]
+},
+{
+  id: 'center_battle',
+  type: 'SHOW',
+  title: 'C位争夺战',
+  description: '小组内投票选C位，你是毛遂自荐还是成全队友？镜头对准你的微表情。',
+  stage: GameStage.SHOW,
+  isMandatory: true,
+  repeatable: false,
+  trigger: (s) => s.showTurnCount === 2,
+  options: [
+    { 
+      text: '强势争C', 
+      effect: (s) => {
+        if (s.stats.vocal + s.stats.dance >= 180) {
+          return { vocal: 3, dance: 3, fans: 2, log: '实力碾压，C位实至名归' };
+        } else {
+          return { ethics: -2, fans: -2, log: '野心配不上实力，被骂“皇族”' };
+        }
+      }
+    },
+    { 
+      text: '让贤辅佐', 
+      effect: () => ({ ethics: 4, fans: 1 }), 
+      log: '团魂感动全场，口碑暴涨' 
+    },
+    { 
+      text: '服从安排', 
+      effect: () => ({ eq: 1 }), 
+      log: '安全但透明，镜头寥寥' 
+    }
+  ]
+},
+{
+  id: 'show_song_selection',
+  type: 'SHOW',
+  title: '一公选曲博弈',
+  description: '选曲决定命运：燃炸舞台易出圈，抒情歌易展现vocal。你如何选择？',
+  stage: GameStage.SHOW,
+  isMandatory: true,
+  repeatable: false,
+  trigger: (s) => s.showTurnCount === 2,
+  options: [
+    { 
+      text: '挑战高音主打', 
+      effect: (s) => {
+        if (s.stats.vocal >= 100) {
+          return { vocal: 4, fans: 3, log: '天籁vocal惊艳全场，热搜预定' };
+        } else {
+          return { vocal: -2, fans: -2, log: '破音翻车，被嘲“不自量力”' };
+        }
+      }
+    },
+    { 
+      text: '选舞蹈炸场', 
+      effect: (s) => {
+        if (s.stats.dance >= 100) {
+          return { dance: 4, fans: 3, log: '卡点机器燃爆舞台，直拍封神' };
+        } else {
+          return { dance: -2, health: -2, log: '动作划水，对比惨烈' };
+        }
+      }
+    },
+    { 
+      text: '挑冷门曲冒险', 
+      effect: () => ({ fans: 2, ethics: 1 }), 
+      log: '差异化成功，但风险极高' 
+    }
+  ]
+},
+{
+  id: 'show_dorm_live',
+  type: 'SHOW',
+  title: '宿舍直播危机',
+  description: '突击直播中，队友突然爆料你生活中的糗事。全场起哄，镜头等你反应。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(40),
+  options: [
+    { 
+      text: '幽默接梗反转', 
+      effect: (s) => {
+        if (s.stats.eq >= 70) {
+          return { fans: 3, ethics: 1, log: '金句频出，弹幕：“情商天花板”' };
+        } else {
+          return { fans: -1, ethics: -1, log: '接梗失败，气氛尴尬' };
+        }
+      }
+    },
+    { 
+      text: '沉默装傻', 
+      effect: () => ({ fans: -1 }), 
+      log: '镜头被剪，存在感归零' 
+    },
+    { 
+      text: '怼回去引爆笑', 
+      effect: () => ({ fans: 3, ethics: -1 }), 
+      log: '综艺感出圈，但被批过火' 
+    }
+  ]
+},
+{
+  id: 'show_mentor',
+  type: 'SHOW',
+  title: '导师合作舞台',
+  description: '导师邀请你即兴合唱，但你的part涉及高难度转音。机会还是陷阱？',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  useAiForOutcome: false, // 30%设置之一
+  trigger: (s) => s.stats.vocal > 50 && chance(30),
+  options: [
+    { 
+      text: '自信接招', 
+      effect: (s) => {
+        if (s.stats.vocal >= 120) {
+          return { vocal: 4, fans: 3, log: '神级转音上热搜，导师点赞' };
+        } else {
+          return { vocal: -2, fans: -2, log: '破音车祸，口碑暴跌' };
+        }
+      }
+    },
+    { 
+      text: '婉拒保平安', 
+      effect: () => ({ ethics: -1, fans: -1 }), 
+      log: '错过曝光，但避免风险' 
+    },
+    { 
+      text: '拉队友共演', 
+      effect: () => ({ ethics: 1, fans: 1 }), 
+      log: '展现团魂，镜头量增加' 
+    }
+  ]
+},
+{
+  id: 'show_elimination',
+  type: 'SHOW',
+  title: '淘汰夜眼泪',
+  description: '好友被淘汰，镜头特写你的表情。热搜预定点：#你的反应#。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(50),
+  options: [
+    { 
+      text: '崩溃大哭', 
+      effect: () => ({ fans: 3, ethics: -2 }), 
+      log: '真情实感虐粉，但被嘲戏多' 
+    },
+    { 
+      text: '强笑祝福', 
+      effect: (s) => {
+        if (s.stats.eq >= 50) {
+          return { ethics: 2, fans: 1, log: '冷静发言被赞“体面人”' };
+        } else {
+          return { fans: -1, ethics: -1, log: '表情管理失败，被批冷漠' };
+        }
+      }
+    },
+    { 
+      text: '沉默拥抱', 
+      effect: () => ({ ethics: 1 }), 
+      log: '镜头一扫而过，无人在意' 
+    }
+  ]
+},
+{
+  id: 'show_ranking',
+  type: 'SHOW',
+  title: '卡位圈生死局',
+  description: '阶段性顺位发布，你卡在第12名。台下粉丝哭喊你的名字，镜头等你发言。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans >120 && chance(30),
+  options: [
+    { 
+      text: '热血逆袭宣言', 
+      effect: () => ({ fans: 4, ethics: 2 }), 
+      log: '粉圈打投鸡血，排名飙升' 
+    },
+    { 
+      text: '哭诉压力太大', 
+      effect: () => ({ fans: 2, health: -2 }), 
+      log: '虐粉成功，但被批卖惨' 
+    },
+    { 
+      text: '鞠躬感谢粉丝', 
+      effect: (s) => {
+        if (s.stats.looks >= 100) {
+          return { fans: 3, ethics: 1, log: '神颜落泪截图出圈，路人怜爱' };
+        } else {
+          return { fans: 1, log: '标准流程，无惊喜无过错' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_unfair',
+  type: 'SHOW',
+  title: '皇族の凝视',
+  description: '“皇族”队友镜头量是你的三倍，粉丝怒骂黑幕。你如何应对？',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 70 && chance(30),
+  options: [
+    { 
+      text: '练习室暗卷', 
+      effect: (s) => {
+        if (s.stats.dance >= 110) {
+          return { dance: 3, fans: 3, log: '直拍数据反超，用实力打脸' };
+        } else {
+          return { vocal: 1, dance: 1, log: '努力但无人在意，镜头更少' };
+        }
+      }
+    },
+    { 
+      text: '采访含蓄开麦', 
+      effect: () => ({ fans: 2, ethics: -1 }), 
+      log: '粉圈支持，但遭节目组打压' 
+    },
+    { 
+      text: '专注自我', 
+      effect: () => ({ ethics: 2, fans: -1 }), 
+      log: '口碑提升，但热度下降' 
+    }
+  ]
+},
+{
+  id: 'show_ad',
+  type: 'SHOW',
+  title: '中插广告修罗场',
+  description: '金主指定你拍中插，但剧本尴尬到脚趾抠地。导演：“要真实！”',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(50),
+  options: [
+    { 
+      text: '放飞自我尬演', 
+      effect: () => ({ fans: 1, ethics: -1 }), 
+      log: '被做成表情包，黑红也是红' 
+    },
+    { 
+      text: '自然流露真诚', 
+      effect: (s) => {
+        if (s.stats.eq >= 60) {
+          return { fans: 3, ethics: 1, log: '反差萌吸粉，金主追加合作' };
+        } else {
+          return { fans: -1, log: '演技生硬，广告被嘲' };
+        }
+      }
+    },
+    { 
+      text: '拒演保口碑', 
+      effect: () => ({ fans: -2, ethics: 1 }), 
+      log: '得罪品牌，后续资源流失' 
+    }
+  ]
+},
+{
+  id: 'show_offline',
+  type: 'SHOW',
+  title: '线下应援对决',
+  description: '粉丝租下海岛大屏应援，高调非常，你下班路过，该如何应对？”',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 100 && chance(40),
+  options: [
+    { 
+      text: '开窗比心回应', 
+      effect: () => ({ fans: 4, ethics: 2 }), 
+      log: '双向奔赴上热搜，死忠固化' 
+    },
+    { 
+      text: '让助理代打招呼', 
+      effect: () => ({ fans: 1, ethics: -1 }), 
+      log: '被批“耍大牌”，站姐脱粉' 
+    },
+    { 
+      text: '无视快步离开', 
+      effect: () => ({ fans: -4, ethics: -2 }), 
+      log: '寒心场面出圈，口碑崩盘' 
+    }
+  ]
+},
+{
+  id: 'show_final',
+  type: 'SHOW',
+  title: '决赛夜冲刺',
+  description: '成团夜倒计时，你加练到嗓音沙哑。队友问：“值得吗？”',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => (s.showTurnCount ===3 ||s.showTurnCount ===4)&& chance(30),
+  options: [
+    { 
+      text: '通宵搏命', 
+      effect: () => ({ vocal: 3, dance: 3, health: -5 }), 
+      log: '舞台封神，但晕倒送医' 
+    },
+    { 
+      text: '保存实力', 
+      effect: () => ({ health: 3, ethics: 1 }), 
+      log: '稳定发挥，但缺乏记忆点' 
+    },
+    { 
+      text: '调整心态', 
+      effect: (s) => {
+        if (s.stats.eq >= 70) {
+          return { ethics: 3, fans: 1, log: '冷静发言圈粉，逆风翻盘' };
+        } else {
+          return { health: 1, log: '平淡过关，无波无澜' };
+        }
+      }
+    }
+  ]
+},
+
+{
+  id: 'show_training_evaluation',
+  type: 'SHOW',
+  title: '训练考核危机',
+  description: '导师突击考核主题曲，你因连轴转嗓音沙哑。队友小声说：“要不假唱？反正剪辑能修。”',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.health < 30 && chance(40),
+  options: [
+    { 
+      text: '坚持真唱', 
+      effect: (s) => {
+        if (s.stats.vocal >= 80) {
+          return { vocal: 2, ethics: 3, fans: 1, log: '破音也坚持，虐粉成功' };
+        } else {
+          return { vocal: -2, fans: -2, log: '严重走音，导师皱眉摇头' };
+        }
+      }
+    },
+    { 
+      text: '假唱混过去', 
+      effect: () => ({ ethics: -3, fans: -3 }), 
+      log: '被耳尖观众扒出，口碑崩塌' 
+    },
+    { 
+      text: '申请缓考', 
+      effect: () => ({ health: 2, ethics: 1, fans: -1 }), 
+      log: '弹幕争议：敬业VS矫情' }
     ]
-  },
-  {
-    id: 'show_mentor',
-    type: 'SHOW',
-    title: '导师合作',
-    description: '导师想和你合作一个即兴舞台。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.vocal > 50 && chance(30),
-    options: [
-      { text: '大胆接受', effect: () => ({ vocal: 3, ethics: 2 }), log: '导师对你刮目相看。' },
-      { text: '婉拒称怕拖后腿', effect: () => ({ ethics: -1 }), log: '导师觉得有点可惜。' },
-      { text: '要求加队友', effect: () => ({ ethics: 1, fans: 1 }), log: '重情重义。' }
-    ]
-  },
-  {
-    id: 'show_elimination',
-    type: 'SHOW',
-    title: '淘汰发言',
-    description: '你的队友被淘汰了，镜头对准你。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => chance(50),
-    options: [
-      { text: '泪洒现场', effect: () => ({ fans: 2, ethics: -2 }), log: '真情实感虐粉。' },
-      { text: '强颜欢笑祝福', effect: () => ({ ethics: 1 }), log: '体面告别。' },
-      { text: '一言不发', effect: () => ({ fans: -1, ethics: -1 }), log: '被说冷漠。' }
-    ]
-  },
-  {
-    id: 'show_ranking',
-    type: 'SHOW',
-    title: '顺位发布',
-    description: '排名发布，你在出道位边缘。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => chance(45),
-    options: [
-      { text: '发表热血宣言', effect: () => ({ fans: 3, ethics: 2 }), log: '燃起来了！' },
-      { text: '感谢粉丝', effect: () => ({ fans: 2 }), log: '标准发言。' },
-      { text: '紧张到忘词', effect: () => ({ fans: -1, ethics: -3 }), log: '播出效果极差。' }
-    ]
-  },
-  {
-    id: 'show_unfair',
-    type: 'SHOW',
-    title: '黑幕质疑',
-    description: '有选手明显皇族，镜头量是别人的三倍。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 70 && chance(30),
-    options: [
-      { text: '发微博内涵', effect: () => ({ fans: 2, ethics: -2 }), log: '被节目组约谈。' },
-      { text: '直播哭诉', effect: () => ({ fans: 4, ethics: -3 }), log: '热搜第一，但得罪节目组。' },
-      { text: '忍气吞声', effect: () => ({ ethics: 1, fans: -2 }), log: '防爆成功，但没水花。' }
-    ]
-  },
-  {
-    id: 'show_ad',
-    type: 'SHOW',
-    title: '中插广告',
-    description: '节目组安排你拍中插广告。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => chance(50),
-    options: [
-      { text: '尬演也全情投入', effect: () => ({ fans: 1 }), log: '被嘲"洗洁精演技"。' },
-      { text: '自然表现', effect: () => ({ fans: 2 }), log: '意外有反差萌。' },
-      { text: '拒绝拍摄', effect: () => ({ fans: -2, ethics: -1 }), log: '得罪金主。' }
-    ]
-  },
-  {
-    id: 'show_offline',
-    type: 'SHOW',
-    title: '线下应援',
-    description: '粉丝来录制现场应援，声势浩大。',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.stats.fans > 100 && chance(40),
-    options: [
-      { text: '开窗回应', effect: () => ({ fans: 3, ethics: 2 }), log: '双向奔赴。' },
-      { text: '让助理代打招呼', effect: () => ({ fans: 1, ethics: -1 }), log: '被说"耍大牌"。' },
-      { text: '无视', effect: () => ({ fans: -3, ethics: -2 }), log: '寒了粉丝心。' }
-    ]
-  },
-  {
-    id: 'show_final',
-    type: 'SHOW',
-    title: '决赛冲刺',
-    description: '决赛前夜，你还要继续练习吗？',
-    stage: GameStage.SHOW,
-    isMandatory: false,
-    repeatable: false,
-    trigger: (s) => s.showTurnCount > 8 && chance(60),
-    options: [
-      { text: '通宵练习', effect: () => ({ vocal: 3, dance: 3, health: -5 }), log: '燃烧生命。' },
-      { text: '适度练习早睡', effect: () => ({ health: 2, ethics: 2 }), log: '养精蓄锐。' },
-      { text: '和队友谈心', effect: () => ({ ethics: 3 }), log: '调整状态。' }
-    ]
-  },
-  {
-    id: 'show_debut',
-    type: 'SHOW',
-    title: '成团争议',
-    description: '你卡在出道位，粉丝和资本在博弈。',
-    stage: GameStage.SHOW,
-    isMandatory: true,
-    repeatable: false,
-    trigger: (s) => s.showTurnCount > 10,
-    options: [
-      { text: '让粉丝别氪金', effect: () => ({ fans: 3, ethics: 3 }), log: '清流爱豆，但可能出不了道。' },
-      { text: '暗示粉丝打投', effect: () => ({ fans: 4, ethics: -2 }), log: '被嘲"又当又立"。' },
-      { text: '听天由命', effect: () => ({ ethics: 1 }), log: '佛系选手。' }
-    ]
-  }
+},
+{
+  id: 'show_fan_meeting',
+  type: 'SHOW',
+  title: '粉丝见面会',
+  description: '线下见面会，粉丝高喊你的名字。一位妈粉哭着说：“宝宝瘦了！”你如何回应？',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  useAiForOutcome: false,
+  trigger: (s) => s.stats.fans > 80 && chance(30),
+  options: [
+    { 
+      text: '撒娇说想家', 
+      effect: () => ({ fans: 3, ethics: -2, eq: -3 }), 
+      log: '妈粉狂欢，但被嘲“巨婴”' 
+    },
+    { 
+      text: '展示肌肉励志', 
+      effect: (s) => {
+        if (s.stats.looks >= 100) {
+          return { fans: 4, ethics: 2, log: '反差感出圈，热搜#猛男落泪#' };
+        } else {
+          return { fans: -1, log: '反响平平，镜头被剪' };
+        }
+      }
+    },
+    { 
+      text: '鞠躬感谢沉默', 
+      effect: () => ({ ethics: 2, fans: 1, eq: -1 }), 
+      log: '被批冷漠，但路人好感up' 
+    }
+  ]
+},
+{
+  id: 'show_sponsor_gift',
+  type: 'SHOW',
+  title: '金主送礼风波',
+  description: '赞助商送来限量潮鞋，但数量不够分。皇族队友直接拿走最后一双，镜头正拍你反应。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(30),
+  options: [
+    { 
+      text: '调侃式抗议', 
+      effect: (s) => {
+        if (s.stats.eq >= 70) {
+          return { ethics: 2, fans: 2, log: '高情商发言，金主点赞' };
+        } else {
+          return { ethics: -2, fans: -1, log: '玩笑过火，气氛尴尬' };
+        }
+      }
+    },
+    { 
+      text: '主动让给他人', 
+      effect: () => ({ ethics: 3, fans: 1 }), 
+      log: '谦逊人设加固，镜头偏爱' 
+    },
+    { 
+      text: '私下找选管要', 
+      effect: () => ({ fans: -2 }), 
+      log: '被曝“耍大牌”，资源受损' 
+    }
+  ]
+},
+{
+  id: 'show_cover_dance',
+  type: 'SHOW',
+  title: '翻跳挑战赛',
+  description: '某顶流男团舞挑战席卷全网，粉丝催你交作业。但原版舞蹈难度极高，容易翻车。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.dance > 60 && chance(30),
+  options: [
+    { 
+      text: '挑战高光片段', 
+      effect: (s) => {
+        if (s.stats.dance >= 120) {
+          return { dance: 3, fans: 4, log: '卡点神级翻跳，原转发认证' };
+        } else {
+          return { dance: -1, fans: -2, log: '动作变形，遭原粉群嘲' };
+        }
+      }
+    },
+    { 
+      text: '改编简单版', 
+      effect: () => ({ fans: 2, ethics: 1 }), 
+      log: '自创风格，意外出圈' 
+    },
+    { 
+      text: '拉队友共跳', 
+      effect: () => ({ ethics: 2, fans: 1 }), 
+      log: '团魂吸粉，风险分摊' 
+    }
+  ]
+},
+{
+  id: 'show_midterm_ranking',
+  type: 'SHOW',
+  title: '中期排名危机',
+  description: '排名发布，你疑似被压票，排名骤降。主持人问：“你觉得公平吗？”全场安静。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 50 && chance(50),
+  options: [
+    { 
+      text: '笑说会更努力', 
+      effect: () => ({ ethics: 2, fans: 1 }), 
+      log: '体面回应，路人缘上升' 
+    },
+    { 
+      text: '含泪质疑赛制', 
+      effect: () => ({ fans: 3, ethics: -2 }), 
+      log: '粉圈震怒，节目组施压' 
+    },
+    { 
+      text: '沉默鞠躬十秒', 
+      effect: (s) => {
+        if (s.stats.looks >= 120) {
+          return { fans: 3, ethics: 1, log: '神颜落泪截图疯传' };
+        } else {
+          return { fans: -1, log: '被批“戏多”，效果平淡' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_group_conflict',
+  type: 'SHOW',
+  title: '小组内讧',
+  description: '排练时队友因part分配吵翻，公演在即。作为队长，你如何调停？',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(35),
+  options: [
+    { 
+      text: '让出自己part', 
+      effect: () => ({ ethics: 4, vocal: -1, votes:-1 }), 
+      log: '平息争端，但表现受限' 
+    },
+    { 
+      text: '强硬镇压', 
+      effect: (s) => {
+        if (s.stats.eq >= 60) {
+          return { ethics: -1, fans: 1, log: '快速推进，但埋下隐患' };
+        } else {
+          return { ethics: -3, fans: -2, log: '矛盾激化，舞台垮掉' };
+        }
+      }
+    },
+    { 
+      text: '找导师调解', 
+      effect: () => ({ ethics: 1, fans: -1 }), 
+      log: '被嘲“打小报告”，但高效' 
+    }
+  ]
+},
+{
+  id: 'show_social_media',
+  type: 'SHOW',
+  title: '社交媒体运营',
+  description: '节目组允许发一条微博。staff暗示：“最好有话题度。”你发什么内容？',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(50),
+  options: [
+    { 
+      text: '发练习室汗湿照', 
+      effect: () => ({ fans: 1, ethics: 1 }), 
+      log: '固粉成功，被对家黑“卖惨”' 
+    },
+    { 
+      text: '蹭顶流热点', 
+      effect: (s) => {
+        if (s.stats.eq >= 50) {
+          return { fans: 3, ethics: -1, log: '巧妙玩梗，出圈热度高' };
+        } else {
+          return { fans: -2, ethics: -2, log: '翻车现场，遭对方粉围攻' };
+        }
+      }
+    },
+    { 
+      text: '晒队友丑照', 
+      effect: () => ({ ethics: -2, fans: 1, eq:2 }), 
+      log: '综艺感获赞，但情商受疑' 
+    }
+  ]
+},
+{
+  id: 'show_mentor_critique',
+  type: 'SHOW',
+  title: '导师犀利点评',
+  description: '导师当众批评你“只有技巧没有感情”。其他选手窃窃私语，你如何回应？',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  useAiForOutcome: false,
+  trigger: (s) => s.stats.vocal > 70 && chance(30),
+  options: [
+    { 
+      text: '鞠躬认错', 
+      effect: () => ({ ethics: 2, fans: -1 }), 
+      log: '态度谦逊，但缺乏记忆点' 
+    },
+    { 
+      text: '即兴清唱证明', 
+      effect: (s) => {
+        if (s.stats.vocal >= 150) {
+          return { vocal: 3, fans: 3, log: '情感爆发，导师改观赞赏' };
+        } else {
+          return { vocal: -2, fans: -2, log: '紧张走音，批评加剧' };
+        }
+      }
+    },
+    { 
+      text: '沉默落泪', 
+      effect: (s) => {
+        if (s.stats.looks >= 120) {
+          return { fans: 2, ethics: -1, log: '破碎感出圈，虐粉成功' };
+        } else {
+          return { fans: -1, ethics: -1, log: '被嘲“玻璃心”，形象受损' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_final_debut',
+  type: 'SHOW',
+  title: '成团夜抉择',
+  description: '比赛中后段你的粉丝数高涨，公司深夜来电：“让位给皇族，补偿你solo资源。”粉丝在场外哭喊你的名字。',
+  stage: GameStage.SHOW,
+  isMandatory: true,
+  repeatable: false,
+  trigger: (s) => s.stats.fans >= 150 && s.showTurnCount ===4,
+  options: [
+    { 
+      text: '拒绝让位', 
+      effect: (s) => {
+        if (s.stats.vocal + s.stats.dance >= 220) {
+          return { fans: 5, ethics: 4, votes: 5, log: '凭绝对实力逆袭，终成团' };
+        } else {
+          return { fans: -5, ethics: 1, votes: -5, log: '资本封杀，镜头一剪梅' };
+        }
+      }
+    },
+    { 
+      text: '接受交易', 
+      effect: () => ({ ethics: -4, fans: 2 }), 
+      log: '资源到手，但终身被嘲“水货”' 
+    },
+    { 
+      text: '现场揭黑幕', 
+      effect: () => ({ fans: 4, ethics: -3 }), 
+      log: '粉圈暴动，但遭行业抵制' 
+    }
+  ]
+},
+{
+  // 范本事件
+  id: 'show_grade',
+  type: 'SHOW',
+  title: '等级评定',
+  description: '初舞台评级，导师们一脸严肃。你准备以什么样的作品登场？',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false,
+  isMandatory: true,
+  repeatable: false,
+  trigger: (s) => s.showTurnCount === 1,
+  options: [
+    { 
+      text: '听导演组安排', 
+      effect: (s) => {
+        if (s.stats.looks >= 100 && s.stats.fans >= 100 && s.stats.vocal + s.stats.dance >= 150) {
+          return { fans: 5, vocal: 2, dance: 2, log: '导演看重你的实力和粉丝基数，给你了剧本' };
+        } else {
+          return { fans: -8, ethics: -2, flags: {script_candy: true }, log: '实力不足，喜提祭天剧本：糖果超甜。' };
+        }
+      }
+    },
+    { text: '展示专业能力的舞台', effect: () => ({ vocal: 2, fans: -2, ethics: 3 }), log: '被一剪梅。' },
+    
+    { 
+      text: '听公司安排', 
+      effect: (s) => {
+        if (s.company === Company.COFFEE) {
+           return { votes: -2, fans: -2, eq: 1, log: '咖啡粒文化不太行，镜头还是被一剪梅' };
+        } else if (s.company === Company.NONE) {
+           return { fans: -1, eq: -1, log: '你是个人练习生，哪来的公司给你安排？' };
+        } else {
+           return { looks: 1, eq: 1, fans: 3 , log: '公司发力了，保留了你的高光镜头' };
+        }
+      }
+    }
+  ] 
+}
 ];

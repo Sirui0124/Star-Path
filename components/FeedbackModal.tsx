@@ -36,7 +36,7 @@ export const FeedbackModal: React.FC<Props> = ({ onClose }) => {
         <div className="bg-slate-900 p-4 text-white flex justify-between items-center shrink-0">
             <div className="flex items-center gap-2">
                 <MessageSquare size={18} className="text-yellow-400" />
-                <span className="font-bold text-sm">联系开发者 / 提建议</span>
+                <span className="font-bold text-sm">联系开发者/提建议</span>
             </div>
             <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-full transition-colors">
                 <X size={18} />
@@ -47,7 +47,7 @@ export const FeedbackModal: React.FC<Props> = ({ onClose }) => {
         <div className="p-5 space-y-5">
             
             <div className="text-xs text-gray-500 leading-relaxed bg-blue-50 p-3 rounded-lg border border-blue-100">
-                👋 嘿！为了确保您的声音不被网络拦截，建议使用邮箱直接发送反馈给我。
+                👋 嘿！欢迎提建议！作者纯个人业余时间为爱发电搞着玩儿，永不收费，可以直接邮箱直接发送反馈给我。
             </div>
 
             {/* Email Display Section */}

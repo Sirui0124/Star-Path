@@ -1,15 +1,16 @@
 
 import React from 'react';
-import { Sparkles, Zap, TrendingUp, BookOpen, Save } from 'lucide-react';
+import { Sparkles, Zap, TrendingUp, BookOpen, Save, MessageSquare } from 'lucide-react';
 import { STORY_IMAGES } from '../content/images';
 
 interface Props {
   onStart: () => void;
   onOpenCollection: () => void;
   onOpenSaveLoad: () => void;
+  onOpenFeedback: () => void;
 }
 
-export const GameIntroModal: React.FC<Props> = ({ onStart, onOpenCollection, onOpenSaveLoad }) => {
+export const GameIntroModal: React.FC<Props> = ({ onStart, onOpenCollection, onOpenSaveLoad, onOpenFeedback }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans h-[100dvh]">
       {/* Background Image Layer */}
@@ -20,6 +21,17 @@ export const GameIntroModal: React.FC<Props> = ({ onStart, onOpenCollection, onO
             className="w-full h-full object-cover opacity-100" 
          />
          <div className="absolute inset-0 bg-black/10"></div>
+      </div>
+
+      {/* Top Left Feedback Button */}
+      <div className="absolute top-4 left-4 z-20">
+         <button 
+            onClick={onOpenFeedback} 
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 text-white rounded-full transition text-xs font-bold border border-white/20 shadow-sm backdrop-blur-md"
+         >
+            <MessageSquare size={14} className="text-yellow-400" />
+            <span>给作者提建议</span>
+         </button>
       </div>
 
       {/* Top Right Buttons */}

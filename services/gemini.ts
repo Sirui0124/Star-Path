@@ -2,6 +2,7 @@
 import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 import { GameState, GameEvent, EventOutcome, GameStage, Company } from "../types";
 import { ANNUAL_SUMMARIES } from "../content/narratives";
+import { COMPANIES } from "../constants";
 
 const TIMEOUT_MS = 1500; // 1.5 seconds for snappy experience
 
@@ -85,7 +86,7 @@ export const generateGameSummary = async (gameState: GameState): Promise<string>
   
   // 提取关键历史事件 (过滤掉重复和琐碎的)
   const events = gameState.history.filter(h => h.includes("【") || h.includes("签约") || h.includes("出道"));
-  const recentEvents = events.slice(-8); // 取最近的8个关键事件
+  const recentEvents = events.slice(-10); // 取最近的10个关键事件
 
   const isAmateur = gameState.stage === GameStage.AMATEUR;
 
@@ -97,46 +98,74 @@ export const generateGameSummary = async (gameState: GameState): Promise<string>
       statsDescription += `选秀票数: ${gameState.stats.votes}万\n`;
   }
 
+  // Get localized company name
+  const companyName = gameState.company === Company.NONE 
+      ? '独立艺人' 
+      : COMPANIES[gameState.company]?.name || gameState.company;
+
+  // --- NEW: Playstyle Analysis ---
+  let styleEvaluation = "";
+  if (isAmateur) {
+      styleEvaluation = "遗憾止步于练习生阶段，未能登上更大的舞台。";
+  } else {
+      const { vocal, dance, looks, ethics } = gameState.stats;
+      const { hotCp } = gameState.hiddenStats;
+      const totalSkill = vocal + dance;
+      
+      const strategies = [];
+      if (totalSkill >= 220) strategies.push("【实力断层】(唱跳能力极强，用舞台说话)");
+      else if (looks >= 160) strategies.push("【神颜降临】(凭借惊人颜值大杀四方)");
+      
+      if (ethics < 40) strategies.push("【黑红路线】(为了热度妥协了道德，争议较大)");
+      if (hotCp >= 3) strategies.push("【CP营业】(通过炒CP获得了巨大关注)");
+      
+      if (strategies.length === 0) strategies.push("【稳扎稳打】(各项均衡，一步一个脚印)");
+      
+      styleEvaluation = strategies.join(" + ");
+  }
+
   const prompt = `
-    你是一位资深的娱乐传记作家，请基于以下数据，为游戏《星途》的主角写一篇**300-600字**的生涯回顾正文。
+    你是一位资深的娱乐传记作家，请基于以下档案，为游戏《星途》的主角写一篇**分段清晰、情感真挚、特点分明**的生涯回忆录。字数：300-600字左右。
 
     【主角档案】
     姓名: ${gameState.name}
     初心梦想: ${gameState.dreamLabel}
     最终结局: ${gameState.gameResult}
-    签约公司: ${gameState.company === Company.NONE ? '独立艺人' : gameState.company}
+    签约公司: ${companyName}
     
     【最终数据】
     ${statsDescription}
     实力: Vocal ${gameState.stats.vocal} / Dance ${gameState.stats.dance} / 颜值 ${gameState.stats.looks} / 情商 ${gameState.stats.eq}
     特殊: CP热度 ${gameState.hiddenStats.hotCp} / 出圈 ${gameState.hiddenStats.viralMoments}
     
-    【生涯轨迹】
+    【星途风格分析 (重要)】
+    ${styleEvaluation}
+    
+    【关键经历】
     ${recentEvents.join('\n')}
     
-    【严格写作要求】
-    1. **字数控制**: 严格控制在 **300 - 600 字**之间。
-    2. **纯正文模式**: 
-       - **不要**加标题（如"星途回顾"）。
-       - **不要**加称呼（如"亲爱的玩家"、"你好"）。
-       - **不要**加开场白（如"我是记录者..."）。
-       - **不要**加结尾客套话（如"祝你未来顺利"）。
-       - **直接开始讲述**主角的故事。
-    3. **文风**: 使用第二人称"你"，深情、有画面感。
-       - **${gameState.gameResult}**: 请根据这个结局定下基调（是荣耀登顶、遗憾退场还是独自美丽）。
-       ${isAmateur ? '- **重要**: 玩家在练习生阶段(Amateur)就结束了游戏，正文中**绝对不要**提及“选票”、“排名”或“成团”，要明确写出“还没有来得及参与选秀”或“倒在了舞台大幕拉开之前”这类遗憾或转折。' : ''}
-    4. **内容融合**: 将数值（如粉丝数、实力）自然融入叙述中，描述大众对你的印象，不要罗列数据。
+    【写作要求】
+    1. **分段结构 (必须遵守)**: 请输出 **3-4 个自然段**，段落之间用空行分隔，阅读感要舒适。
+       - **第一段 (起步)**: 回顾16岁时的青涩与初心。
+       - **第二段 (征途)**: **重点点评**TA在选秀/奋斗期间的**选择与代价**。
+         * 如果是实力派，赞美汗水；如果是颜值派，感叹天赋；
+         * **关键**：如果TA走了【黑红】或【CP】路线，请委婉点评这种“为了红的妥协”带来的热度与争议，以及这是否值得。
+       - **第三段 (终章)**: 结合结局【${gameState.gameResult}】，送上温暖、有力或释然的寄语。
+    
+    2. **文风**: 第二人称"你"。深情、有画面感，像一位老友在灯下夜谈。
+       ${isAmateur ? '- **注意**: 玩家未参加选秀就结束了，请侧重描写“倒在黎明前”的遗憾，鼓励TA重头再来。' : ''}
+    3. **去格式化**: 不要加标题，不要加“亲爱的玩家”等客套前缀，直接开始讲故事。
   `;
 
   try {
     const response = await callWithRetry(() => ai.models.generateContent({
-      model: 'gemini-3-flash-preview', // Switch to Thinking model for better quality
+      model: 'gemini-3-flash-preview', 
       contents: prompt,
       config: { 
-          thinkingConfig: { thinkingBudget: 512 }, // Allocate budget for thinking
-          maxOutputTokens: 4096 
+          thinkingConfig: { thinkingBudget:512 }, // Give it some thought for better structure
+          maxOutputTokens: 2048
       } 
-    }), 3, 2000) as GenerateContentResponse; // More retries, longer delay for summary
+    }), 2, 2000) as GenerateContentResponse;
     return response.text || "星光虽微，亦有光芒。感谢游玩。";
   } catch (error) {
     console.error("Gemini summary failed after retries", error);
@@ -186,7 +215,7 @@ export const generateFanComments = async (gameState: GameState, context: 'START'
   if (!ai) return fallback;
 
   const prompt = `
-    生成3条有趣的、抓马的选秀综艺弹幕/评论(每条15字内)。
+    生成3条有趣的、抓马的选秀综艺弹幕/评论(每条20字内)。
     选手性别: 男。
     当前排名:${gameState.rank}, 票数:${gameState.stats.votes}万
     
@@ -353,26 +382,27 @@ export const generateEventOutcome = async (
     
     【生成要求】
     1. **narrative (结果日志)**: 
-       - 长度：**10-18字以内** (非常重要！)。
-       - 内容：必须短小精悍，有画面感或神转折。可以使用"社死"、"塌房"、"起飞"、"封神"等词汇。
+       - 长度：**15-35字以内** (不要太短，要有点剧情感)。
+       - 结合了玩家现在的数据表现情况
+       - 内容：有画面感或神转折，语句通顺。可以使用"社死"、"塌房"、"起飞"、"封神"等词汇。
        - 坏例子："你的表现很好，获得了大家的喜欢" (太无聊)。
        - 好例子："操作太下饭，粉丝连夜扛火车跑路。", "凭借一张神图，直接封神。", "试图耍帅，结果把假发片甩飞了。"
     
     2. **changes (数值)**: 
-       - 必须符合逻辑。如果narrative是"社死/被嘲"，必须扣Fans/Looks/Eq。如果是"封神/出圈"，必须加Fans。
+       - 必须符合逻辑。例如：如果narrative是"社死/被嘲"，必须扣Fans/Looks/Eq。如果是"封神/出圈"，必须加Fans。
        - 数值范围参考: ${statRange}。
        - 必须修改2-3个属性。
        - ${statsInstruction}
 
     3. **socialContent (社交反馈)**:
-       - 必须简短有力(20字内)。
+       - 要有梗，10-20字左右。
        - 如果是坏结局，评论要"笋"、"阴阳怪气"或"恨铁不成钢"。
        - 如果是好结局，评论要"彩虹屁"、"尖叫"或"玩梗"。
        - ${companyConstraint}
     
     输出JSON:
     {
-      "narrative": "string (10-18 chars)",
+      "narrative": "string (15-35 chars)",
       "changes": { "statName": number },
       "socialType": "WECHAT"|"WEIBO",
       "socialSender": "string (5 chars)",

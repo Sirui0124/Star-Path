@@ -80,11 +80,11 @@ export const ALL_CARDS: UnlockableCard[] = [
   {
     id: 'trait_skill',
     title: '全能ACE',
-    description: 'Vocal>150且Dance>150且颜值>150。',
+    description: 'Vocal+Dance>300，且颜值>150。',
     unlockText: '无短板的六边形战士，内娱有你了不起。',
     image: STORY_IMAGES.card_8,
     rarity: 'SSR',
-    condition: (s) => s.stats.vocal > 150 && s.stats.dance > 150&& s.stats.looks > 150
+    condition: (s) => s.stats.vocal+s.stats.dance > 300&& s.stats.looks > 150
   },
   {
     id: 'ending_rich',

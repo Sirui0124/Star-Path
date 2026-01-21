@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Lock, Sparkles, BookOpen, Info } from 'lucide-react';
 import { ALL_CARDS, UnlockableCard } from '../content/cards';
+import { logGameEvent } from '../services/firebase';
 
 interface Props {
   onClose: () => void;
@@ -13,13 +14,35 @@ export const CardCollectionModal: React.FC<Props> = ({ onClose }) => {
 
   useEffect(() => {
     const storage = localStorage.getItem('star_path_cards');
+    let currentUnlocked: string[] = [];
     if (storage) {
       try {
-        setUnlockedIds(JSON.parse(storage));
+        currentUnlocked = JSON.parse(storage);
+        setUnlockedIds(currentUnlocked);
       } catch (e) {
         console.error("Failed to parse card storage");
       }
     }
+
+    // Analytics: Track collection status when user opens the modal
+    // helping to verify if card collection drives engagement
+    logGameEvent('view_collection_status', {
+        unlocked_count: currentUnlocked.length,
+        total_count: ALL_CARDS.length,
+        completion_rate: (currentUnlocked.length / ALL_CARDS.length).toFixed(2)
+    });
+
+    // --- Analytics: Collection Snapshot ---
+    const urCount = ALL_CARDS.filter(c => c.rarity === 'UR' && currentUnlocked.includes(c.id)).length;
+    const ssrCount = ALL_CARDS.filter(c => c.rarity === 'SSR' && currentUnlocked.includes(c.id)).length;
+
+    logGameEvent('collection_summary', {
+        owned_count: currentUnlocked.length,
+        completion_percentage: (currentUnlocked.length / ALL_CARDS.length).toFixed(4), // More precision
+        ur_count: urCount,
+        ssr_count: ssrCount
+    });
+
   }, []);
 
   const getRarityColor = (rarity: string) => {
