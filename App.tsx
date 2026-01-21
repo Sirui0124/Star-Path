@@ -372,10 +372,38 @@ export default function App() {
     }
   };
 
+  // --- LOCAL FALLBACK GENERATOR ---
+  const generateLocalSummary = (state: GameState): string => {
+      const { name, dreamLabel, gameResult, stats } = state;
+      const age = state.time.age;
+      
+      let p1 = `16岁那年，${name}怀揣着"${dreamLabel}"的梦想踏入了这个光怪陆离的圈子。那时的你青涩而坚定，汗水浸透了练习室的地板。`;
+      
+      let p2 = "";
+      if (state.stage === GameStage.AMATEUR) {
+          p2 = "可惜星途漫漫，机遇总是稍纵即逝。在日复一日的等待中，你遗憾错过了报名的黄金年龄，但这段为了梦想全力以赴的日子，依然闪闪发光。";
+      } else {
+          p2 = `在《青春404》的舞台上，你经历了无数次考核与挑战。最终收获了${stats.fans}万粉丝的喜爱，${stats.votes}万次打投是你人气的证明。`;
+          if (stats.vocal + stats.dance > 180) p2 += " 你的实力有目共睹，舞台就是你最好的名片。";
+          else if (stats.looks > 100) p2 += " 你的颜值成为了节目的亮点，让人过目难忘。";
+      }
+
+      let p3 = `最终，你迎来了${gameResult}的结局。${age}岁的你，或许已经成为了聚光灯下的焦点，或许即将开启另一段不同的人生。无论如何，感谢你从未放弃那个发光的自己。`;
+
+      return `${p1}\n\n${p2}\n\n${p3}`;
+  };
+
   const handleRetrySummary = async () => {
     startLoading();
+    // Use current gameState which already has the gameResult
     const summary = await generateGameSummary(gameState);
-    setAiSummary(summary);
+    
+    // Check if AI failed via the specific signal
+    if (summary === "AI_GENERATION_FAILED") {
+        setAiSummary(generateLocalSummary(gameState));
+    } else {
+        setAiSummary(summary);
+    }
     setIsLoadingAi(false);
   };
 
@@ -953,7 +981,14 @@ export default function App() {
 
     startLoading();
     const summary = await generateGameSummary({ ...gameState, gameResult: result });
-    setAiSummary(summary);
+    
+    // Fallback logic handled in component state
+    if (summary === "AI_GENERATION_FAILED") {
+        setAiSummary(generateLocalSummary({ ...gameState, gameResult: result }));
+    } else {
+        setAiSummary(summary);
+    }
+    
     setIsLoadingAi(false);
   };
 
@@ -1031,7 +1066,7 @@ export default function App() {
                       ) : (
                         <>
                             {aiSummary}
-                            {(aiSummary.includes("网络波动") || aiSummary.includes("API Key")) && (
+                            {(aiSummary.includes("网络波动") || aiSummary.includes("API Key") || aiSummary.includes("FAILED")) && (
                                 <div className="mt-8 text-center pt-4 border-t border-dashed border-slate-200">
                                     <p className="text-xs text-slate-400 mb-3">生成似乎遇到了问题？</p>
                                     <button onClick={handleRetrySummary} className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full text-xs font-bold transition-all border border-blue-200 shadow-sm">
