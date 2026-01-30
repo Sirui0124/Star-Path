@@ -106,7 +106,7 @@ export const AMATEUR_ACTIONS: Action[] = [
     effect: (state) => ({
       health: -2,
       eq: 5,
-      fans: state.stats.fans >= 100 ? rand(8, 12) : rand(3, 5)
+      fans: state.stats.fans >= 100 ? rand(6, 10) : rand(2, 4)
     })
   }
 ];
@@ -176,8 +176,8 @@ export const SHOW_ACTIONS: Action[] = [
     apCost: 1,
     effect: () => ({
       ethics: -10,
-      fans:chance(20)? 10: rand(5,8),
-      votes: chance(30)? 20 : rand(8,12),
+      fans:chance(15)? 10: rand(5,8),
+      votes: chance(15)? 20 : rand(8,12),
       hotCp: chance(30) ? 1 : 0
     })
   }

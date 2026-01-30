@@ -21,7 +21,7 @@ export const STORY_IMAGES: Record<string, string> = {
   signing_agray: "https://s3.bmp.ovh/imgs/2026/01/16/339996571040d5d4.png",     // 艾灰音乐
 
   // --- 练习生阶段 (16-18岁) ---
-  default: "https://s3.bmp.ovh/imgs/2026/01/14/76df613fa07ca668.png",
+  default: "https://s3.bmp.ovh/imgs/2026/01/20/16054371961ae157.png",
   16: "https://s3.bmp.ovh/imgs/2026/01/19/e1fa9d367fc4376d.png", // 粉色系，懵懂
   17: "https://s3.bmp.ovh/imgs/2026/01/15/c26bca5e78bb8700.png", // 深粉，汗水
   18: "https://s3.bmp.ovh/imgs/2026/01/15/900fb73b79ed0b23.png", // 紫粉，成长

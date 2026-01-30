@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Trainee, VoteBreakdown } from '../types';
-import { Trophy, Users, MessageCircle, BarChart3, Flame, TrendingUp, Sparkles, AlertCircle } from 'lucide-react';
+import { Trophy, Users, MessageCircle, BarChart3, Flame, TrendingUp, Sparkles, AlertCircle, Save } from 'lucide-react';
 import { STORY_IMAGES } from '../content/images';
 
 interface Props {
@@ -11,11 +11,12 @@ interface Props {
   voteBreakdown: VoteBreakdown | null;
   trainees: Trainee[];
   comments?: string[];
-  highlights?: string[]; // Added Highlights
+  highlights?: string[]; 
   onClose: () => void;
+  onOpenSaveLoad: () => void;
 }
 
-export const ShowRankModal: React.FC<Props> = ({ title, rank, votes, voteBreakdown, trainees, comments, highlights, onClose }) => {
+export const ShowRankModal: React.FC<Props> = ({ title, rank, votes, voteBreakdown, trainees, comments, highlights, onClose, onOpenSaveLoad }) => {
   // Combine user (as temp trainee) with trainees to get sorted list for display logic
   const allTrainees = [
     { id: 'player', name: '我 (你)', votes: votes, trend: 0 },
@@ -36,6 +37,17 @@ export const ShowRankModal: React.FC<Props> = ({ title, rank, votes, voteBreakdo
                  <img src={STORY_IMAGES.show_rank_bg} className="w-full h-full object-cover opacity-80" alt="rank bg" />
                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
              </div>
+             
+             {/* Save Button (Top Right) */}
+             <div className="absolute top-3 right-3 z-20">
+                <button 
+                  onClick={onOpenSaveLoad}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 text-white rounded-full transition text-[10px] font-bold border border-white/20 shadow-sm backdrop-blur-md"
+                >
+                  <Save size={12} /> 存档
+                </button>
+             </div>
+
              <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
                  <div>
                     <div className="text-[10px] text-blue-300 font-bold tracking-wider uppercase mb-1 flex items-center gap-1">

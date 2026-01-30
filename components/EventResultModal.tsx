@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { EventOutcome, EventType } from '../types';
-import { ArrowUp, ArrowDown, MessageCircle, User, Bell, ChevronRight, Hash, Sparkles, Zap } from 'lucide-react';
+import { ArrowUp, ArrowDown, MessageCircle, User, Bell, ChevronRight, Hash } from 'lucide-react';
 import { STORY_IMAGES } from '../content/images';
 
 interface Props {
@@ -9,10 +9,9 @@ interface Props {
   eventType: EventType;
   context: { title: string, desc: string, options: string[], selectedIndex: number } | null;
   onClose: () => void;
-  isAiGenerated?: boolean;
 }
 
-export const EventResultModal: React.FC<Props> = ({ outcome, eventType, context, onClose, isAiGenerated }) => {
+export const EventResultModal: React.FC<Props> = ({ outcome, eventType, context, onClose }) => {
   const { narrative, changes, socialType, socialSender, socialContent } = outcome;
   
   // Format stats for display - Filter out hidden stats like sincerity
@@ -121,24 +120,11 @@ export const EventResultModal: React.FC<Props> = ({ outcome, eventType, context,
                     )}
 
                     {/* 3. Social Feedback (Embedded) */}
-                    <div className="mt-0.5 relative">
-                       {/* AI Status Badge - Absolute Positioned or Flex embedded */}
-                       <div className="absolute top-1 right-1 z-10">
-                          {isAiGenerated ? (
-                             <div className="text-[10px] text-purple-400 bg-purple-900/20 px-1.5 rounded-full border border-purple-500/30 flex items-center gap-0.5" title="AI命运观测中">
-                                <Sparkles size={8} className="animate-pulse" /> AI
-                             </div>
-                          ) : (
-                             <div className="text-[10px] text-slate-400 bg-slate-800/50 px-1.5 rounded-full border border-slate-600/30 flex items-center gap-0.5" title="基础模式运行">
-                                <Zap size={8} /> 
-                             </div>
-                          )}
-                       </div>
-
+                    <div className="mt-0.5">
                        {socialType === 'WECHAT' && (
                          <div className="flex items-start gap-2 bg-white/90 p-2.5 rounded-lg shadow-sm">
                             <div className="bg-green-500 text-white p-1 rounded-full shrink-0 mt-0.5"><MessageCircle size={12} /></div>
-                            <div className="min-w-0 pr-4">
+                            <div className="min-w-0">
                                <div className="text-[10px] md:text-xs font-bold text-gray-500 mb-0.5">{socialSender}</div>
                                <div className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2">{socialContent}</div>
                             </div>
@@ -148,7 +134,7 @@ export const EventResultModal: React.FC<Props> = ({ outcome, eventType, context,
                        {socialType === 'WEIBO' && (
                          <div className="flex items-start gap-2 bg-white/90 p-2.5 rounded-lg shadow-sm">
                             <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center shrink-0 border border-orange-200 mt-0.5"><User size={12} /></div>
-                            <div className="min-w-0 pr-4">
+                            <div className="min-w-0">
                                <div className="text-[10px] md:text-xs font-bold text-orange-800 mb-0.5">{socialSender}</div>
                                <div className="text-xs md:text-sm font-bold text-gray-800 leading-tight line-clamp-2">{socialContent}</div>
                             </div>
@@ -158,7 +144,7 @@ export const EventResultModal: React.FC<Props> = ({ outcome, eventType, context,
                        {socialType === 'SYSTEM' && (
                           <div className="flex items-center gap-2 bg-blue-900/40 p-2.5 rounded-lg border border-blue-500/30">
                              <Bell size={14} className="text-blue-200 shrink-0"/>
-                             <div className="text-xs md:text-sm text-blue-100 font-bold leading-tight pr-4">{socialContent}</div>
+                             <div className="text-xs md:text-sm text-blue-100 font-bold leading-tight">{socialContent}</div>
                           </div>
                        )}
                     </div>

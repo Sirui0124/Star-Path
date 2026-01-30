@@ -23,9 +23,10 @@ interface SaveSlotData {
   state: GameState;
 }
 
-const SLOT_KEYS = ['auto', 'slot_1', 'slot_2', 'slot_3'];
+const SLOT_KEYS = ['auto', 'pre_debut', 'slot_1', 'slot_2', 'slot_3'];
 const SLOT_NAMES: Record<string, string> = {
   'auto': '自动存档 (每年冬季)',
+  'pre_debut': '自动存档 (出道前夜)',
   'slot_1': '存档位 01',
   'slot_2': '存档位 02',
   'slot_3': '存档位 03'
@@ -65,8 +66,6 @@ export const SaveLoadModal: React.FC<Props> = ({ currentGameState, onClose, onLo
   const handleLoad = (key: string) => {
     const slot = slots[key];
     if (slot && slot.state) {
-      // Removed window.confirm to prevent blocking issues. 
-      // Directly loading the state.
       try {
           console.log("Loading slot:", key);
           onLoad(slot.state);
@@ -105,7 +104,7 @@ export const SaveLoadModal: React.FC<Props> = ({ currentGameState, onClose, onLo
         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
            {SLOT_KEYS.map(key => {
               const slot = slots[key];
-              const isAuto = key === 'auto';
+              const isAuto = key === 'auto' || key === 'pre_debut';
               
               return (
                 <div key={key} className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-sm hover:shadow-md transition-shadow">

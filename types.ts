@@ -54,6 +54,17 @@ export interface VoteBreakdown {
   total: number;       // 本轮新增总计
 }
 
+// New: Data structure to persist the state of the Rank Modal
+export interface RankModalData {
+  title: string;
+  rank: number;
+  votes: number;
+  voteBreakdown: VoteBreakdown | null;
+  trainees: Trainee[];
+  comments: string[];
+  highlights: string[];
+}
+
 export interface GameState {
   name: string; // Player name
   gender: Gender;
@@ -84,6 +95,9 @@ export interface GameState {
   rank: number; // Current rank in show
   trainees: Trainee[]; // Pool of competitors
   
+  // New: Persist Rank Modal State
+  rankModalData?: RankModalData | null;
+
   isGameOver: boolean;
   gameResult?: string;
 
