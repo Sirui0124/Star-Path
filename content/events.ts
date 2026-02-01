@@ -1076,9 +1076,1130 @@ export const ALL_EVENTS: GameEvent[] = [
   ]
 },
 
+///----------------131新增事件
+
+  {
+    id: 'social_live_pet',
+    type: 'SOCIAL',
+    title: '直播宠粉危机',
+    description: '深夜直播时，有粉丝留言刷屏，要求你模仿油腻情话，并说“这是成为男友粉的条件哦”。弹幕瞬间两极分化。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => s.stats.fans > 30 && chance(40),
+    options: [
+      {
+        text: '为满足粉丝，硬着头皮模仿',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: 2, eq: -3, ethics: -2, log: '模仿用力过猛，尴尬溢出屏幕，被截成“油田”黑图四处传播。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 3, health: -1, ethics: -1, log: '豁出去娱乐大家，收获一波“喜剧人”粉，但形象略显轻浮。' };
+          } else {
+            return { fans: 4, eq: 2, health: -2, log: '巧妙将情话改编成励志语录，既满足要求又成功升华，高情商出圈。' };
+          }
+        }
+      },
+      {
+        text: '礼貌拒绝，并岔开到新话题',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { ethics: 2, fans: -2, log: '拒绝得生硬，被该粉丝及同好挂上“假清高”、“玩不起”的标签。' };
+          } else if (s.stats.eq <= 70) {
+            return { ethics: 2, fans: -1, eq: 1, log: '守住底线获得好评，但部分渴望亲密的粉丝感到失望。' };
+          } else {
+            return { ethics: 3, eq: 3, fans: 1, log: '用幽默自嘲化解，并成功引导话题到新歌练习，被赞“温柔有原则”。' };
+          }
+        }
+      },
+      {
+        text: '提议换成其他才艺展示作为交换',
+        effect: (s) => {
+          if (s.stats.vocal < 50 && s.stats.dance < 50) {
+            return { fans: -2, eq: -1, log: '才艺展示翻车，被嘲“没活硬整”，场面雪上加霜。' };
+          } else if (s.stats.vocal > 60 || s.stats.dance > 60) {
+            return { fans: 3, vocal: 1, dance: 1, health: -1, log: '成功用实力转移焦点，圈了新粉，但临时加练很累。' };
+          } else {
+            return { fans: 2, eq: 2, health: -2, log: '展示稳定基本功，诚意获赞，但为准备加练牺牲了休息。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_private_contact_rumor',
+    type: 'SOCIAL',
+    title: '私联乌龙事件',
+    description: '一位粉丝晒出聊天截图，称有你的“私人联系方式”并频繁互动，在粉圈内反响大，引发众人羡慕与质疑。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+     useAiForOutcome: false,
+    trigger: (s) => s.stats.fans > 60 && chance(35),
+    options: [
+      {
+        text: '严肃辟谣，声明绝无私联',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { ethics: 3, fans: -2, log: '声明语气过于严厉，像在指责粉丝，引发小规模脱粉。' };
+          } else if (s.stats.eq <= 70) {
+            return { ethics: 4, fans: -1, log: '立场鲜明，杜绝后患，但伤了部分“梦女”粉丝的心。' };
+          } else {
+            return { ethics: 4, eq: 2, fans: 1, log: '辟谣同时安抚粉丝情绪，呼吁关注舞台，树立“事业批”清醒形象。' };
+          }
+        }
+      },
+      {
+        text: '幽默回应：“这是AI仿生人吗？”',
+        effect: (s) => {
+          if (s.stats.eq < 30) {
+            return { fans: -1, ethics: 2, log: '自以为幽默，但部分粉丝认为在绕开话题。' };
+          } else if (s.stats.eq <= 70) {
+            return { ethics: 1, eq: 2, log: '轻松化解尴尬，转移了焦点，大部分粉丝觉得好玩。' };
+          } else {
+            return { fans: 1, eq: 4, log: '用高科技梗巧妙否定，既辟谣又不伤面子，话题转向趣味科普。' };
+          }
+        }
+      },
+      {
+        text: '联系公司发律师函警告造假者',
+        effect: (s) => {
+          if (s.stats.ethics < 50) {
+            return { ethics: 2, fans: -3, health: -1, log: '被批“小题大做”、“吓唬粉丝”，路人观感极差。' };
+          } else if (s.stats.ethics <= 80) {
+            return { ethics: 3, fans: -2, log: '震慑了造假者，但过程冷硬，让粉丝感到距离感。' };
+          } else {
+            return { ethics: 5, fans: -2, eq: 1, log: '通过公司严肃处理，明确底线，保护了更多粉丝免受欺骗。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_trend_challenge_fail',
+    type: 'SOCIAL',
+    title: '热舞挑战翻车',
+    description: '你试图翻跳某顶流新歌的抖音挑战，但因舞蹈难度高且练习仓促，视频卡点不准，动作绵软，评论区的“哈哈哈哈”淹没了鼓励。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+     useAiForOutcome: false,
+    trigger: (s) => s.stats.dance < 70 && chance(40),
+    options: [
+      {
+        text: '火速删除视频，假装无事发生',
+        effect: (s) => {
+          if (s.stats.eq < 30) {
+            return { fans: -3, ethics: -3, log: '“秒删”行为被录屏，成为“玩不起”的新梗，遭群嘲。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: -1, eq: -1, log: '及时止损，但错过了将错就错的机会，显得怯场。' };
+          } else {
+            return { fans: -1, log: '删除后发了个“溜了溜了”的表情包，自嘲化解，勉强过关。' };
+          }
+        }
+      },
+      {
+        text: '保留视频，虚心求教并@原编舞老师',
+        effect: (s) => {
+          if (s.stats.dance < 30) {
+            return { dance: 2, fans: -1, eq: -1, log: '@了老师但对方未回应，被嘲“蹭热度未遂”，精神可嘉。' };
+          } else if (s.stats.dance <= 50) {
+            return { dance: 3, fans: 1, log: '态度诚恳，获得一些专业粉丝的指点，舞技有收获。' };
+          } else {
+            return {fans: 2, eq: 3, log: '谦逊互动引发好感，原编舞老师点赞鼓励，意外收获业内关注。' };
+          }
+        }
+      },
+      {
+        text: '发起 #帮XX抠舞 话题，邀请粉丝一起练',
+        effect: (s) => {
+          if (s.stats.fans < 60) {
+            return { fans: 1, health: -3, log: '响应者寥寥，话题冷场，更显心酸。' };
+          } else if (s.stats.fans <= 120) {
+            return { fans: 2, dance: 1, health: -2, log: '成功转化为粉丝互动活动，凝聚力提升，但耗费时间。' };
+          } else {
+            return { fans: 3, dance: 3, health: -2, log: '将翻车变成大型线上舞蹈课，参与度爆棚，口碑逆转。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_fan_overinterpretation',
+    type: 'SOCIAL',
+    title: '动态引发“解码”',
+    description: '你发了一张天空照片，配文“乌云后有光”。粉丝们化身侦探，结合近期练习生状态，坚信你在隐喻“受压但怀有希望”，小作文刷屏。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => s.stats.fans > 70 && chance(35),
+    options: [
+      {
+        text: '澄清只是随手拍，让大家别多想',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -4, log: '“亲手打碎粉丝的梦”，被指责冷漠无情，大规模脱粉回踩。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: -2, ethics: 1, log: '阻止了过度解读，但也浇灭了粉丝的创作热情和情感投射。' };
+          } else {
+            return { fans: -1, eq: -2, ethics: 2, log: '温柔表示“被大家的想象力感动”，但希望关注现实生活，成功引导。' };
+          }
+        }
+      },
+      {
+        text: '不否认也不承认，发个[狗头]表情',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: 1, ethics: -2, log: '暧昧态度被公司警告，认为你在暗中表达不满。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 2, log: '保持了神秘感和讨论度，粉丝解读热潮更盛。' };
+          } else {
+            return { fans: 3, eq: 2, log: '完美保持朦胧感，既满足了粉丝的想象空间，又没留下任何把柄。' };
+          }
+        }
+      },
+      {
+        text: '顺着粉丝的话，发一段加油打气的语音',
+        effect: (s) => {
+          if (s.stats.looks < 50) {
+            return { fans: -1,ethics: -1, log: '声音疲态明显，被疑“卖惨”，效果打折扣。' };
+          } else if (s.stats.looks <= 80) {
+            return { fans: 2, health: -1, log: '声音苏感十足，安抚力极强，粉丝忠诚度飙升，但为公司所注意。' };
+          } else {
+            return { fans: 3, eq: 1, health: -1, log: '用专业且有感染力的声音传递正能量，圈粉同时巩固积极人设。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_mukbang_conflict',
+    type: 'SOCIAL',
+    title: '吃播体重警告',
+    description: '你为满足粉丝想看的“吃播”，深夜狂炫炸鸡。视频大受欢迎，却收到公司严厉的体重管理警告，要求你立刻删除视频并道歉。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => s.stats.health > 30 && chance(20),
+    options: [
+      {
+        text: '乖乖删除视频并诚恳道歉',
+        effect: (s) => {
+          if (s.stats.ethics < 50) {
+            return { ethics: 2, fans: -2, health: 1, log: '道歉被粉丝视为“屈服于公司压迫”，指责你没担当。' };
+          } else if (s.stats.ethics <= 80) {
+            return { ethics: 3, fans: -1, health: 2, log: '树立了遵守职业规范的形象，但部分粉丝觉得“失去真实”。' };
+          } else {
+            return { ethics: 3, fans: 1, health: 3, log: '道歉时说明偶像保持身材的重要性，获得理解，还推广了健康理念。' };
+          }
+        }
+      },
+      {
+        text: '换小号发剪辑版，只留“好吃”部分',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: 1, ethics: -3, health: -1, log: '小号迅速被扒出，被批“阳奉阴违”、“欺骗公司”，信任危机。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 2, health: -2, log: '与粉丝建立了“共享秘密”的默契，但熬夜剪辑伤身。' };
+          } else {
+            return { fans: 3, eq: 2, health: -2, log: '剪辑成趣味短视频，淡化热量焦点，既满足粉丝又未明显违规，在危险边缘试探成功。' };
+          }
+        }
+      },
+      {
+        text: '发布健身vlog，承诺消耗掉热量',
+        effect: (s) => {
+          if (s.stats.dance < 50 && s.stats.health < 70) {
+            return { health: -3, fans: -1, log: '健身vlog敷衍了事，被嘲“又菜又爱玩”，人设崩塌。' };
+          } else if (s.stats.dance > 60 || s.stats.health > 70) {
+            return { fans: 3, dance: 1, health: 1, log: '展现自律和活力，成功将“吃货”标签扭转为“健身爱好者”。' };
+          } else {
+            return { fans: 2, health: 2, log: '态度积极，传递平衡理念，获得健康和粉丝的双重肯定。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_graduation_memory',
+    type: 'SOCIAL',
+    title: '毕业季回忆杀',
+    description: '毕业季，你在社交平台晒出中学时代的非主流毕业照和同学留言，引发粉丝对“素人时期”的考古热潮。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => s.stats.looks > 40 && chance(30),
+    options: [
+      {
+        text: '大方分享更多青涩故事和感悟',
+        effect: (s) => {
+          if (s.stats.looks < 50) {
+            return { fans: 2, eq: 1, looks: -1, log: '旧照与现在反差不大，考古热度一般，但亲和力加分。' };
+          } else if (s.stats.looks <= 80) {
+            return { fans: 3, eq: 2, log: '“整容式成长”引发热议，励志感十足，圈了一批事业粉。' };
+          } else {
+            return { fans: 4, looks: 1, eq: 3, log: '即使旧照也清秀，故事真诚动人，巩固“天生偶像”与“不忘初心”形象。' };
+          }
+        }
+      },
+      {
+        text: '表示不堪回首，求粉丝别再挖了',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -2, eq: -2, log: '反应过度，被批“偶像包袱太重”，旧照传播更广。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: -1, looks: 1, log: '略带娇羞的阻止反而激起粉丝的“逆反”考古欲。' };
+          } else {
+            return { fans: 1, eq: 2, looks: 1, log: '用玩笑口吻求放过，并附上现在帅照“洗眼睛”，成功控场。' };
+          }
+        }
+      },
+      {
+        text: '发起 #和过去的自己合影# 挑战',
+        effect: (s) => {
+          if (s.stats.fans < 80) {
+            return { fans: 1, eq: 1, health: -1, log: '挑战有点门槛，参与度不高，自己运营得挺累。' };
+          } else if (s.stats.fans <= 150) {
+            return { fans: 3, eq: 2, health: -2, log: '成功掀起怀旧风潮，增强粉丝参与感与归属感，但耗时耗力。' };
+          } else {
+            return { fans: 4, eq: 3, health: -1, log: '引爆全民挑战，话题出圈，展现极强的粉丝号召力和策划能力。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_forgot_mention',
+    type: 'SOCIAL',
+    title: '合照忘@队友',
+    description: '你发了与朋友C、D的练习室合照，却只@了C，忘了@D。D的粉丝涌入评论区质问：“D是不配拥有姓名吗？”，引发一些唯粉间摩擦。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => chance(25),
+    options: [
+      {
+        text: '火速编辑补上，并评论道歉',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { eq: -1, ethics: 1, log: '编辑记录被截，道歉语焉不详，被骂“心虚”、“敷衍”。' };
+          } else if (s.stats.eq <= 70) {
+            return {ethics: 1, log: '补救及时，态度端正，大部分粉丝表示谅解。' };
+          } else {
+            return { ethics: 2, fans: 1, health:-1, log: '迅速补上并@，用幽默口吻自罚“请D喝一周奶茶”，瞬间平息风波。' };
+          }
+        }
+      },
+      {
+        text: '删除原博，重新发一条正确的',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -2, eq: -2, log: '“毁灭证据”行为激怒所有人，被解读为“嫌麻烦”和“不尊重”。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: -1, ethics: 1, log: '彻底重置，避免后续纠错麻烦，但显得有点笨拙。' };
+          } else {
+            return { ethics: 2, eq: 2, log: '删除同时发预告“手滑了，重来！”，重发博文更有设计感，变坏事为宣传。' };
+          }
+        }
+      },
+      {
+        text: '在评论区与D互动，玩笑带过',
+        effect: (s) => {
+          if (s.stats.fans < 50) {
+            return { fans: -3, eq: -3, log: '玩笑不合时宜，像在威逼对方，D的粉丝更加愤怒。' };
+          } else if (s.stats.fans <= 100) {
+            return { fans: -1, eq: 1, log: 'D配合互动则能化解，D若不搭理则略显尴尬。' };
+          } else {
+            return { fans: 2, eq: 3, log: '精准@D并评论：“主要你太帅，我光顾着存图了”，D愉快接梗，CP粉狂喜。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_looks_controversy',
+    type: 'SOCIAL',
+    title: '外貌评价风波',
+    description: '某时尚博主点评练习生长相，将你归为“有特色但非标准帅哥”，你的粉丝和反对者在该博文下激烈辩论，话题发酵。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => s.stats.looks > 20 && s.stats.looks < 30 && chance(30),
+    options: [
+      {
+        text: '发自拍，配文“独特的定义权在自己”',
+        effect: (s) => {
+          if (s.stats.looks < 60) {
+            return { looks: 2, fans: 2, eq: 1, log: '自信的态度加成，让“特色”变成魅力点，粉丝更有底气。' };
+          } else if (s.stats.looks <= 80) {
+            return { looks: 3, fans: 3, eq: 2, log: '颜值本就抗打，加上自信发言，直接打破“非标准”定义，大获全胜。' };
+          } else {
+            return { looks: 1, fans: 4, eq: 3, log: '神颜无需多言，淡然又霸气的回应，被奉为经典，逼格飙升。' };
+          }
+        }
+      },
+      {
+        text: '分享一段关于“审美多元化”的采访',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { eq: -1, fans: -1, log: '被指“掉书袋”、“不敢直面”，显得怯懦。' };
+          } else if (s.stats.eq <= 70) {
+            return { ethics: 2, eq: 1, log: '展现思想深度，提升格调，但部分粉丝觉得不解气。' };
+          } else {
+            return { ethics: 3, eq: 3, fans: 1, log: '分享的片段恰到好处，既升华话题又低调反击，赢得路人缘。' };
+          }
+        }
+      },
+      {
+        text: '在直播中调侃：“谢谢博主帮我省了整容钱”',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -2, eq: -3, looks: -1, log: '调侃显得阴阳怪气，坐实了“在意长相”的评价。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 2, eq: 2, log: '幽默化解，展现高情商和大心脏，圈了一波性格粉。' };
+          } else {
+            return { fans: 3, eq: 4, looks: 1, log: '自黑玩梗效果爆炸，金句出圈，反而让“非标准”成了最具辨识度的赞美。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_practice_room_leak',
+    type: 'SOCIAL',
+    title: '练习室偷拍疑云',
+    description: '一段你练习到崩溃、对着镜子沮丧蹲下的模糊视频在粉圈流传。拍摄角度隐秘，不确定是否私生偷拍流出，引发粉丝对管理的不满和对你心态的担忧。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => s.stats.dance > 40 && s.stats.health < 80 && chance(20),
+    options: [
+      {
+        text: '发布阳光训练照，报平安',
+        effect: (s) => {
+          if (s.stats.health < 30) {
+            return { fans: -2, eq:-1, log: '照片中难掩疲态，被粉丝心疼指责“强颜欢笑”，担忧加剧。' };
+          } else if (s.stats.health <= 40) {
+            return { fans: 1, log: '成功安抚大部分粉丝情绪，转移了焦点。' };
+          } else {
+            return {fans: 2, ethics: 1, log: '精神饱满的状态让谣言不攻自破，展现超强抗压能力。' };
+          }
+        }
+      },
+      {
+        text: '借机呼吁，尊重隐私，专注舞台',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { ethics: 1, fans: -2, log: '语气像在指责偷拍，引发误解和反感。' };
+          } else if (s.stats.ethics <= 70) {
+            return { ethics: 2, fans: -1, log: '立场正确，获得理性粉丝支持，但显得有点官方。' };
+          } else {
+            return {eq: 2, fans: 1, log: '严肃而不失温和地强调隐私边界，引导粉丝共同维护健康环境，获业界好评。' };
+          }
+        }
+      },
+      {
+        text: '将计就计，发vlog展示完整练习过程',
+        effect: (s) => {
+          if (s.stats.dance < 30) {
+            return { dance: 2, fans: -1, health: -3, log: 'vlog暴露了更多实力短板和练习混乱。' };
+          } else if (s.stats.dance <= 60) {
+            return { dance: 2, fans: 2, health: -2, log: '展现从崩溃到攻克难点的全过程，励志又真实，圈粉无数，但极度疲惫。' };
+          } else {
+            return { fans: 4, eq: 2, health: -1, log: '以大师课般的vlog展示高超技艺和坚韧心性，将危机转化为个人纪录片的精彩序幕。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_cringey_history',
+    type: 'SOCIAL',
+    title: '中二黑历史袭击',
+    description: '你初中时在贴吧发布的、充满火星文和夸张表情的“疼痛文学”帖子被挖出，包括“伱卟懂の薆”等经典句式，在各大论坛疯传。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => chance(40),
+    options: [
+      {
+        text: '声称账号被盗，非本人所为',
+        effect: (s) => {
+          if (s.stats.ethics < 30) {
+            return { ethics: -5, fans: -4, log: '否认过于彻底，被技术党扒出更多佐证，彻底沦为笑柄，信誉破产。' };
+          } else if (s.stats.ethics <= 50) {
+            return { ethics: -2, fans: -2, log: '“甩锅盗号”行为本身显得不够担当。' };
+          } else {
+            return { ethics: -2, eq: 1, log: '声明模糊，未完全否认但引导大家关注现在，止损效果一般。' };
+          }
+        }
+      },
+      {
+        text: '大方认领，并朗读片段作为直播福利',
+        effect: (s) => {
+          if (s.stats.eq < 30) {
+            return { fans: 1,health:-3, log: '朗读时尴尬到脚趾抠地，场面惨烈，喜剧变悲剧。' };
+          } else if (s.stats.eq <= 60) {
+            return { fans: 2, eq: 1, log: '放飞自我的朗读引爆笑点，“自黑”成功，喜提“喜剧人”称号。' };
+          } else {
+            return { fans: 4,looks: 2, log: '用专业播音腔朗读火星文，反差萌拉满，黑历史变成经典搞笑物料。' };
+          }
+        }
+      },
+      {
+        text: '发起 #全网寻找我的青春# 二创大赛',
+        effect: (s) => {
+          if (s.stats.fans < 80) {
+            return { eq: 1, health: -3, log: '将社死现场转化为小范围趣味互动，操劳但水花不大。' };
+          } else if (s.stats.fans <= 100) {
+            return { eq: 2, health: -2, log: '成功引导粉丝进行创意改编，神作频出，反而成了流行梗。' };
+          } else {
+            return { eq: 3, health: -2,looks:2, log: '引发全网二创狂欢，各大官微玩梗，将个人黑历史打造成现象级营销案例。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_cover_controversy',
+    type: 'SOCIAL',
+    title: '模仿前辈惹争议',
+    description: '你在直播中即兴模仿了某位大前辈的标志性舞台动作，惟妙惟肖。前辈粉丝涌入，一部分夸你有天赋，一部分批你“不尊重”、“蹭热度”。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => s.stats.dance > 50 && chance(30),
+    options: [
+      {
+        text: '立刻道歉，表示纯属致敬无冒犯之意',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { ethics: 1, fans: -2, dance: -1, log: '道歉显得卑微，被批“软骨”，也伤了自家粉丝的心。' };
+          } else if (s.stats.eq <= 70) {
+            return { ethics: 1, fans: -1, log: '平息了前辈粉的怒火，但模仿带来的热度与话题性消失。' };
+          } else {
+            return { ethics: 3, eq: -1, log: '道歉诚恳且及时，强调学习和尊敬，获得前辈粉谅解。' };
+          }
+        }
+      },
+      {
+        text: '放出完整片段，显示模仿前对前辈的赞美',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: 1, ethics: -2, log: '被指“早有预谋”、“心机剪辑”，争议更大。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 1, ethics: 1, log: '证明初衷是好的，大部分路人表示理解。' };
+          } else {
+            return { fans: 3, dance: 1, log: '完整视频展现了你对前辈艺术的深刻理解和由衷崇拜，收获“专业迷弟”称号。' };
+          }
+        }
+      },
+      {
+        text: '向前辈官方账号发出合作邀请（胆大版）',
+        effect: (s) => {
+          if (s.stats.vocal < 60 && s.stats.dance < 80) {
+            return { fans: -3, eq: -2, log: '被嘲“糊咖碰瓷”、“不自量力”，成为业界笑谈。' };
+          } else if (s.stats.vocal > 150 || s.stats.dance > 150) {
+            return { fans: 3, eq:3, log: '大胆举动展现了野心和自信，吸引了一批慕强粉。' };
+          } else {
+            return { fans: 1, eq: 2, log: '行为出格但有趣，小范围讨论，前辈未回应，无惊无险。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_burner_account_exposed',
+    type: 'SOCIAL',
+    title: '小号掉马甲',
+    description: '你用来追星、吐槽食堂饭菜、转发搞笑段子的微博小号被眼尖的粉丝通过手机型号、关注列表等细节扒出。大量私人化的发言暴露在公众面前。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => chance(10),
+    options: [
+      {
+        text: '火速清空小号，并装死不回应',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -3, ethics: -2, log: '“毁灭证据”行为坐实心虚，引发更大规模的考古和恶意解读。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: -2, log: '冷处理，等风波自然过去，但期间会持续流失觉得“不真诚”的粉丝。' };
+          } else {
+            return { fans: -1, eq: 1, log: '清空但未注销，被解读为“保护隐私”，部分粉丝表示理解。' };
+          }
+        }
+      },
+      {
+        text: '大号转发小号有趣内容，自曝玩梗',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -2, eq:1, log: '转发内容选择失误，暴露吐槽，形象受损。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 1, eq: 2, log: '“真性情”、“有趣灵魂”标签加深，拉近与粉丝距离。' };
+          } else {
+            return { fans: 4, eq: 4, log: '精选最无害有趣的几条转发，并配文“被发现了…那就一起玩吧”，完美将危机变圈粉现场。' };
+          }
+        }
+      },
+      {
+        text: '发长文，谈公众人物与私人空间的边界',
+        effect: (s) => {
+          if (s.stats.ethics < 60) {
+            return { ethics: 2, fans: -4, log: '长文充满说教和抱怨，被批“又当又立”，激起逆反心理。' };
+          } else if (s.stats.ethics <= 90) {
+            return {  fans: -2, eq: 1, log: '观点获得部分理性人士认同，但伤及了热衷“考古”的核心粉丝的感情。' };
+          } else {
+            return { eq: 3, fans: 1, log: '真诚探讨，既表达被窥探的不适，也理解粉丝的好奇，引发广泛共情与反思。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_live_save_field',
+    type: 'SOCIAL',
+    title: '救场直播显情商',
+    description: '同公司的前辈艺人直播时突然设备故障，画面卡顿无声。运营紧急联系刚好在公司的你，请求你临时开播“接力”十分钟稳住观众。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => s.stats.eq > 50 && chance(15),
+    options: [
+      {
+        text: '欣然接受，并巧妙为前辈技术问题圆场',
+        effect: (s) => {
+          if (s.stats.eq < 60) {
+            return { fans: 2, health:-2, log: '圆场话术略显生硬，但态度积极，前辈粉丝表示感谢。' };
+          } else if (s.stats.eq <= 100) {
+            return { fans: 1, ethics: 2, log: '用幽默化解尴尬，并自然展示自己，获得前辈粉和路人的双重好感。' };
+          } else {
+            return { fans: 4, ethics: 3, log: '反应迅速，谈吐得体，既尊重前辈又突出个人魅力，被赞“教科书级救场”。' };
+          }
+        }
+      },
+      {
+        text: '推荐另一位更有经验的练习生去',
+        effect: (s) => {
+          if (s.stats.ethics < 60) {
+            return { ethics: -2, fans: -1, log: '被运营认为“不上道”、“推卸机会”，印象分大减。' };
+          } else if (s.stats.ethics <= 90) {
+            return { ethics: 2, eq: 1, log: '展现了团队精神和自知之明，在公司内部获得好评。' };
+          } else {
+            return { ethics: 3, eq: 3, log: '谦逊推荐并说明了对方更适合的理由，格局打开，赢得同事尊重。' };
+          }
+        }
+      },
+      {
+        text: '接棒，但全程只聊前辈的优点和作品',
+        effect: (s) => {
+          if (s.stats.vocal < 50) {
+            return { ethics: 3, fans: 1, log: '态度满分，但口才一般，内容略显枯燥，热度平平。' };
+          } else if (s.stats.vocal <= 80) {
+            return { ethics: 4, fans: 2, vocal: 1, log: '真诚安利，口条清晰，成功安抚并转移了前辈粉丝的注意力。' };
+          } else {
+            return { ethics: 4, fans: 3, vocal: 2, eq: 2, log: '如数家珍般介绍前辈作品，并即兴清唱其代表作，专业与情商俱佳，疯狂圈粉。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_lookalike_meme',
+    type: 'SOCIAL',
+    title: '撞脸梗狂欢',
+    description: '有网友发现你某个角度神似一位传奇童星，对比图疯传。“XXX长大后”的词条热度飙升，大量路人前来围观。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+     useAiForOutcome: false,
+    trigger: (s) => s.stats.looks > 50 && chance(20),
+    options: [
+      {
+        text: '主动玩梗，发布模仿童星经典角色的视频',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { looks: -1, fans: 1, eq: -2, log: '模仿油腻或尴尬，被批“毁童年”、“蹭得难看”。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 1, ethics: -2, log: '模仿到位，勾起一些人的回忆杀，但很多路人骂你蹭。' };
+          } else {
+            return { fans: 3, looks: 1, log: '精准复刻神态，并加入自己的创意改编，趣味与情怀兼备，成功“收编”梗文化。' };
+          }
+        }
+      },
+      {
+        text: '礼貌回应：很荣幸，但更想做自己',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -2, health: -1, log: '回应显得有点“端”着，被说“不识趣”、“浪费热度”。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 1, ethics: 2, log: '态度不卑不亢，展现独立个性，巩固核心粉。' };
+          } else {
+            return { fans: 2, ethics: 2, eq: 3, log: '先感谢认可，再温柔表达自我追求的愿景，赢得“清醒有野心”的评价。' };
+          }
+        }
+      },
+      {
+        text: '联系童星本人，尝试互动',
+        effect: (s) => {
+          if (s.stats.fans < 80) {
+            return { eq: 1, log: '对方未回应，小范围讨论后热度消退。' };
+          } else if (s.stats.fans <= 150) {
+            return { fans: 3, eq: 2, log: '对方友好回应，实现梦幻联动，话题热度翻倍。' };
+          } else {
+            return { fans: 4, eq: 3, ethics: 1, log: '不仅互动成功，还受邀合作拍摄趣味短片，将偶然事件升格为成功的营销案例。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_childhood_photo',
+    type: 'SOCIAL',
+    title: '童年照 vs 现在',
+    description: '你妈妈向粉丝后援会提供了你从小到大的系列照片，从肉嘟嘟到清瘦少年。后援会精心制作成“成长时间线”发布，萌化众人。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+     useAiForOutcome: false,
+    trigger: (s) => s.stats.fans > 60 && chance(30),
+    options: [
+      {
+        text: '转发并感谢妈妈和后援会',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: 2, eq: -1, log: '感谢词干巴巴，被说“像个转发机器”，感情不够。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 3, ethics: 1, log: '展现感恩心，强化“妈宝”（褒义）和“宠粉”形象。' };
+          } else {
+            return { fans: 4, ethics: 2, eq: 2, log: '深情回忆童年趣事，并@妈妈表达爱意，温馨感人，家庭和睦人设稳了。' };
+          }
+        }
+      },
+      {
+        text: '发起粉丝童年照交换活动',
+        effect: (s) => {
+          if (s.stats.fans < 100) {
+            return { fans: 2, eq: 1, health: -1, log: '活动有趣，增进了与粉丝的亲密感，但运营需要精力。' };
+          } else if (s.stats.fans <= 180) {
+            return { fans: 3, eq: 2, health: -2, log: '掀起“和偶像一起长大”风潮，社区活跃度激增，你需要花时间互动。' };
+          } else {
+            return { fans: 4, eq: 3, health: -2, log: '活动爆火，产出无数感人故事和二创，将个人成长话题发酵为大型情感连接现场。' };
+          }
+        }
+      },
+      {
+        text: '害羞表示“黑历史被公开了”',
+        effect: (s) => {
+          if (s.stats.looks < 60) {
+            return { fans: 2, eq: 1, log: '恰到好处的害羞更显可爱，亲和力提升。' };
+          } else if (s.stats.looks <= 100) {
+            return { fans: 3, looks: 1, eq: 2, log: '从小好看到大的事实无可辩驳，害羞反而成了“凡尔赛”，魅力加倍。' };
+          } else {
+            return { fans: 3, eq: 3, log: '神颜童年照搭配害羞表情，形成反差萌，瞬间收割大批“妈妈粉”和“姐姐粉”。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_birthday_project_pressure',
+    type: 'SOCIAL',
+    title: '天价生日应援',
+    description: '你的富豪大粉宣布，将包下全市公交站牌和商业中心LED屏，为你打造“铺天盖地”的生日应援。其他粉丝在羡慕的同时，也感到巨大压力和攀比之风。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+     useAiForOutcome: false,
+    trigger: (s) => s.stats.fans > 100 && chance(40),
+    options: [
+      {
+        text: '公开感谢，但呼吁将爱意用于公益',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { ethics: 1, fans: -3, log: '被富豪粉视为“不领情”、“打脸”，该粉脱粉并回踩。' };
+          } else if (s.stats.eq <= 70) {
+            return { ethics: 3, fans: -1, log: '树立正面导向，获官方媒体点赞，但失去这位“金主”粉的支持。' };
+          } else {
+            return { ethics: 4, fans: 2, eq: 2, log: '真诚感谢其心意，并成功说服其将应援预算转为以你名义的公益捐赠，名利双收。' };
+          }
+        }
+      },
+      {
+        text: '私下联系大粉，表达感谢与不安',
+        effect: (s) => {
+          if (s.stats.ethics < 20) {
+            return { ethics: -2, fans: -2, log: '私联内容被泄露，被指责“既要面子又要里子”，虚伪。' };
+          } else if (s.stats.ethics <= 30) {
+            return { ethics: -3, fans: 2, log: '沟通成功，应援规模缩小但更精致，但私联是不对的。' };
+          } else {
+            return { ethics: -3, eq: 3, log: '沟通成功，关系升华，但私联是不对的。' };
+          }
+        }
+      },
+      {
+        text: '将焦点转移到集体，感谢所有粉丝',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -1, health:-1, log: '发言顾左右而言他，被批“和稀泥”，两边不讨好。' };
+          } else if (s.stats.eq <= 70) {
+            return { ethics: 1, health: -1, log: '强调团体，削弱了个人攀比，但未能完全平息争议。' };
+          } else {
+            return { fans: 2, ethics: 1, log: '发言将个人生日定义为“与所有支持者共同的节日”，成功将天价应援转化为全体粉丝的荣光，团结了群体。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_game_live_reveal',
+    type: 'SOCIAL',
+    title: '游戏直播露真容',
+    description: '你受邀参与一个“不带妆、不开美颜”的游戏主播联动直播。全程素颜怼脸，且因游戏失利偶尔爆出方言粗口，表现极其真实。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => chance(30),
+    options: [
+      {
+        text: '全程注意形象，游戏放水力求优雅',
+        effect: (s) => {
+          if (s.stats.looks < 70) {
+            return { looks: 1, fans: -1, eq: -1, log: '不自然的表现和糟糕的游戏水平遭到双倍嘲笑，效果尴尬。' };
+          } else if (s.stats.looks <= 100) {
+            return { looks: 2, fans: 1, log: '颜值撑住了，但游戏表现平平，与直播接地气的风格格格不入。' };
+          } else {
+            return { looks: 3, fans: 2, log: '神颜素颜抗住镜头，即使游戏菜也被宽容为“笨蛋美人”，另类圈粉。' };
+          }
+        }
+      },
+      {
+        text: '彻底放飞，展现真实游戏宅一面',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -3, ethics: -2, looks: -1, log: '粗口过多，表情管理失控，被截图做成一系列“颜艺”黑图。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 2, eq: 1, health: 1, log: '真实有趣，游戏圈观众好感度大增，但部分原有粉丝觉得人设崩塌。' };
+          } else {
+            return { fans: 4, eq: 3, health: 2, log: '在真实与可控间找到完美平衡，粗口变萌点，素颜能打，成功破圈吸引大量游戏粉和性格粉。' };
+          }
+        }
+      },
+      {
+        text: '提前与主播沟通，设计有趣环节补救',
+        effect: (s) => {
+          if (s.stats.eq < 50) {
+            return { eq: 1, fans: 1, log: '环节设计生硬，效果一般，无功无过。' };
+          } else if (s.stats.eq <= 100) {
+            return { fans: 3, eq: 2, health: -1, log: '与主播配合默契，即使游戏输也有节目效果，直播效果拉满。' };
+          } else {
+            return { fans: 3, eq: 4, looks: 1, log: '不仅环节有趣，还能在“失误”时即兴创造新梗，控场能力和综艺感得到业界认可。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_rumor_audition',
+    type: 'SOCIAL',
+    title: '选秀传闻四起',
+    description: '知名选秀节目开始筹备的消息传出，某瓣小组流出一份“拟邀练习生”名单，你的名字赫然在列。粉丝群情激动，黑粉则开始提前“防爆”，散布你的所谓“黑料”。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => s.stats.fans > 70 && chance(40),
+    options: [
+      {
+        text: '发布加倍努力的训练日常',
+        effect: (s) => {
+          if (s.stats.dance < 70 && s.stats.vocal < 70) {
+            return { fans: 1, health: -3, log: '努力肉眼可见，但实力进步有限，被黑粉嘲“努力错方向”、“无效内卷”。' };
+          } else if (s.stats.dance > 80 || s.stats.vocal > 80) {
+            return { fans: 3, health: -2, log: '强大的实力背书下，努力更显珍贵，粉丝底气十足，期待值拉满。' };
+          } else {
+            return { dance: 2, vocal: 2, fans: 2, health: -2, log: '以行动回应一切，稳扎稳打，巩固“努力派”形象，观望者增多。' };
+          }
+        }
+      },
+      {
+        text: '直播间接梗，反问“我配吗？”',
+        effect: (s) => {
+          if (s.stats.eq < 40) {
+            return { fans: -2, eq: -2, log: '自贬过度，显得极其不自信，粉丝看了都泄气。' };
+          } else if (s.stats.eq <= 70) {
+            return { fans: 1, eq: -2, log: '以退为进，展现谦逊和幽默，将问题抛回给观众。' };
+          } else {
+            return { fans: 3, health:2, log: '用玩笑方式回应，既不自大也不卑微，并巧妙将话题引导至对节目的祝福上，格局打开。' };
+          }
+        }
+      },
+      {
+        text: '通过公司发布模棱两可的声明',
+        effect: (s) => {
+          if (s.stats.ethics < 60) {
+            return { ethics: -1, fans: -1, log: '声明被批“套话”、“没营养”，浪费了热度。' };
+          } else if (s.stats.ethics <= 100) {
+            return { ethics: 1, fans: -1, log: '标准操作，平息了部分争议，但未能最大化利用关注度。' };
+          } else {
+            return { ethics: 2, fans: 1, log: '声明措辞精妙，既未承认也未否认，保留了所有可能性，同时抬高了自身身价。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_english_name',
+    type: 'SOCIAL',
+    title: '英文名闹笑话',
+    description: '为显得国际化，你给自己起了个英文名“Sunshine”。不料被海外粉丝和留学生群嘲，指出该名字过于幼稚且像宠物名字。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => chance(40),
+    options: [
+      {
+        text: '坚持使用，称代表自己的乐观',
+        effect: (s) => {
+          if (s.stats.eq < 30) {
+            return { fans: -3, eq: -2, log: '被批“固执己见”、“不听劝”，海外市场好感度暴跌。' };
+          } else if (s.stats.eq <= 60) {
+            return { fans: -1, ethics: 1, log: '展现个性，留住部分觉得“可爱”的粉丝，但阻碍了国际视野。' };
+          } else {
+            return { fans: 1, log: '以轻松口吻解释名字对自己的特殊意义，化解部分尴尬，但难改刻板印象。' };
+          }
+        }
+      },
+      {
+        text: '从善如流，请粉丝帮忙征集新名字',
+        effect: (s) => {
+          if (s.stats.fans < 50) {
+            return { fans: 1, eq: 1, log: '互动有趣，粉丝参与感强，新名字虽不出彩但安全。' };
+          } else if (s.stats.fans <= 80) {
+            return { health: 2, eq: 2, log: '成功将尴尬事件转化为高互动性活动，新名字有特色，讨论度高。' };
+          } else {
+            return { health:3, eq: 3, log: '征集活动火爆，最终选出一个既有意义又酷炫的新英文名，完成了一次漂亮的话题营销和粉丝共建。' };
+          }
+        }
+      },
+      {
+        text: '自黑到底，将社交简介改为“Sunshine (for pets)”',
+        effect: (s) => {
+          if (s.stats.eq < 30) {
+            return { fans: -2, eq: -3, log: '自黑显得破罐破摔，更显尴尬。' };
+          } else if (s.stats.eq <= 60) {
+            return { fans: 3, eq: -2, log: '极致的自黑带来极致的喜剧效果，吸引一群抽象粉。' };
+          } else {
+            return { fans: 3,looks: 2, log: '高级自黑，既接受了批评又展现了自信与大度，被赞“玩梗大师”，意外赢得网友好感。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'social_fan_culture_shock',
+    type: 'SOCIAL',
+    title: '海外粉的直球',
+    description: '你的直拍在海外平台小火，大量海外粉丝用极其直接热烈的语言表达喜爱，并制作了各种“肉体向”/午夜场剪辑。国内粉丝搬运回来，文化冲击下引发热议。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => s.stats.dance > 70 && s.stats.looks > 70 && chance(20),
+    options: [
+      {
+        text: '装看不懂，用中文感谢所有支持',
+        effect: (s) => {
+          if (s.stats.eq < 50) {
+            return { fans: 1, eq: -2, log: '被海外粉认为“冷淡”，错失拓展海外影响力的机会。' };
+          } else if (s.stats.eq <= 100) {
+            return { fans: 2, eq: 1, log: '稳妥处理，未引发进一步争议，但未抓住亮点。' };
+          } else {
+            return { fans: 3, eq: 2, log: '用中文发布感谢视频，但内容及风格国际化，兼顾了各方感受。' };
+          }
+        }
+      },
+      {
+        text: '学习简单外语，用其评论回复海外热帖',
+        effect: (s) => {
+          if (s.stats.vocal < 80) {
+            return { fans: 1, health: -2, log: '发音虽不标准，但有一定努力和诚意，海外粉狂喜。' };
+          } else {
+            return { fans: 5, health: -2, log: '用流利口语和地道网络用语互动，被海外粉惊为天人，迅速积累起第一批海外死忠。' };
+          }
+        }
+      },
+      {
+        text: '通过国内粉头，温和引导翻译尺度',
+        effect: (s) => {
+          if (s.stats.ethics < 30) {
+            return { ethics: 2, fans: -2, log: '被指“管太宽”、“干涉粉丝自由”，引发内外粉不满。' };
+          } else if (s.stats.ethics <= 50) {
+            return { eq: 2, fans: 1, log: '以尊重文化差异为前提的引导，被大部分核心粉丝接受，维护了社区氛围。' };
+          } else {
+            return { eq: 3, fans: 2, log: '成功建立跨文化粉丝交流规范，既保护自己免受过度解读，又促进了不同粉丝群体的和谐共处，展现卓越领导力。' };
+          }
+        }
+      }
+    ]
+  },
+
   // =================================================================
   // 2. GENERIC RANDOM EVENTS (突发事件 - ONLY AMATEUR)
   // =================================================================
+   {
+    id: 'random_mukbang_disaster',
+    type: 'RANDOM',
+    title: '吃播变灾难现场',
+    description: '应粉丝要求做吃播，却因食物太辣当场失控。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => s.stats.fans > 40 && chance(20),
+    options: [
+      {
+        text: '强忍继续直播',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { fans: 3, health: -3, log: '“敬业小哭包”形象爆红，眼泪鼻涕齐飞成经典表情包。' };
+          } else if (s.stats.eq >= 40) {
+            return { fans: 2, health: -2, log: '痛苦面具引发怜爱，但状态不佳导致后半程冷场。' };
+          } else {
+            return { fans: 1, health: -3, looks: -2, log: '表情管理彻底失败，狰狞画面广为流传。' };
+          }
+        }
+      },
+      {
+        text: '撒娇求放过',
+        effect: (s) => {
+          if (s.stats.eq >= 70 && s.stats.looks >= 70) {
+            return { fans: 4, eq: 1, log: '“辣哭仙女”名场面出圈，自然不做作的撒娇圈粉无数。' };
+          } else if (s.stats.eq >= 40) {
+            return { fans: 2, eq: 1, log: '成功萌混过关，直播转向聊天，氛围轻松。' };
+          } else {
+            return { fans: 0, eq: -1, log: '撒娇略显刻意，被弹幕吐槽“戏多”，效果平平。' };
+          }
+        }
+      },
+      {
+        text: '果断喝水中止',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { fans: 1, ethics: 1, health: 1, log: '理性处理，自嘲“不能吃辣实锤”，安全下播。' };
+          } else if (s.stats.eq >= 40) {
+            return { fans: 0, health: 1, log: '平淡结束，未起波澜，也未被诟病。' };
+          } else {
+            return { fans: -1, ethics: -1, log: '中断略显突兀，被部分粉丝批评“敷衍”、“不敬业”。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'random_cp_fandom_riot',
+    type: 'RANDOM',
+    title: 'CP粉的暴走',
+    description: '你和队友的CP粉因过度解读你们的互动，引发唯粉大战。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => s.stats.fans > 60 && chance(30),
+    options: [
+      {
+        text: '疏远队友避嫌',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { fans: -1, ethics: 1, log: '唯粉满意，但CP粉心碎回踩，团队默契受影响。' };
+          } else if (s.stats.eq >= 40) {
+            return { fans: -2, ethics: -1, log: '行为生硬，两边不讨好，还被队友觉得你小题大做。' };
+          } else {
+            return { fans: -3, ethics: -2, log: '过度避嫌导致关系尴尬，团队氛围降至冰点。' };
+          }
+        }
+      },
+      {
+        text: '正常相处不回应',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { fans: 0, ethics: 2, log: '“清者自清”态度获理智粉赞赏，风波随时间平息。' };
+          } else if (s.stats.eq >= 40) {
+            return { fans: -1, ethics: 1, log: '粉丝内部持续小规模摩擦，但未影响大局。' };
+          } else {
+            return { fans: -2, ethics: -1, log: '被骂“养蛊”、“吃CP红利”，形象变得模糊。' };
+          }
+        }
+      },
+      {
+        text: '直播中巧妙澄清',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { fans: 2, eq: 3, log: '高情商强调兄弟情，既安抚唯粉又给CP粉留足面子，一举两得。' };
+          } else if (s.stats.eq >= 40) {
+            return { fans: 1, eq: 1, log: '澄清起到一定效果，但部分极端粉丝仍不满意。' };
+          } else {
+            return { fans: -3, eq: -2, log: '澄清言辞不当，激怒CP粉，被认为“又当又立”，大规模脱粉。' };
+          }
+        }
+      }
+    ]
+  },
+  
+  {
+    id: 'random_fake_news_attack',
+    type: 'RANDOM',
+    title: '黑料空降',
+    description: '一张你疑似在夜店的模糊旧照在饭圈中引起传播，实际上只是你和同学在KTV聚会。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => s.stats.fans > 80 && chance(15),
+    options: [
+      {
+        text: '发童年帅照回忆杀',
+        effect: (s) => {
+          if (s.stats.looks >= 100) {
+            return { eq:-2,fans: 1, ethics:-1,log: '“从小帅到大”话题转移焦点，用颜值和情怀，但文不对题。' };
+          } else if (s.stats.looks >= 50) {
+            return { eq: -3, fans:-2,log: '莫名其妙，文不对题。' };
+          } else {
+            return { fans: -3, health:-3, log: '被质疑“避重就轻”，且照片也不帅。' };
+          }
+        }
+      },
+      {
+        text: '强硬发律师声明',
+        effect: (s) => {
+          if (s.stats.ethics >= 50) {
+            return { ethics: 1, fans: 2, log: '声明有力，大部分粉丝坚信清白，事件迅速降温。' };
+          } else if (s.stats.ethics >= 40) {
+            return { ethics: 1, fans:-1,log: '声明发出，吓退部分黑子，但路人观感“小题大做”。' };
+          } else {
+            return { ethics: 1, fans: -2, log: '被扒出声明模板有误，沦为笑柄，公信力下降。' };
+          }
+        }
+      },
+      {
+        text: '直播直面澄清',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { fans: 3, ethics: 2, log: '坦诚说出情景，真挚态度圈粉。' };
+          } else if (s.stats.eq >= 40) {
+            return { fans: 1, eq: 1, ethics: 1, log: '澄清事实，获得理解，平稳渡过危机。' };
+          } else {
+            return { fans: -1, ethics: 1, log: '直播中表达不当、逻辑混乱、言辞闪烁，被指“心虚”、越描越黑。' };
+          }
+        }
+      }
+    ]
+  },
+  
   {
   id: 'random_rainy_day_revamped',
   type: 'RANDOM',
@@ -1088,7 +2209,7 @@ export const ALL_EVENTS: GameEvent[] = [
   isMandatory: false,
   repeatable: false,
   useAiForOutcome: false, //经典事件，结果固化
-  trigger: (s) => true,
+  trigger: (s) => chance(40),
   options: [
     { 
       text: '冒雨狂奔保持形象', 
@@ -1561,7 +2682,7 @@ export const ALL_EVENTS: GameEvent[] = [
   stage: GameStage.AMATEUR,
   isMandatory: false,
   repeatable: false,
-  trigger: (s) => chance(35),
+  trigger: (s) => chance(15),
   options: [
     { 
       text: '强势拍板定方案', 
@@ -2362,6 +3483,152 @@ export const ALL_EVENTS: GameEvent[] = [
   ]
 },
 
+  {
+    id: 'random_fan_gift_dilemma',
+    type: 'RANDOM',
+    title: '烫手山芋礼物',
+    description: '收到粉丝送的昂贵奢侈品，远超公司规定额度。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: false,
+    trigger: (s) => s.stats.fans > 70 && chance(20),
+    options: [
+      {
+        text: '上交公司处理',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { ethics: 3, fans: 1, log: '公司发公告表扬并妥善退回，树立业界清流形象。' };
+          } else if (s.stats.eq >= 40) {
+            return { ethics: 2, fans: -1, log: '礼物被退回，送礼大粉觉得没面子，悄然脱粉。' };
+          } else {
+            return { ethics: 1, fans: -2, log: '处理过程生硬，伤及粉丝心意，口碑小幅下滑。' };
+          }
+        }
+      },
+      {
+        text: '私下联系婉拒',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { ethics: 2, fans: 3, eq: 2, log: '真诚沟通感动粉丝，故事被传出，虐粉又固粉。' };
+          } else if (s.stats.eq >= 40) {
+            return { ethics: 2, fans: 1, eq: 1, log: '成功退回礼物，但沟通记录不慎泄露，引发小范围讨论。' };
+          } else {
+            return { ethics: -2, fans: -3, log: '私下联系被截图放大，被质疑“私联粉丝”，跳进黄河洗不清。' };
+          }
+        }
+      },
+      {
+        text: '折现捐做公益',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { ethics: 3, fans: 2, log: '以粉丝名义捐赠，获得官方报道，正能量典范。' };
+          } else if (s.stats.eq >= 40) {
+            return { ethics: 2, fans: 0, log: '公益行为被认可，但部分粉丝觉得心意未被珍惜。' };
+          } else {
+            return { ethics: 1, fans: -1, log: '被质疑“借花献佛”、“立人设”，公益效果打折。' };
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: 'random_trainer_favoritism',
+    type: 'RANDOM',
+    title: '老师的“偏爱”',
+    description: '舞蹈老师总让你单独加练到最晚，引发队友不满。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    useAiForOutcome: true,
+    trigger: (s) => s.stats.dance >= 50 && chance(30),
+    options: [
+      {
+        text: '接受并加倍努力',
+        effect: (s) => {
+          if (s.stats.eq >= 60) {
+            return { dance: 4, health: -3, ethics: -1, log: '实力突飞猛进，但被孤立，“卷王”之名坐实。' };
+          } else if (s.stats.eq >= 30) {
+            return { dance: 3, health: -2, ethics: -2, log: '进步明显，但团队关系出现裂痕，练习氛围变差。' };
+          } else {
+            return { dance: 2, health: -3, ethics: -3, log: '只顾自己练，完全脱离集体，口碑跌入谷底。' };
+          }
+        }
+      },
+      {
+        text: '邀请队友一起练',
+        effect: (s) => {
+          if (s.stats.eq >= 70 && s.stats.dance >= 60) {
+            return { dance: 2, ethics: 3, fans: 1, log: '无私分享技巧，成为团队小老师，人缘和声望双丰收。' };
+          } else if (s.stats.eq >= 40) {
+            return { dance: 1, ethics: 2, log: '缓和了团队矛盾，老师也赞赏你的团队精神。' };
+          } else {
+            return { dance: 0, ethics: 1, log: '邀请被部分人拒绝，收效甚微，略显尴尬。' };
+          }
+        }
+      },
+      {
+        text: '向老师委婉提出',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { ethics: 2, eq: 2, dance: -1, log: '巧妙沟通，老师调整方案，团队恢复平衡，情商获赞。' };
+          } else if (s.stats.eq >= 40) {
+            return { ethics: 1, eq: 1, dance: -1, log: '老师减少单独辅导，团队矛盾缓解，但个人进度稍慢。' };
+          } else {
+            return { ethics: -1, eq: -1, dance: -2, log: '表达不当，惹老师不快，失去了重点指导机会。' };
+          }
+        }
+      }
+    ]
+  },
+
+  {
+    id: 'random_friend_debut',
+    type: 'RANDOM',
+    title: '同期生已出道',
+    description: '关系很好的同期练习生突然官宣出道，你还在等待。',
+    stage: GameStage.AMATEUR,
+    isMandatory: false,
+    repeatable: false,
+    trigger: (s) => chance(20),
+    options: [
+      {
+        text: '真心祝福并宣传',
+        effect: (s) => {
+          if (s.stats.eq >= 70) {
+            return { ethics: 2,fans: 3, log: '大格局获赞，“神仙友谊”出圈，路人缘暴涨。' };
+          } else if (s.stats.eq >= 40) {
+            return { ethics: 1, eq: 1, log: '得体应对，展现了良好风度，未留话柄。' };
+          } else {
+            return { ethics: 1,fans:-1, log: '祝福略显官方，被显微镜粉丝解读出“一丝勉强”。' };
+          }
+        }
+      },
+      {
+        text: '减少互动避风头',
+        effect: (s) => {
+          if (s.stats.eq >= 60) {
+            return { health: 1,ethics:1, log: '安静消化情绪，避免被比较，专注自身练习。' };
+          } else if (s.stats.eq >= 30) {
+            return { fans: -1, eq: -1, log: '疏远明显，被指“心胸狭窄”、“见不得朋友好”。' };
+          } else {
+            return { fans: -2, eq: -2, ethics: -1, log: '取关、删除互动痕迹，彻底决裂，形象受损。' };
+          }
+        }
+      },
+      {
+        text: '发训练视频明志',
+        effect: (s) => {
+          if (s.stats.dance >= 60 || s.stats.vocal >= 60) {
+            return {  dance: 1, vocal: 1, health:-2, log: '“默默努力，惊艳所有人”叙事成立，虐粉并展示进步。' };
+          } else {
+            return { fans: -1, health:-2, log: '视频质量平平，被嘲“酸鸡跳脚”、“蹭热度”，适得其反。' };
+          }
+        }
+      }
+    ]
+  },
+
   // =================================================================
   // 3. SHOW EVENTS (选秀事件 - ONLY SHOW)
   // =================================================================
@@ -2683,7 +3950,7 @@ export const ALL_EVENTS: GameEvent[] = [
   trigger: (s) => s.stats.fans > 80 && chance(30),
   options: [
     { 
-      text: '火速晒家属合照', 
+      text: '火速晒家人合照', 
       effect: () => ({ fans: 3, ethics: 1 }), 
       log: '澄清及时，反赚一波亲情粉' 
     },
@@ -3480,5 +4747,394 @@ export const ALL_EVENTS: GameEvent[] = [
       }
     }
   ] 
+},
+{
+  id: 'show_wanna_leave',
+  type: 'SHOW',
+  title: '人间清醒反差萌',
+  description: '某佛系选手采访直言“好想下班”，意外因“反内卷”人设爆火，热度碾压。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(40),
+  options: [
+    { 
+      text: '蹭热度玩梗互动', 
+      effect: (s) => {
+        if (s.stats.eq >= 50) {
+          return { fans: 4, ethics: -1, votes: 5, log: '联动“下班联盟”上热搜，话题度飙升，吃到一波红利' };
+        } else {
+          return { fans: 1, ethics: -1, log: '玩梗过度被批“跟风学人精”' };
+        }
+      }
+    },
+    { 
+      text: '严肃切割劝学', 
+      effect: () => ({ ethics: 3, fans: -2,votes:-3 }), 
+      log: '树立努力榜样，但被嘲“扫兴假正经”' 
+    },
+    { 
+      text: '我行我素不理会', 
+      effect: () => ({ eq: 1, ethics: 1 }), 
+      log: '专注自身，存在感被淹没' 
+    }
+  ]
+},
+{
+  id: 'show_fans_edit',
+  type: 'SHOW',
+  title: '站姐为爱发电',
+  description: '你的神级粉丝用爱发电，剪辑的安利视频血洗B站，播放量破三百万。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => (s.stats.looks > 70 || s.stats.dance > 70) && chance(30),
+  options: [
+    { 
+      text: '小号偷偷点赞', 
+      effect: () => ({ votes: 10, ethics: -2 }), 
+      log: '双向奔赴感动粉圈，打投激增' 
+    },
+    { 
+      text: '公开感谢引流', 
+      effect: (s) => {
+        if (s.stats.eq >= 60) {
+          return { fans: 2, ethics: 1, log: '高情商发言圈粉，站姐更死忠' };
+        } else {
+          return { fans: 1, ethics: -2, log: '感谢生硬像营业，被疑炒作' };
+        }
+      }
+    },
+    { 
+      text: '无视怕被说媚粉', 
+      effect: () => ({ fans: -5, ethics: 1 }), 
+      log: '站姐心寒停更，物料断了' 
+    }
+  ]
+},
+{
+  id: 'show_mom_fans',
+  type: 'SHOW',
+  title: '妈粉抗议造型',
+  description: '妈粉后援会联名抗议，称化妆师给你画的“战损妆”像“被揍了”，要求更换。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 80 && chance(25),
+  options: [
+    { 
+      text: '顺从粉丝换妆', 
+      effect: () => ({ fans: 2, looks: 1, ethics:-2, log: '“听劝”人设出圈，妈粉战斗力Max' }), 
+    },
+    { 
+      text: '坚持妆造理念', 
+      effect: (s) => {
+        if (s.stats.looks >= 150) {
+          return { votes: 2, fans: 5, log: '硬照表现力封神，时尚资源递橄榄枝' };
+        } else {
+          return { fans: -5, log: '颜值撑不起概念，被嘲“审美黑洞”' };
+        }
+      }
+    },
+    { 
+      text: '幽默自拍化解', 
+      effect: (s) => {
+        if (s.stats.eq >= 65) {
+          return { fans: 2, looks: 2, log: '发对比图玩梗“揍前揍后”，路人好感UP' };
+        } else {
+          return { fans: -2, log: '玩笑没开好，两边不讨好' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_live_anti',
+  type: 'SHOW',
+  title: '翻牌翻到黑粉',
+  description: '互动直播让你随机翻牌粉丝评论，却精准抽中一条你的恶评，全场寂静。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(40),
+  options: [
+    { 
+      text: '高情商念出并回应', 
+      effect: (s) => {
+        if (s.stats.eq >= 80) {
+          return { votes:3, fans: 3, log: '“感谢监督”四两拨千斤，风评逆转封神' };
+        } else {
+          return { fans: -3, looks: -1, log: '表情管理失败，回应结巴被截成黑图' };
+        }
+      }
+    },
+    { 
+      text: '假装网络卡顿跳过', 
+      effect: () => ({ fans: -3, ethics: 1}), 
+      log: '被火眼金睛拆穿，嘲“玻璃心”' 
+    },
+    { 
+      text: '直接拉黑并警告', 
+      effect: () => ({ fans: -5, ethics: -1,votes:-3 }), 
+      log: '被批“玩不起”，黑粉狂欢' 
+    }
+  ]
+},
+{
+  id: 'show_staff_favoritism',
+  type: 'SHOW',
+  title: '选管偏心疑云',
+  description: '你撞见选管偷偷给“皇族”队友加餐送宵夜，你却只有清汤寡水。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(30),
+  options: [
+    { 
+      text: '当场质疑不公', 
+      effect: () => ({ ethics: 1, fans: -3, votes:-3 }), 
+      log: '得罪皇族+选管，被穿小鞋，镜头量显著减少' 
+    },
+    { 
+      text: '默默加练，用实力证明自己', 
+      effect: () => ({ vocal: 1, dance: 1 }), 
+      log: '努力总会有回报的，哪怕一点点' 
+    },
+    { 
+      text: '玩笑式撒娇讨要', 
+      effect: (s) => {
+        if (s.stats.looks >= 100) {
+          return { fans: 3, ethics: 1, log: '颜值撒娇无人敌，选管无奈多给鸡腿' };
+        } else {
+          return { ethics: -1, log: '东施效颦，尴尬得抠出城堡' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_dorm_skincare',
+  type: 'SHOW',
+  title: '宿舍关系',
+  description: '你发现室友偷偷用你贵妇护肤品，瓶已见底，明天你还有重要镜头。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(25),
+  options: [
+    { 
+      text: '直接对峙要求赔偿', 
+      effect: () => ({ ethics: 2, fans: -2 }), 
+      log: '关系破裂，被剪成“小心眼”片段' 
+    },
+    { 
+      text: '找机会暗讽', 
+      effect: () => ({ fans: 1, ethics: -3 }), 
+      log: '粉圈解码开撕，宿舍氛围冰点' 
+    },
+    { 
+      text: '共用并安利链接', 
+      effect: (s) => {
+        if (s.stats.eq >= 70) {
+          return { looks: 3, fans: 2, log: '“大气”人设出圈，意外获品牌推广' };
+        } else {
+          return { looks: -1, ethics: 1, log: '皮肤变差，但收获表面和平' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_dialect_rap',
+  type: 'SHOW',
+  title: '方言Rap出圈',
+  description: '公演时你即兴加了一句家乡方言Rap，土潮土潮的，意外爆火。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: true,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.vocal > 40 && chance(25),
+  options: [
+    { 
+      text: '乘胜追击推方言歌', 
+      effect: () => ({ vocal: 3, fans: 4, ethics: -1 }), 
+    },
+    { 
+      text: '低调处理怕被定型', 
+      effect: () => ({ fans: -1, ethics: 1 }), 
+    },
+    { 
+      text: '拒绝标签只此一次', 
+      effect: () => ({ fans: -3, eq: 2 }), 
+    }
+  ]
+},
+{
+  id: 'show_daipai_chaos',
+  type: 'SHOW',
+  title: '代拍扰乱秩序',
+  description: '下班路上被代拍围堵，推搡中导致一位站姐摔倒受伤，现场一片混乱。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.fans > 200 && chance(30),
+  options: [
+    { 
+      text: '停下扶人维持秩序', 
+      effect: () => ({ ethics: 4, fans: 2 }), 
+      log: '“温柔守护”视频出圈，好感度拉满' 
+    },
+    { 
+      text: '冷脸快步离开现场', 
+      effect: () => ({ ethics: -3, fans: -2 }), 
+      log: '被骂“冷漠无情”，站姐心寒' 
+    },
+    { 
+      text: '让保安强硬开路', 
+      effect: () => ({ ethics: -1, fans: -1 }), 
+      log: '安全离场，但留下“耍大牌”话柄' 
+    }
+  ]
+},
+{
+  id: 'show_save_the_stage',
+  type: 'SHOW',
+  title: '抢拍危机救场',
+  description: '公演现场，队友严重抢拍，整个舞台即将垮掉，你的Part即将开始。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: false,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.dance > 50 && chance(40),
+  options: [
+    { 
+      text: '临场改动作配合', 
+      effect: (s) => {
+        if (s.stats.dance >= 100) {
+          return { dance: 3, ethics: 3, log: '神级救场被奉为“教科书”，团魂炸裂' };
+        } else {
+          return { dance: -2, vocal: -1, log: '自乱阵脚，一起垮掉' };
+        }
+      }
+    },
+    { 
+      text: '坚持原拍点突出', 
+      effect: () => ({ ethics: -2, fans: 2 }), 
+      log: '个人表现亮眼，但被批“自私”' 
+    },
+    { 
+      text: '用眼神手势提醒', 
+      effect: (s) => {
+        if (s.stats.eq >= 70) {
+          return { eq: 2, ethics: 1, log: '默契小动作被捕捉，CP粉狂喜' };
+        } else {
+          return { log: '队友没看懂，救场失败' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_backing_track',
+  type: 'SHOW',
+  title: '垫音争议风波',
+  description: '节目见面会的现场直播清唱环节，你的垫音音量意外过大，弹幕瞬间刷满“假唱”、“废物”。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.vocal < 80 && chance(50),
+  options: [
+    { 
+      text: '要求关伴奏重唱', 
+      effect: (s) => {
+        if (s.stats.vocal >= 70) {
+          return { vocal: 2, ethics: 2, log: '真金不怕火炼，口碑逆风翻盘' };
+        } else {
+          return { vocal: -3, fans: -3, log: '清唱翻车惨烈，坐实“水货”之名' };
+        }
+      }
+    },
+    { 
+      text: '甩锅设备问题', 
+      effect: () => ({ fans: -2, ethics: -2 }), 
+      log: '无人买账，嘲“又当又立”' 
+    },
+    { 
+      text: '幽默自嘲躺平', 
+      effect: (s) => {
+        if (s.stats.eq >= 65) {
+          return { eq: 2, fans: 1, log: '“下次一定真唱”玩梗，勉强过关' };
+        } else {
+          return { fans: -2, log: '自嘲变自黑，风评进一步下跌' };
+        }
+      }
+    }
+  ]
+},
+{
+  id: 'show_outfit_clash',
+  type: 'SHOW',
+  title: '撞衫不可怕',
+  description: '和一位人气选手私服撞衫，对比图会被营销号搬运拉踩：“谁丑谁尴尬”。',
+  stage: GameStage.SHOW,
+  useAiForOutcome: true,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => s.stats.looks > 50 && chance(35),
+  options: [
+    { 
+      text: '发合照称兄弟装', 
+      effect: () => ({ ethics: 2, fans: 3, looks: 1 }), 
+    },
+    { 
+      text: '换风格再也不穿', 
+      effect: () => ({ looks: -1, fans: -2 }), 
+    },
+    { 
+      text: '无视专注练身材', 
+      effect: () => ({ dance: 2, looks: 2 }), 
+    }
+  ]
+},
+{
+  id: 'show_makeup_disaster',
+  type: 'SHOW',
+  title: '化妆师失误事件',
+  description: '化妆师失误，你的舞台眼线歪出天际，像“被人揍了一拳”，即将上台。',
+  stage: GameStage.SHOW,
+  isMandatory: false,
+  repeatable: false,
+  trigger: (s) => chance(20),
+  options: [
+    { 
+      text: '要求立刻改妆', 
+      effect: () => ({ looks: 2, ethics: -1 }), 
+      log: '耽误上场时间，被导演组埋怨' 
+    },
+    { 
+      text: '将错就错硬上', 
+      effect: (s) => {
+        if (s.stats.eq >= 75) {
+          return { eq: 3, fans: 3, log: '“喜剧人”舞台意外出圈，效果拉满' };
+        } else {
+          return { looks: -3, fans: -2, log: '舞台表现力崩盘，成黑历史名场面' };
+        }
+      }
+    },
+    { 
+      text: '自己动手补救', 
+      effect: (s) => {
+        if (s.stats.looks >= 90) {
+          return { looks: 1, fans: 2, log: '“自学成才”惊艳众人，获美妆品牌青睐' };
+        } else {
+          return { looks: -2, log: '补救失败，雪上加霜' };
+        }
+      }
+    }
+  ]
 }
 ];
